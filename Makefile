@@ -11,7 +11,7 @@ ifeq ($(shell uname -s), Darwin)
 else
 
     INCLUDE = C:\msys64\mingw64\include
-	LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -mwindows
+    LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -mwindows -lm
  
 endif
 
