@@ -6,7 +6,7 @@
 #include <SDL2/SDL_image.h>
 
 // Define pixels/second
-#define SCROLL_SPEED (30) // pixels/second
+#define SCROLL_SPEED (60) // pixels/second
 #define SPEED 200
 
 // Define screen dimensions
