@@ -128,6 +128,27 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        ///Background-
+        // Load the tile texture
+        SDL_Surface *tileSurface = IMG_Load("resources/Map.jpg");
+        SDL_Texture *tileTexture = SDL_CreateTextureFromSurface(renderer, tileSurface);
+        SDL_FreeSurface(tileSurface);
+
+        // Define tile dimensions
+        const int TILE_WIDTH = 64;
+        const int TILE_HEIGHT = 64;
+
+        // Loop through the tiles and render them
+        for (int row = 0; row < SCREEN_HEIGHT / TILE_HEIGHT; row++)
+        {
+            for (int col = 0; col < SCREEN_WIDTH / TILE_WIDTH; col++)
+            {
+                SDL_Rect srcRect = {0, 0, TILE_WIDTH, TILE_HEIGHT};
+                SDL_Rect destRect = {col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+                SDL_RenderCopy(renderer, tileTexture, &srcRect, &destRect);
+            }
+        }//Slutar backgroound
+
         // Render the sprite
         SDL_RenderCopy(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect);
 
