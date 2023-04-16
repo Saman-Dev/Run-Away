@@ -5,6 +5,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
 #include "player/player.h"
+#include "map/map.h"
 
 // Sprite dimensions
 #define FRAME_WIDTH 32
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
         SDL_Surface *tileSurface = IMG_Load("resources/Map.jpg");
         SDL_Texture *tileTexture = SDL_CreateTextureFromSurface(renderer, tileSurface);
         SDL_FreeSurface(tileSurface);
+        //get_tile_information(8,8);
 
         // Define tile dimensions
         const int TILE_WIDTH = 64;
@@ -141,7 +143,7 @@ int main(int argc, char *argv[])
         // Loop through the tiles and render them
         for (int row = 0; row < SCREEN_HEIGHT / TILE_HEIGHT; row++)
         {
-            for (int col = 0; col < SCREEN_WIDTH / TILE_WIDTH; col++)
+            for (int col = 0; col < SCREEN_WIDTH+1 / TILE_WIDTH; col++)
             {
                 SDL_Rect srcRect = {0, 0, TILE_WIDTH, TILE_HEIGHT};
                 SDL_Rect destRect = {col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
