@@ -5,121 +5,90 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
 
-// Define pixels/second
-#define SCROLL_SPEED (60) // pixels/second
-#define SPEED 200
+// sprite dimensions
+#define FRAME_WIDTH 32
+#define FRAME_HEIGHT 32
+#define FRAME_COUNT 12
 
-// Define screen dimensions
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-
-int main(int argv, char **args)
+int main(int argc, char* argv[])
 {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        return 1;
-    }
-    SDL_Window *pWindow = SDL_CreateWindow("Jaga muspekaren", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    if (!pWindow)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
-    }
-    SDL_Renderer *pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!pRenderer)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_DestroyWindow(pWindow);
-        SDL_Quit();
-        return 1;
-    }
-    SDL_Surface *pSurface = IMG_Load("resources/Ship.png");
-    if (!pSurface)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_DestroyRenderer(pRenderer);
-        SDL_DestroyWindow(pWindow);
-        SDL_Quit();
-        return 1;
-    }
-    SDL_Texture *pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
-    SDL_FreeSurface(pSurface);
-    if (!pTexture)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_DestroyRenderer(pRenderer);
-        SDL_DestroyWindow(pWindow);
-        SDL_Quit();
-        return 1;
-    }
+    SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Rect shipRect;
-    SDL_QueryTexture(pTexture, NULL, NULL, &shipRect.w, &shipRect.h);
-    shipRect.w /= 4;
-    shipRect.h /= 4;
+    // Create a window and renderer
+    SDL_Window* window = SDL_CreateWindow("Sprite Sheet Animation",
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          640, 480, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    float shipX = (SCREEN_WIDTH - shipRect.w) / 2;  // left side
-    float shipY = (SCREEN_HEIGHT - shipRect.h) / 2; // upper side
-    float shipVelocityX = 0;
-    float shipVelocityY = 0;
+    // Load the sprite sheet image
+    SDL_Surface* spriteSheetSurface = IMG_Load("resources/Runner_1.png");
+    SDL_Texture* spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
+    SDL_FreeSurface(spriteSheetSurface);
 
-    bool close_requested = false;
+    // Initialize the source rectangles for each frame of animation
+    SDL_Rect frameRects[FRAME_COUNT];
+frameRects[0] = (SDL_Rect) { 1, 3, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[1] = (SDL_Rect) { 33, 3, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[2] = (SDL_Rect) { 66, 3, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[3] = (SDL_Rect) { 1, 35, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[4] = (SDL_Rect) { 33, 35, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[5] = (SDL_Rect) { 66, 35, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[6] = (SDL_Rect) { 1, 67, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[7] = (SDL_Rect) { 33, 67, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[8] = (SDL_Rect) { 66, 67, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[9] = (SDL_Rect) { 1, 99, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[10] = (SDL_Rect) { 33, 99, FRAME_WIDTH, FRAME_HEIGHT };
+frameRects[11] = (SDL_Rect) { 66, 99, FRAME_WIDTH, FRAME_HEIGHT };
 
-    while (!close_requested)
+    // Initialize variables for the main loop
+    bool quit = false;
+    SDL_Event event;
+    const int FPS = 60;
+    int currentFrame = 0;
+    SDL_Rect spriteRect = { 0, 0, FRAME_WIDTH, FRAME_HEIGHT };
+    spriteRect.x = (640 - FRAME_WIDTH) / 2; // Center horizontally
+    spriteRect.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
+
+    // Main loop
+    while (!quit)
     {
-
-        SDL_Event event;
+        // Handle events
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                close_requested = true;
+            {
+                quit = true;
+            }
         }
 
-        int mouseX, mouseY;
-        int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+        // Clear the screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
-        int deltaX = mouseX - (shipX + shipRect.w / 2); // compare to center of ship
-        int deltaY = mouseY - (shipY + shipRect.h / 2);
-        float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-        if (distance < 5)
+        // Render the sprite
+        SDL_RenderCopy(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect);
+        
+        // Update the screen
+        SDL_RenderPresent(renderer);
+        // Delay to control the frame rate
+        SDL_Delay(7000 / FPS);
+
+        // Update the current frame of animation
+        currentFrame++;
+        if (currentFrame >= FRAME_COUNT)
         {
-            shipVelocityX = shipVelocityY = 0;
+            currentFrame = 0;
         }
-        else
-        {
-            shipVelocityX = deltaX * SPEED / distance;
-            shipVelocityY = deltaY * SPEED / distance;
-        }
-        if (buttons & SDL_BUTTON(SDL_BUTTON_LEFT))
-        {
-            shipVelocityX = -shipVelocityX;
-            shipVelocityY = -shipVelocityY;
-        }
-        shipX += shipVelocityX / 60;
-        shipY += shipVelocityY / 60;
-        if (shipX < 0)
-            shipX = 0;
-        if (shipY < 0)
-            shipY = 0;
-        if (shipX > SCREEN_WIDTH - shipRect.w)
-            shipX = SCREEN_WIDTH - shipRect.w;
-        if (shipY > SCREEN_HEIGHT - shipRect.h)
-            shipY = SCREEN_HEIGHT - shipRect.h;
-        shipRect.x = shipX;
-        shipRect.y = shipY;
-        SDL_SetRenderDrawColor(pRenderer, 0, 255, 255, 255);
-        SDL_RenderClear(pRenderer);
-        SDL_RenderCopy(pRenderer, pTexture, NULL, &shipRect);
-        SDL_RenderPresent(pRenderer);
-        SDL_Delay(1000 / 60);
     }
 
-    SDL_DestroyTexture(pTexture);
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
+    // Clean up resources
+    SDL_DestroyTexture(spriteSheetTexture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }
+       
