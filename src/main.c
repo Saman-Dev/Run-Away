@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO);
 
     // Create a window and renderer
-    SDL_Window* window = SDL_CreateWindow("Sprite Sheet Animation",
+    SDL_Window* window = SDL_CreateWindow("Sprite walking test",
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           640, 480, SDL_WINDOW_SHOWN);
@@ -29,18 +29,18 @@ int main(int argc, char* argv[])
 
     // Initialize the source rectangles for each frame of animation
     SDL_Rect frameRects[FRAME_COUNT];
-frameRects[0] = (SDL_Rect) { 1, 3, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[1] = (SDL_Rect) { 33, 3, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[2] = (SDL_Rect) { 66, 3, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[3] = (SDL_Rect) { 1, 35, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[4] = (SDL_Rect) { 33, 35, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[5] = (SDL_Rect) { 66, 35, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[6] = (SDL_Rect) { 1, 67, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[7] = (SDL_Rect) { 33, 67, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[8] = (SDL_Rect) { 66, 67, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[9] = (SDL_Rect) { 1, 99, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[10] = (SDL_Rect) { 33, 99, FRAME_WIDTH, FRAME_HEIGHT };
-frameRects[11] = (SDL_Rect) { 66, 99, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[0] = (SDL_Rect) { 1, 3, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[1] = (SDL_Rect) { 33, 3, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[2] = (SDL_Rect) { 66, 3, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[3] = (SDL_Rect) { 1, 35, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[4] = (SDL_Rect) { 33, 35, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[5] = (SDL_Rect) { 66, 35, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[6] = (SDL_Rect) { 1, 67, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[7] = (SDL_Rect) { 33, 67, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[8] = (SDL_Rect) { 66, 67, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[9] = (SDL_Rect) { 1, 99, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[10] = (SDL_Rect) { 33, 99, FRAME_WIDTH, FRAME_HEIGHT };
+    frameRects[11] = (SDL_Rect) { 66, 99, FRAME_WIDTH, FRAME_HEIGHT };
 
     // Initialize variables for the main loop
     bool quit = false;
