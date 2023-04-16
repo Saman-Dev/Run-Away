@@ -4,3 +4,4 @@
 # Executables
 *.exe
 *.out
+.vscode/settings.json
