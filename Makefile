@@ -15,34 +15,33 @@ ifneq ($(OS),Windows_NT)
 endif
 
 
-LDFLAGS := -lm -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
+LDFLAGS := -lSDL2 -lSDL2_image
 LDFLAGS_WINDOWS := -lmingw32 -mwindows
-LDFLAGS_MAC := -L /opt/homebrew/lib
+LDFLAGS_MAC := -L /opt/homebrew/lib/
 CFLAGS_WINDOWS := C:\msys64\mingw64\include
-CFLAGS_MAC := /opt/homebrew/include/SDL2
+CFLAGS_MAC := /opt/homebrew/include/
 
 
 ifeq ($(CURRENT_OS),windows)
     LDFLAGS := $(LDFLAGS_WINDOWS) $(LDFLAGS)
-	CFLAGS := -g -I$(CFLAGS_WINDOWS) -c 
+	CFLAGS := -I$(CFLAGS_WINDOWS) -c 
 
 endif
 
 ifeq ($(CURRENT_OS),mac)
     LDFLAGS := $(LDFLAGS_MAC) $(LDFLAGS)
-	CFLAGS := -g -I$(CFLAGS_MAC) -c 
-	CFLAGS  := $(CFLAGS_MAC) $(CFLAGS)
+	CFLAGS := -I$(CFLAGS_MAC) -c 
 endif
 
 
 theGame: main.o player.o map.o
-	gcc -o game main.o player.o map.o -L/opt/homebrew/lib/ -lSDL2 -lSDL2_image
+	$(CC) -o game main.o player.o map.o $(LDFLAGS)
 main.o: src/main.c
-	gcc -c src/main.c -I/opt/homebrew/include/SDL2
+	$(CC) src/main.c $(CFLAGS)
 player.o: src/player/player.c
-	gcc -c src/player/player.c
+	$(CC) -c src/player/player.c
 map.o: src/map/map.c
-	gcc -c src/map/map.c
+	$(CC) -c src/map/map.c
 
 clean:
 	rm -f game

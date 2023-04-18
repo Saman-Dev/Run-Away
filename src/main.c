@@ -26,7 +26,7 @@ int main(int argc, char *args[])
     SDL_Renderer *renderer = NULL;
     bool quit = false;
 
-    // Spaceman
+    // Player
     SDL_Texture *spriteSheetTexture = NULL;
     SDL_Rect frameRects[12];
     SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -44,7 +44,7 @@ int main(int argc, char *args[])
         printf("worked\n");
     }
 
-    loadMedia(renderer, &spriteSheetTexture, frameRects, /*&mAlien, gAlien,*/ &tilesModule, tilesGraphic);
+    loadMedia(renderer, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
