@@ -1,10 +1,7 @@
 #include <stdio.h>
-#include <math.h>
-#include <stdbool.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
-#include "player/player.h"
+#include <stdbool.h>
 #include "map/map.h"
 
 // Sprite dimensions
@@ -16,54 +13,44 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-int main(int argc, char *argv[])
+#undef main
+
+bool init(SDL_Renderer **renderer);
+void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
+void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
+
+int main(int argc, char *args[])
 {
-    // Initialize SDL
-    SDL_Init(SDL_INIT_VIDEO);
 
-    // Create a window and renderer
-    SDL_Window *window = SDL_CreateWindow("Sprite walking test",
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    // Load the sprite sheet image
-    SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_1.png");
-    SDL_Texture *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
-    SDL_FreeSurface(spriteSheetSurface);
-
-    // Initialize the source rectangles for each frame of animation
-    SDL_Rect frameRects[FRAME_COUNT];
-    frameRects[0] = (SDL_Rect){1, 3, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[1] = (SDL_Rect){33, 3, FRAME_WIDTH, FRAME_HEIGHT}; // starting position
-    frameRects[2] = (SDL_Rect){66, 3, FRAME_WIDTH, FRAME_HEIGHT};
-
-    frameRects[3] = (SDL_Rect){1, 35, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[4] = (SDL_Rect){33, 35, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[5] = (SDL_Rect){66, 35, FRAME_WIDTH, FRAME_HEIGHT};
-
-    frameRects[6] = (SDL_Rect){1, 67, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[7] = (SDL_Rect){33, 67, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[8] = (SDL_Rect){66, 67, FRAME_WIDTH, FRAME_HEIGHT};
-
-    frameRects[9] = (SDL_Rect){1, 99, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[10] = (SDL_Rect){33, 99, FRAME_WIDTH, FRAME_HEIGHT};
-    frameRects[11] = (SDL_Rect){66, 99, FRAME_WIDTH, FRAME_HEIGHT};
-
-    // Initialize variables for the main loop
-    bool quit = false;
     SDL_Event event;
-    const int FPS = 60;
-    int currentFrame = 1;
+    SDL_Renderer *renderer = NULL;
+    bool quit = false;
+
+    // Spaceman
+    SDL_Texture *spriteSheetTexture = NULL;
+    SDL_Rect frameRects[12];
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
     SDL_Rect spriteRect = {0, 0, FRAME_WIDTH, FRAME_HEIGHT};
     spriteRect.x = (640 - FRAME_WIDTH) / 2;  // Center horizontally
     spriteRect.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
+    int currentFrame = 6;
 
-    // Main loop
+    // Background
+    SDL_Texture *tilesModule = NULL;
+    SDL_Rect tilesGraphic[16];
+
+    if (init(&renderer))
+    {
+        printf("worked\n");
+    }
+
+    loadMedia(renderer, &spriteSheetTexture, frameRects, /*&mAlien, gAlien,*/ &tilesModule, tilesGraphic);
+
+    // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
     {
-        // Handle game events
+
+        // Game event
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
@@ -76,7 +63,8 @@ int main(int argc, char *argv[])
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_UP:
-                    // Increment the current frame
+                    printf("UP\n");
+                    // Increment the current currentFrame
                     if (currentFrame == 9 || currentFrame == 10)
                         currentFrame++;
                     else
@@ -87,7 +75,8 @@ int main(int argc, char *argv[])
                     SDL_Delay(100);
                     break;
                 case SDLK_DOWN:
-                    // Increment the current frame
+                    printf("DOWN\n");
+                    // Increment the current currentFrame
                     if (currentFrame == 0 || currentFrame == 1)
                         currentFrame++;
                     else
@@ -98,7 +87,8 @@ int main(int argc, char *argv[])
                     SDL_Delay(100);
                     break;
                 case SDLK_LEFT:
-                    // Increment the current frame
+                    printf("LEFT\n");
+                    // Increment the current currentFrame
                     if (currentFrame == 3 || currentFrame == 4)
                         currentFrame++;
                     else
@@ -109,7 +99,8 @@ int main(int argc, char *argv[])
                     SDL_Delay(100);
                     break;
                 case SDLK_RIGHT:
-                    // Increment the current frame
+                    printf("RIGHT\n");
+                    // Increment the current currentFrame
                     if (currentFrame == 6 || currentFrame == 7)
                         currentFrame++;
                     else
@@ -125,46 +116,132 @@ int main(int argc, char *argv[])
             }
         }
 
-        // Clear the screen
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        int foo = collidesWithImpassableTile(spriteRect.x, spriteRect.y);
+
+        // Game renderer
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
-
-        ///Background-
-        // Load the tile texture
-        SDL_Surface *tileSurface = IMG_Load("resources/Map.jpg");
-        SDL_Texture *tileTexture = SDL_CreateTextureFromSurface(renderer, tileSurface);
-        SDL_FreeSurface(tileSurface);
-        //get_tile_information(8,8);
-
-        // Define tile dimensions
-        const int TILE_WIDTH = 64;
-        const int TILE_HEIGHT = 64;
-
-        // Loop through the tiles and render them
-        for (int row = 0; row < SCREEN_HEIGHT / TILE_HEIGHT; row++)
-        {
-            for (int col = 0; col < SCREEN_WIDTH+1 / TILE_WIDTH; col++)
-            {
-                SDL_Rect srcRect = {0, 0, TILE_WIDTH, TILE_HEIGHT};
-                SDL_Rect destRect = {col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
-                SDL_RenderCopy(renderer, tileTexture, &srcRect, &destRect);
-            }
-        }//Slutar backgroound
-
-        // Render the sprite
-        SDL_RenderCopy(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect);
-
-        // Update the screen
+        renderBackground(renderer, tilesModule, tilesGraphic);
+        SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
         SDL_RenderPresent(renderer);
-        // Delay to control the frame rate
-        SDL_Delay(1000 / FPS);
     }
 
-    // Clean up resources
-    SDL_DestroyTexture(spriteSheetTexture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
     return 0;
+}
+
+void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect tilesGraphic[])
+{
+
+    SDL_Rect possition;
+    possition.y = 0;
+    possition.x = 0;
+    possition.h = getTileHeight();
+    possition.w = getTileWidth();
+
+    for (int i = 0; i < getTileColumns(); i++)
+    {
+        for (int j = 0; j < getTileRows(); j++)
+        {
+            possition.y = i * getTileHeight();
+            possition.x = j * getTileWidth();
+            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getGridOfTiles(i, j)], &possition, 0, NULL, SDL_FLIP_NONE);
+        }
+    }
+}
+
+void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[])
+{
+
+    SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_1.PNG");
+    *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
+
+    frameRects[0].x = 1;
+    frameRects[0].y = 3;
+    frameRects[0].w = 32;
+    frameRects[0].h = 32;
+
+    frameRects[1].x = 33;
+    frameRects[1].y = 3;
+    frameRects[1].w = 32;
+    frameRects[1].h = 32;
+
+    frameRects[2].x = 66;
+    frameRects[2].y = 3;
+    frameRects[2].w = 32;
+    frameRects[2].h = 32;
+
+    frameRects[3].x = 1;
+    frameRects[3].y = 35;
+    frameRects[3].w = 32;
+    frameRects[3].h = 32;
+
+    frameRects[4].x = 33;
+    frameRects[4].y = 35;
+    frameRects[4].w = 32;
+    frameRects[4].h = 32;
+
+    frameRects[5].x = 66;
+    frameRects[5].y = 35;
+    frameRects[5].w = 32;
+    frameRects[5].h = 32;
+
+    frameRects[6].x = 1;
+    frameRects[6].y = 67;
+    frameRects[6].w = 32;
+    frameRects[6].h = 32;
+
+    frameRects[7].x = 33;
+    frameRects[7].y = 67;
+    frameRects[7].w = 32;
+    frameRects[7].h = 32;
+
+    frameRects[8].x = 66;
+    frameRects[8].y = 67;
+    frameRects[8].w = 32;
+    frameRects[8].h = 32;
+
+    frameRects[9].x = 1;
+    frameRects[9].y = 99;
+    frameRects[9].w = 32;
+    frameRects[9].h = 32;
+
+    frameRects[10].x = 33;
+    frameRects[10].y = 99;
+    frameRects[10].w = 32;
+    frameRects[10].h = 32;
+
+    frameRects[11].x = 66;
+    frameRects[11].y = 99;
+    frameRects[11].w = 32;
+    frameRects[11].h = 32;
+
+    SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
+    *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
+    for (int i = 0; i < 5; i++)
+    {
+        tilesGraphic[i].x = i * getTileWidth();
+        tilesGraphic[i].y = 0;
+        tilesGraphic[i].w = getTileWidth();
+        tilesGraphic[i].h = getTileHeight();
+    }
+}
+
+bool init(SDL_Renderer **renderer)
+{
+    bool test = true;
+    SDL_Window *gWindow = NULL;
+    SDL_Init(SDL_INIT_VIDEO);
+    gWindow = SDL_CreateWindow("The Alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (gWindow == NULL)
+    {
+        printf("Fungerar ej\n");
+        test = false;
+    }
+    *renderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (*renderer == NULL)
+    {
+        printf("Fungerar ej\n");
+        test = false;
+    }
+    return test;
 }

@@ -3,8 +3,8 @@
 #define PUBLIC /* empty */
 #define PRIVATE static
 
-PRIVATE int WIDTH = 16;
-PRIVATE int HEIGHT = 16;
+PRIVATE int WIDTH = 32;
+PRIVATE int HEIGHT = 32;
 
 struct Player_type
 {
