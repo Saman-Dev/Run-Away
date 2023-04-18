@@ -155,17 +155,65 @@ void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rec
     SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_1.PNG");
     *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
 
-    int x = 1;
-    int y = 3;
-    int w = 32;
-    int h = 32;
+    frameRects[0].x = 1;
+    frameRects[0].y = 3;
+    frameRects[0].w = 32;
+    frameRects[0].h = 32;
 
-    for (int j = 0; j < 12; j++) {
-        frameRects[j].x = x + (j % 3) * (w + 1);
-        frameRects[j].y = y + (j / 3) * (h + 1);
-        frameRects[j].w = w;
-        frameRects[j].h = h;
-    }
+    frameRects[1].x = 33;
+    frameRects[1].y = 3;
+    frameRects[1].w = 32;
+    frameRects[1].h = 32;
+
+    frameRects[2].x = 66;
+    frameRects[2].y = 3;
+    frameRects[2].w = 32;
+    frameRects[2].h = 32;
+
+    frameRects[3].x = 1;
+    frameRects[3].y = 35;
+    frameRects[3].w = 32;
+    frameRects[3].h = 32;
+
+    frameRects[4].x = 33;
+    frameRects[4].y = 35;
+    frameRects[4].w = 32;
+    frameRects[4].h = 32;
+
+    frameRects[5].x = 66;
+    frameRects[5].y = 35;
+    frameRects[5].w = 32;
+    frameRects[5].h = 32;
+
+    frameRects[6].x = 1;
+    frameRects[6].y = 67;
+    frameRects[6].w = 32;
+    frameRects[6].h = 32;
+
+    frameRects[7].x = 33;
+    frameRects[7].y = 67;
+    frameRects[7].w = 32;
+    frameRects[7].h = 32;
+
+    frameRects[8].x = 66;
+    frameRects[8].y = 67;
+    frameRects[8].w = 32;
+    frameRects[8].h = 32;
+
+    frameRects[9].x = 1;
+    frameRects[9].y = 99;
+    frameRects[9].w = 32;
+    frameRects[9].h = 32;
+
+    frameRects[10].x = 33;
+    frameRects[10].y = 99;
+    frameRects[10].w = 32;
+    frameRects[10].h = 32;
+
+    frameRects[11].x = 66;
+    frameRects[11].y = 99;
+    frameRects[11].w = 32;
+    frameRects[11].h = 32;
 
     SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
