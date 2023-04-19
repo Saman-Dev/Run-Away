@@ -57,6 +57,9 @@ int main(int argc, char *args[])
         return -1;
     }
 
+    // Set the music volume to 20%
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+
     // Play music in a loop
     Mix_PlayMusic(music, -1);
     //------------------------------------------------------------------------------------------------------------------
