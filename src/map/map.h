@@ -2,11 +2,16 @@
 #define world_h
 #include <stdio.h>
 
-int getTileRows();
-int getTileColumns();
-int getTileWidth();
-int getTileHeight();
-int getGridOfTiles(int x, int y);
-int collidesWithImpassableTile(int x, int y);
+#define MAP_ROWS 100 //100
+#define MAP_COLUMNS 75 //75
+#define TILE_WIDTH 8
+#define TILE_HEIGHT 8
+
+int getNumberOfRowsInMap();
+int getNumberOfColumnsInMap();
+int getTheWidthOfTheTile();
+int getTheHeightOfTheTile();
+int getTileInformation(int x, int y);
+int encountersForbiddenTile(int x, int y);
 
 #endif /* world_h */
