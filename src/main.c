@@ -26,6 +26,8 @@ int main(int argc, char *args[])
     SDL_Renderer *renderer = NULL;
     bool quit = false;
 
+    int collision = 0;
+
     // Player
     SDL_Texture *spriteSheetTexture = NULL;
     SDL_Rect frameRects[12];
@@ -63,52 +65,68 @@ int main(int argc, char *args[])
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_UP:
-                    printf("UP\n");
-                    // Increment the current currentFrame
-                    if (currentFrame == 9 || currentFrame == 10)
-                        currentFrame++;
-                    else
-                        currentFrame = 9;
+                    collision = encountersForbiddenTile(spriteRect.x, spriteRect.y-5);
+                    if (collision == 0)
+                    {
+                        printf("UP\n");
+                        // Increment the current currentFrame
+                        if (currentFrame == 9 || currentFrame == 10)
+                            currentFrame++;
+                        else
+                            currentFrame = 9;
 
-                    spriteRect.y -= 4;
-                    // Add a delay to slow down the animation
-                    SDL_Delay(100);
+                        spriteRect.y -= 4;
+                        // Add a delay to slow down the animation
+                        SDL_Delay(100);
+                    }
                     break;
                 case SDLK_DOWN:
-                    printf("DOWN\n");
-                    // Increment the current currentFrame
-                    if (currentFrame == 0 || currentFrame == 1)
-                        currentFrame++;
-                    else
-                        currentFrame = 0;
+                    collision = encountersForbiddenTile(spriteRect.x, spriteRect.y+26);
+                    if (collision == 0)
+                    {
+                        printf("DOWN\n");
+                        // Increment the current currentFrame
+                        if (currentFrame == 0 || currentFrame == 1)
+                            currentFrame++;
+                        else
+                            currentFrame = 0;
 
-                    spriteRect.y += 4;
-                    // Add a delay to slow down the animation
-                    SDL_Delay(100);
+                        spriteRect.y += 4;
+                        // Add a delay to slow down the animation
+                        SDL_Delay(100);
+                    }
                     break;
                 case SDLK_LEFT:
-                    printf("LEFT\n");
-                    // Increment the current currentFrame
-                    if (currentFrame == 3 || currentFrame == 4)
-                        currentFrame++;
-                    else
-                        currentFrame = 3;
+                    collision = encountersForbiddenTile(spriteRect.x-5, spriteRect.y);
+                    if (collision == 0)
+                    {
+                        printf("LEFT\n");
+                        // Increment the current currentFrame
+                        if (currentFrame == 3 || currentFrame == 4)
+                            currentFrame++;
+                        else
+                            currentFrame = 3;
 
-                    spriteRect.x -= 4;
-                    // Add a delay to slow down the animation
-                    SDL_Delay(100);
+                        spriteRect.x -= 4;
+                        // Add a delay to slow down the animation
+                        SDL_Delay(100);
+                    }
                     break;
                 case SDLK_RIGHT:
-                    printf("RIGHT\n");
-                    // Increment the current currentFrame
-                    if (currentFrame == 6 || currentFrame == 7)
-                        currentFrame++;
-                    else
-                        currentFrame = 6;
+                    collision = encountersForbiddenTile(spriteRect.x+16, spriteRect.y);
+                    if (collision == 0)
+                    {
+                        printf("RIGHT\n");
+                        // Increment the current currentFrame
+                        if (currentFrame == 6 || currentFrame == 7)
+                            currentFrame++;
+                        else
+                            currentFrame = 6;
 
-                    spriteRect.x += 4;
-                    // Add a delay to slow down the animation
-                    SDL_Delay(100);
+                        spriteRect.x += 4;
+                        // Add a delay to slow down the animation
+                        SDL_Delay(100);
+                    }
                     break;
                 default:
                     break;
