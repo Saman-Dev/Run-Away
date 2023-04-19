@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "map/map.h"
+#include <SDL2/SDL_mixer.h>
 
 // Sprite dimensions
 #define FRAME_WIDTH 32
@@ -10,13 +11,13 @@
 #define FRAME_COUNT 12
 
 // Screen dimensions
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 810
+#define SCREEN_HEIGHT 800
 
 #undef main
 
 bool init(SDL_Renderer **renderer);
-void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
+void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
 
 int main(int argc, char *args[])
@@ -39,12 +40,35 @@ int main(int argc, char *args[])
     SDL_Texture *tilesModule = NULL;
     SDL_Rect tilesGraphic[16];
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Initialize SDL2 Mixer library
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to initialize SDL2 Mixer: %s", Mix_GetError());
+        return -1;
+    }
+
+    // Load OGG file
+    Mix_Music *music = Mix_LoadMUS("resources/main_theme.wav");
+    if (!music)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
+        Mix_CloseAudio();
+        return -1;
+    }
+
+    // Play music in a loop
+    Mix_PlayMusic(music, -1);
+    //------------------------------------------------------------------------------------------------------------------
+
     if (init(&renderer))
     {
         printf("worked\n");
     }
 
-    loadMedia(renderer, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
+    int playerNr = 1;
+
+    loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
@@ -62,7 +86,7 @@ int main(int argc, char *args[])
                 // Handle key presses
                 switch (event.key.keysym.sym)
                 {
-                case SDLK_UP:
+                case SDLK_w:
                     printf("UP\n");
                     // Increment the current currentFrame
                     if (currentFrame == 9 || currentFrame == 10)
@@ -74,7 +98,7 @@ int main(int argc, char *args[])
                     // Add a delay to slow down the animation
                     SDL_Delay(100);
                     break;
-                case SDLK_DOWN:
+                case SDLK_s:
                     printf("DOWN\n");
                     // Increment the current currentFrame
                     if (currentFrame == 0 || currentFrame == 1)
@@ -86,7 +110,7 @@ int main(int argc, char *args[])
                     // Add a delay to slow down the animation
                     SDL_Delay(100);
                     break;
-                case SDLK_LEFT:
+                case SDLK_a:
                     printf("LEFT\n");
                     // Increment the current currentFrame
                     if (currentFrame == 3 || currentFrame == 4)
@@ -98,7 +122,7 @@ int main(int argc, char *args[])
                     // Add a delay to slow down the animation
                     SDL_Delay(100);
                     break;
-                case SDLK_RIGHT:
+                case SDLK_d:
                     printf("RIGHT\n");
                     // Increment the current currentFrame
                     if (currentFrame == 6 || currentFrame == 7)
@@ -109,6 +133,9 @@ int main(int argc, char *args[])
                     spriteRect.x += 4;
                     // Add a delay to slow down the animation
                     SDL_Delay(100);
+                    break;
+                case SDLK_ESCAPE:
+                    quit = true;
                     break;
                 default:
                     break;
@@ -126,6 +153,11 @@ int main(int argc, char *args[])
         SDL_RenderPresent(renderer);
     }
 
+    //-------------------------------
+    // Free resources and close SDL
+    Mix_FreeMusic(music);
+    Mix_CloseAudio();
+    //-------------------------------
     return 0;
 }
 
@@ -149,11 +181,20 @@ void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect
     }
 }
 
-void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[])
+void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[])
 {
 
-    SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_1.PNG");
-    *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
+    // Load player sprite
+    if (playerNr == 2)
+    {
+        SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_2.PNG");
+        *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
+    }
+    else if (playerNr == 1)
+    {
+        SDL_Surface *spriteSheetSurface = IMG_Load("resources/Hunter.PNG");
+        *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
+    }
 
     frameRects[0].x = 1;
     frameRects[0].y = 3;
