@@ -2,8 +2,8 @@
 #define world_h
 #include <stdio.h>
 
-#define MAP_ROWS 100
-#define MAP_COLUMNS 75
+#define MAP_ROWS 100 //100
+#define MAP_COLUMNS 75 //75
 #define TILE_WIDTH 8
 #define TILE_HEIGHT 8
 
