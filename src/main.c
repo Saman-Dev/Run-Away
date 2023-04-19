@@ -116,7 +116,7 @@ int main(int argc, char *args[])
             }
         }
 
-        int foo = collidesWithImpassableTile(spriteRect.x, spriteRect.y);
+        int foo = encountersForbiddenTile(spriteRect.x, spriteRect.y);
 
         // Game renderer
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -135,16 +135,16 @@ void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect
     SDL_Rect possition;
     possition.y = 0;
     possition.x = 0;
-    possition.h = getTileHeight();
-    possition.w = getTileWidth();
+    possition.h = getTheHeightOfTheTile();
+    possition.w = getTheWidthOfTheTile();
 
-    for (int i = 0; i < getTileColumns(); i++)
+    for (int i = 0; i < getNumberOfColumnsInMap(); i++)
     {
-        for (int j = 0; j < getTileRows(); j++)
+        for (int j = 0; j < getNumberOfRowsInMap(); j++)
         {
-            possition.y = i * getTileHeight();
-            possition.x = j * getTileWidth();
-            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getGridOfTiles(i, j)], &possition, 0, NULL, SDL_FLIP_NONE);
+            possition.y = i * getTheHeightOfTheTile();
+            possition.x = j * getTheWidthOfTheTile();
+            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getTileInformation(i, j)], &possition, 0, NULL, SDL_FLIP_NONE);
         }
     }
 }
@@ -219,10 +219,10 @@ void loadMedia(SDL_Renderer *renderer, SDL_Texture **spriteSheetTexture, SDL_Rec
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
     for (int i = 0; i < 5; i++)
     {
-        tilesGraphic[i].x = i * getTileWidth();
+        tilesGraphic[i].x = i * getTheWidthOfTheTile();
         tilesGraphic[i].y = 0;
-        tilesGraphic[i].w = getTileWidth();
-        tilesGraphic[i].h = getTileHeight();
+        tilesGraphic[i].w = getTheWidthOfTheTile();
+        tilesGraphic[i].h = getTheHeightOfTheTile();
     }
 }
 
