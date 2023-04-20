@@ -36,6 +36,16 @@ int main(int argc, char *args[])
     spriteRect.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame = 6;
 
+    //Hunter
+    SDL_Texture *spriteSheetTexture2 = NULL;
+    SDL_Rect frameRects2[12];
+    SDL_RendererFlip flip2 = SDL_FLIP_NONE;
+    SDL_Rect spriteRect2 = {0, 0, FRAME_WIDTH, FRAME_HEIGHT};
+    spriteRect2.x = (640 - FRAME_WIDTH) / 2;  // Center horizontally
+    spriteRect2.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
+    int currentFrame2 = 6;
+
+
     // Background
     SDL_Texture *tilesModule = NULL;
     SDL_Rect tilesGraphic[16];
@@ -70,8 +80,9 @@ int main(int argc, char *args[])
     }
 
     int playerNr = 1;
-
     loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
+    loadMedia(renderer, 2, &spriteSheetTexture2, frameRects2, &tilesModule, tilesGraphic);
+
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
@@ -89,6 +100,54 @@ int main(int argc, char *args[])
                 // Handle key presses
                 switch (event.key.keysym.sym)
                 {
+                    case SDLK_UP:
+                printf("Player 1: UP\n");
+                // Increment the current frame
+                if (currentFrame2 == 9 || currentFrame2 == 10)
+                    currentFrame2++;
+                else
+                    currentFrame2 = 9;
+
+                spriteRect2.y -= 4;
+                // Add a delay to slow down the animation
+                SDL_Delay(100);
+                break;
+            case SDLK_DOWN:
+                printf("Player 1: DOWN\n");
+                // Increment the current frame
+                if (currentFrame2 == 0 || currentFrame2 == 1)
+                    currentFrame2++;
+                else
+                    currentFrame2 = 0;
+
+                spriteRect2.y += 4;
+                // Add a delay to slow down the animation
+                SDL_Delay(100);
+                break;
+            case SDLK_LEFT:
+                printf("Player 1: LEFT\n");
+                // Increment the current frame
+                if (currentFrame2 == 3 || currentFrame2 == 4)
+                    currentFrame2++;
+                else
+                    currentFrame2 = 3;
+
+                spriteRect2.x -= 4;
+                // Add a delay to slow down the animation
+                SDL_Delay(100);
+                break;
+            case SDLK_RIGHT:
+                printf("Player 1: RIGHT\n");
+                // Increment the current frame
+                if (currentFrame2 == 6 || currentFrame2 == 7)
+                    currentFrame2++;
+                else
+                    currentFrame2 = 6;
+
+                spriteRect2.x += 4;
+                // Add a delay to slow down the animation
+                SDL_Delay(100);
+                break;
                 case SDLK_w:
                     printf("UP\n");
                     // Increment the current currentFrame
@@ -153,6 +212,7 @@ int main(int argc, char *args[])
         SDL_RenderClear(renderer);
         renderBackground(renderer, tilesModule, tilesGraphic);
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
+        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame], &spriteRect2, 0, NULL, flip2);
         SDL_RenderPresent(renderer);
     }
 
@@ -198,66 +258,65 @@ void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTe
         SDL_Surface *spriteSheetSurface = IMG_Load("resources/Hunter.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
+        frameRects[0].x = 1;
+        frameRects[0].y = 3;
+        frameRects[0].w = 32;
+        frameRects[0].h = 32;
 
-    frameRects[0].x = 1;
-    frameRects[0].y = 3;
-    frameRects[0].w = 32;
-    frameRects[0].h = 32;
+        frameRects[1].x = 33;
+        frameRects[1].y = 3;
+        frameRects[1].w = 32;
+        frameRects[1].h = 32;
 
-    frameRects[1].x = 33;
-    frameRects[1].y = 3;
-    frameRects[1].w = 32;
-    frameRects[1].h = 32;
+        frameRects[2].x = 66;
+        frameRects[2].y = 3;
+        frameRects[2].w = 32;
+        frameRects[2].h = 32;
 
-    frameRects[2].x = 66;
-    frameRects[2].y = 3;
-    frameRects[2].w = 32;
-    frameRects[2].h = 32;
+        frameRects[3].x = 1;
+        frameRects[3].y = 35;
+        frameRects[3].w = 32;
+        frameRects[3].h = 32;
 
-    frameRects[3].x = 1;
-    frameRects[3].y = 35;
-    frameRects[3].w = 32;
-    frameRects[3].h = 32;
+        frameRects[4].x = 33;
+        frameRects[4].y = 35;
+        frameRects[4].w = 32;
+        frameRects[4].h = 32;
 
-    frameRects[4].x = 33;
-    frameRects[4].y = 35;
-    frameRects[4].w = 32;
-    frameRects[4].h = 32;
+        frameRects[5].x = 66;
+        frameRects[5].y = 35;
+        frameRects[5].w = 32;
+        frameRects[5].h = 32;
 
-    frameRects[5].x = 66;
-    frameRects[5].y = 35;
-    frameRects[5].w = 32;
-    frameRects[5].h = 32;
+        frameRects[6].x = 1;
+        frameRects[6].y = 67;
+        frameRects[6].w = 32;
+        frameRects[6].h = 32;
 
-    frameRects[6].x = 1;
-    frameRects[6].y = 67;
-    frameRects[6].w = 32;
-    frameRects[6].h = 32;
+        frameRects[7].x = 33;
+        frameRects[7].y = 67;
+        frameRects[7].w = 32;
+        frameRects[7].h = 32;
 
-    frameRects[7].x = 33;
-    frameRects[7].y = 67;
-    frameRects[7].w = 32;
-    frameRects[7].h = 32;
+        frameRects[8].x = 66;
+        frameRects[8].y = 67;
+        frameRects[8].w = 32;
+        frameRects[8].h = 32;
 
-    frameRects[8].x = 66;
-    frameRects[8].y = 67;
-    frameRects[8].w = 32;
-    frameRects[8].h = 32;
+        frameRects[9].x = 1;
+        frameRects[9].y = 99;
+        frameRects[9].w = 32;
+        frameRects[9].h = 32;
 
-    frameRects[9].x = 1;
-    frameRects[9].y = 99;
-    frameRects[9].w = 32;
-    frameRects[9].h = 32;
+        frameRects[10].x = 33;
+        frameRects[10].y = 99;
+        frameRects[10].w = 32;
+        frameRects[10].h = 32;
 
-    frameRects[10].x = 33;
-    frameRects[10].y = 99;
-    frameRects[10].w = 32;
-    frameRects[10].h = 32;
-
-    frameRects[11].x = 66;
-    frameRects[11].y = 99;
-    frameRects[11].w = 32;
-    frameRects[11].h = 32;
+        frameRects[11].x = 66;
+        frameRects[11].y = 99;
+        frameRects[11].w = 32;
+        frameRects[11].h = 32;
 
     SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
