@@ -1,11 +1,12 @@
-#ifndef player_h
-#define player_h
+#ifndef PLAYER_H
+#define PLAYER_H
 
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Player_type *Player;
 
 Player createPlayer(int x, int y);
+int getPlayerHeight();
+int getPlayerWidth();
 
 #endif

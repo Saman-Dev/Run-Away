@@ -1,5 +1,6 @@
 # Makefile for for MacOS, windows and  
 SRCDIR=./src
+SRC=src/Entities
 CC=gcc 
 
 
@@ -34,17 +35,19 @@ ifeq ($(CURRENT_OS),mac)
 endif
 
 
-theGame: main.o player.o map.o
-	$(CC) -o game main.o player.o map.o $(LDFLAGS)
+theGame: main.o player.o map.o audio.o
+	$(CC) -o game main.o player.o map.o audio.o $(LDFLAGS)
 	./game.exe
 	./game.out
 main.o: src/main.c
 	@echo "Building Game" 
 	$(CC) src/main.c $(CFLAGS)
-player.o: src/player/player.c
-	$(CC) -c src/player/player.c
-map.o: src/map/map.c
-	$(CC) -c src/map/map.c
+player.o: $(SRC)/player/player.c
+	$(CC) -c $(SRC)/player/player.c
+map.o: $(SRC)/map/map.c
+	$(CC) -c $(SRC)/map/map.c
+audio.o: $(SRC)/audio/audio.c
+	$(CC) -c $(SRC)/audio/audio.c
 
 clean:
 	rm -f game
