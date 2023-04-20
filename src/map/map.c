@@ -134,10 +134,12 @@ int encountersForbiddenTile(int x, int y)
 {
     int tileX = (y + 8) >> 3;
     int tileY = (x + 8) >> 3;
-    if (mapGrid[tileX][tileY] > 0x03)
+    printf("TileX: %d TileY: %d TileValue:%d\n", tileX, tileY,mapGrid[tileX][tileY]);
+    if (mapGrid[tileX][tileY] == 0x04)
     {
-        printf("The player is drawning\n");
+        printf("Collision!\n");
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
