@@ -271,7 +271,7 @@ int main(int argc, char *args[])
         renderBackground(renderer, tilesModule, tilesGraphic);
         // Render players
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
-        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame], &spriteRect2, 0, NULL, flip2);
+        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
         SDL_RenderPresent(renderer);
     }
 
@@ -305,75 +305,77 @@ void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTe
 {
 
     // Load player sprite
-    if (playerNr == 2)
+    if (playerNr == 1)
     {
         SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_2.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
-    else if (playerNr == 1)
+    else if (playerNr == 2)
     {
         SDL_Surface *spriteSheetSurface = IMG_Load("resources/Hunter.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
+
+    // Ghaith ändrade "frameRects[0].h" till 30 den var 32
     frameRects[0].x = 1;
     frameRects[0].y = 3;
     frameRects[0].w = 32;
-    frameRects[0].h = 32;
+    frameRects[0].h = 30;
 
     frameRects[1].x = 33;
     frameRects[1].y = 3;
     frameRects[1].w = 32;
-    frameRects[1].h = 32;
+    frameRects[1].h = 30;
 
     frameRects[2].x = 66;
     frameRects[2].y = 3;
     frameRects[2].w = 32;
-    frameRects[2].h = 32;
+    frameRects[2].h = 30;
 
     frameRects[3].x = 1;
     frameRects[3].y = 35;
     frameRects[3].w = 32;
-    frameRects[3].h = 32;
+    frameRects[3].h = 30;
 
     frameRects[4].x = 33;
     frameRects[4].y = 35;
     frameRects[4].w = 32;
-    frameRects[4].h = 32;
+    frameRects[4].h = 30;
 
     frameRects[5].x = 66;
     frameRects[5].y = 35;
     frameRects[5].w = 32;
-    frameRects[5].h = 32;
+    frameRects[5].h = 30;
 
     frameRects[6].x = 1;
     frameRects[6].y = 67;
     frameRects[6].w = 32;
-    frameRects[6].h = 32;
+    frameRects[6].h = 30;
 
     frameRects[7].x = 33;
     frameRects[7].y = 67;
     frameRects[7].w = 32;
-    frameRects[7].h = 32;
+    frameRects[7].h = 30;
 
     frameRects[8].x = 66;
     frameRects[8].y = 67;
     frameRects[8].w = 32;
-    frameRects[8].h = 32;
+    frameRects[8].h = 30;
 
     frameRects[9].x = 1;
     frameRects[9].y = 99;
     frameRects[9].w = 32;
-    frameRects[9].h = 32;
+    frameRects[9].h = 30;
 
     frameRects[10].x = 33;
     frameRects[10].y = 99;
     frameRects[10].w = 32;
-    frameRects[10].h = 32;
+    frameRects[10].h = 30;
 
     frameRects[11].x = 66;
     frameRects[11].y = 99;
     frameRects[11].w = 32;
-    frameRects[11].h = 32;
+    frameRects[11].h = 30;
 
     SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
