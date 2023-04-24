@@ -63,7 +63,7 @@ int main(int argc, char *args[])
     loadMedia(renderer, 2, &spriteSheetTexture2, frameRects2, &tilesModule, tilesGraphic);
 
     // Boolean array to keep track of which keys are pressed
-    bool keysPressed[4] = {false, false, false, false};
+    bool keysPressed[8] = {false, false, false, false, false, false, false, false};
 
     // Movement speed of the player
     const int PLAYER_SPEED = 2;
