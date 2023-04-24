@@ -13,8 +13,8 @@
 #define FRAME_COUNT 12
 
 // Screen dimensions
-#define SCREEN_WIDTH 810
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 #undef main
 
