@@ -35,7 +35,7 @@ ifeq ($(CURRENT_OS),mac)
 endif
 
 
-theGame: main.o player.o map.o audio.o
+theGame: main.o player.o map.o audio.o #perks.o
 	$(CC) -o game main.o player.o map.o audio.o $(LDFLAGS)
 	./game.exe
 	./game.out
@@ -48,6 +48,9 @@ map.o: $(SRC)/map/map.c
 	$(CC) -c $(SRC)/map/map.c
 audio.o: $(SRC)/audio/audio.c
 	$(CC) -c $(SRC)/audio/audio.c
+#perks.o: $(SRC)/perks/perks.c
+#	$(CC) -c $(SRC)/perks/perks.c
+
 
 clean:
 	rm -f game

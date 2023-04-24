@@ -1,4 +1,5 @@
 #include "player.h"
+#include "../perks/perks.h"
 
 #define PUBLIC /* empty */
 #define PRIVATE static
@@ -6,13 +7,13 @@
 PRIVATE int WIDTH = 32;
 PRIVATE int HEIGHT = 32;
 
-struct Player_type
+typedef struct Player_type
 {
     int Player_POSITION_X;
     int Player_POSITION_Y;
     int Player_FRAME;
     int speed;
-};
+} *Player;
 
 PUBLIC Player createPlayer(int x, int y)
 {

@@ -2,6 +2,9 @@
     "files.associations": {
         "sdl.h": "c",
         "math.h": "c",
-        "numbers": "c"
+        "numbers": "c",
+        "player.h": "c",
+        "perks.h": "c",
+        "audio.h": "c"
     }
 }
