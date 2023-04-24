@@ -292,7 +292,7 @@ int main(int argc, char *args[])
             }
         }
 
-        if (speedBoostPerk.active && checkCollision(spriteRect, speedBoostPerk.rect)) 
+        if (speedBoostPerk.active && checkCollision(spriteRect, speedBoostPerk.rect) || speedBoostPerk.active && checkCollision(spriteRect2, speedBoostPerk.rect)) 
         {
             // Apply the speed boost effect to the player
             PLAYER_SPEED += 2; // Increase the speed
