@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
@@ -7,24 +9,49 @@
 #include "Entities/player/player.h"
 #include <stdbool.h>
 
-// Sprite dimensions
+// Player Sprite dimensions
 #define FRAME_WIDTH 32
 #define FRAME_HEIGHT 32
 #define FRAME_COUNT 12
 
 // Screen dimensions
-#define SCREEN_WIDTH 810
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+
+// Perk dimensions
+#define PERK_WIDTH 20
+#define PERK_HEIGHT 20
+#define SPEED_BOOST_AMOUNT 1
+#define PERK_SPAWN_TIME 5000 // in milliseconds
 
 #undef main
+
+typedef struct {
+    SDL_Rect rect;
+    bool active;
+} SpeedBoostPerk;
+
+SpeedBoostPerk speedBoostPerk;
+
+void initSpeedBoostPerk() {
+    speedBoostPerk.rect.x = 300; 
+    speedBoostPerk.rect.y = 300; 
+    speedBoostPerk.rect.w = PERK_WIDTH;  
+    speedBoostPerk.rect.h = PERK_HEIGHT; 
+    speedBoostPerk.active = true;
+}
 
 bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
+void renderSpeedBoostPerk(SDL_Renderer *renderer);
+bool checkCollision(SDL_Rect a, SDL_Rect b);
+
 
 int main(int argc, char *args[])
 {
 
+    srand(time(NULL));
     SDL_Event event;
     SDL_Renderer *renderer = NULL;
     bool quit = false;
@@ -49,6 +76,7 @@ int main(int argc, char *args[])
     spriteRect2.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame2 = 6;
 
+
     // Background
     SDL_Texture *tilesModule = NULL;
     SDL_Rect tilesGraphic[16];
@@ -63,10 +91,12 @@ int main(int argc, char *args[])
     loadMedia(renderer, 2, &spriteSheetTexture2, frameRects2, &tilesModule, tilesGraphic);
 
     // Boolean array to keep track of which keys are pressed
-    bool keysPressed[4] = {false, false, false, false};
+    bool keysPressed[8] = {false, false, false, false, false, false, false, false};
 
     // Movement speed of the player
-    const int PLAYER_SPEED = 2;
+    int PLAYER_SPEED = 2;
+
+    initSpeedBoostPerk(); // Initialize the speed boost perk
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
@@ -262,16 +292,32 @@ int main(int argc, char *args[])
             }
         }
 
+        if (speedBoostPerk.active && checkCollision(spriteRect, speedBoostPerk.rect) || speedBoostPerk.active && checkCollision(spriteRect2, speedBoostPerk.rect)) 
+        {
+            // Apply the speed boost effect to the player
+            PLAYER_SPEED += 2; // Increase the speed
+            speedBoostPerk.active = false; // Deactivate the perk
+        }
+
         // Add a delay to control the speed of the player
         SDL_Delay(16);
 
+        // Clear the renderer
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        
         // Game renderer
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
         renderBackground(renderer, tilesModule, tilesGraphic);
+
+        renderSpeedBoostPerk(renderer);
+
         // Render players
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
-        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
+        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame], &spriteRect2, 0, NULL, flip2);
+        SDL_RenderPresent(renderer);
+        // Present the rendered frame
         SDL_RenderPresent(renderer);
     }
 
@@ -284,19 +330,19 @@ int main(int argc, char *args[])
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect tilesGraphic[])
 {
 
-    SDL_Rect possition;
-    possition.y = 0;
-    possition.x = 0;
-    possition.h = getTheHeightOfTheTile();
-    possition.w = getTheWidthOfTheTile();
-
+    SDL_Rect position;
+    position.y = 0;
+    position.x = 0;
+    position.h = getTheHeightOfTheTile();
+    position.w = getTheWidthOfTheTile();
+    
     for (int i = 0; i < getNumberOfColumnsInMap(); i++)
     {
         for (int j = 0; j < getNumberOfRowsInMap(); j++)
         {
-            possition.y = i * getTheHeightOfTheTile();
-            possition.x = j * getTheWidthOfTheTile();
-            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getTileInformation(i, j)], &possition, 0, NULL, SDL_FLIP_NONE);
+            position.y = i * getTheHeightOfTheTile();
+            position.x = j * getTheWidthOfTheTile();
+            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getTileInformation(i, j)], &position, 0, NULL, SDL_FLIP_NONE);
         }
     }
 }
@@ -305,77 +351,29 @@ void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTe
 {
 
     // Load player sprite
-    if (playerNr == 1)
+    if (playerNr == 2)
     {
-        SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_2.PNG");
+        SDL_Surface *spriteSheetSurface = IMG_Load("resources/Runner_1.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
-    else if (playerNr == 2)
+    else if (playerNr == 1)
     {
         SDL_Surface *spriteSheetSurface = IMG_Load("resources/Hunter.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
-
-    // Ghaith ändrade "frameRects[0].h" till 30 den var 32
-    frameRects[0].x = 1;
-    frameRects[0].y = 3;
-    frameRects[0].w = 32;
-    frameRects[0].h = 30;
-
-    frameRects[1].x = 33;
-    frameRects[1].y = 3;
-    frameRects[1].w = 32;
-    frameRects[1].h = 30;
-
-    frameRects[2].x = 66;
-    frameRects[2].y = 3;
-    frameRects[2].w = 32;
-    frameRects[2].h = 30;
-
-    frameRects[3].x = 1;
-    frameRects[3].y = 35;
-    frameRects[3].w = 32;
-    frameRects[3].h = 30;
-
-    frameRects[4].x = 33;
-    frameRects[4].y = 35;
-    frameRects[4].w = 32;
-    frameRects[4].h = 30;
-
-    frameRects[5].x = 66;
-    frameRects[5].y = 35;
-    frameRects[5].w = 32;
-    frameRects[5].h = 30;
-
-    frameRects[6].x = 1;
-    frameRects[6].y = 67;
-    frameRects[6].w = 32;
-    frameRects[6].h = 30;
-
-    frameRects[7].x = 33;
-    frameRects[7].y = 67;
-    frameRects[7].w = 32;
-    frameRects[7].h = 30;
-
-    frameRects[8].x = 66;
-    frameRects[8].y = 67;
-    frameRects[8].w = 32;
-    frameRects[8].h = 30;
-
-    frameRects[9].x = 1;
-    frameRects[9].y = 99;
-    frameRects[9].w = 32;
-    frameRects[9].h = 30;
-
-    frameRects[10].x = 33;
-    frameRects[10].y = 99;
-    frameRects[10].w = 32;
-    frameRects[10].h = 30;
-
-    frameRects[11].x = 66;
-    frameRects[11].y = 99;
-    frameRects[11].w = 32;
-    frameRects[11].h = 30;
+    
+    int frame_count = 0;
+    for (int y = 0; y < 4; y++) 
+    {
+        for (int x = 0; x < 3; x++) 
+        {
+            frameRects[frame_count].x = x * (32) + 1; // 32 width/height
+            frameRects[frame_count].y = y * (32) + 3;
+            frameRects[frame_count].w = 32;
+            frameRects[frame_count].h = 32;
+            frame_count++;
+        }
+    }
 
     SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
@@ -414,4 +412,18 @@ bool init(SDL_Renderer **renderer)
         test = false;
     }
     return test;
+}
+
+bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
+{
+    return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
+}
+
+void renderSpeedBoostPerk(SDL_Renderer *renderer) 
+{
+    if (speedBoostPerk.active)
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &speedBoostPerk.rect);
+    }
 }
