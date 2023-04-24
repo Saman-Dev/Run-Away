@@ -44,20 +44,9 @@ void initSpeedBoostPerk() {
 bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
+void renderSpeedBoostPerk(SDL_Renderer *renderer);
+bool checkCollision(SDL_Rect a, SDL_Rect b);
 
-bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
-{
-    return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
-}
-
-void renderSpeedBoostPerk(SDL_Renderer *renderer) 
-{
-    if (speedBoostPerk.active)
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &speedBoostPerk.rect);
-    }
-}
 
 int main(int argc, char *args[])
 {
@@ -423,4 +412,18 @@ bool init(SDL_Renderer **renderer)
         test = false;
     }
     return test;
+}
+
+bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
+{
+    return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
+}
+
+void renderSpeedBoostPerk(SDL_Renderer *renderer) 
+{
+    if (speedBoostPerk.active)
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &speedBoostPerk.rect);
+    }
 }
