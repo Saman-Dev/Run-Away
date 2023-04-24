@@ -20,8 +20,8 @@ int init_audio()
         return -1;
     }
 
-    // Set the music volume to 20%
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+    // Set the music volume to 5%
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 20);
 
     // Play music in a loop
     Mix_PlayMusic(music, -1);
