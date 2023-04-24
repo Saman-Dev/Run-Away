@@ -72,8 +72,8 @@ int main(int argc, char *args[])
     SDL_Rect frameRects2[12];
     SDL_RendererFlip flip2 = SDL_FLIP_NONE;
     SDL_Rect spriteRect2 = {0, 0, FRAME_WIDTH, FRAME_HEIGHT};
-    spriteRect2.x = (640 - FRAME_WIDTH) / 2;  // Center horizontally
-    spriteRect2.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
+    spriteRect2.x = (600 - FRAME_WIDTH) / 2;  // Center horizontally
+    spriteRect2.y = (400 - FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame2 = 6;
 
 
@@ -310,12 +310,12 @@ int main(int argc, char *args[])
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
         renderBackground(renderer, tilesModule, tilesGraphic);
-
+        // Perk render
         renderSpeedBoostPerk(renderer);
 
         // Render players
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
-        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame], &spriteRect2, 0, NULL, flip2);
+        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
         SDL_RenderPresent(renderer);
         // Present the rendered frame
         SDL_RenderPresent(renderer);
