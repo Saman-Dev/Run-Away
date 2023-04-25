@@ -47,7 +47,7 @@ player.o: $(SRC)/player/player.c
 map.o: $(SRC)/map/map.c
 	$(CC) -c $(SRC)/map/map.c
 audio.o: $(SRC)/audio/audio.c
-	$(CC) -c $(SRC)/audio/audio.c
+	$(CC) -c $(SRC)/audio/audio.c $(CFLAGS)
 
 clean:
 	rm -f game
