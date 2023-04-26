@@ -27,19 +27,13 @@
 #undef main
 
 typedef struct {
+    SDL_Texture* texture;
     SDL_Rect rect;
     bool active;
 } SpeedBoostPerk;
 
 SpeedBoostPerk speedBoostPerk;
 
-void initSpeedBoostPerk() {
-    speedBoostPerk.rect.x = 300; 
-    speedBoostPerk.rect.y = 300; 
-    speedBoostPerk.rect.w = PERK_WIDTH;  
-    speedBoostPerk.rect.h = PERK_HEIGHT; 
-    speedBoostPerk.active = true;
-}
 
 bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
@@ -76,6 +70,12 @@ int main(int argc, char *args[])
     spriteRect2.y = (400 - FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame2 = 6;
 
+    // Perk
+    speedBoostPerk.rect.x = 300; 
+    speedBoostPerk.rect.y = 300; 
+    speedBoostPerk.rect.w = PERK_WIDTH;  
+    speedBoostPerk.rect.h = PERK_HEIGHT; 
+    speedBoostPerk.active = true;
 
     // Background
     SDL_Texture *tilesModule = NULL;
@@ -96,7 +96,7 @@ int main(int argc, char *args[])
     // Movement speed of the player
     int PLAYER_SPEED = 2;
 
-    initSpeedBoostPerk(); // Initialize the speed boost perk
+    //initSpeedBoostPerk(); // Initialize the speed boost perk
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
     while (!quit)
@@ -360,6 +360,8 @@ void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTe
         SDL_Surface *spriteSheetSurface = IMG_Load("resources/Hunter.PNG");
         *spriteSheetTexture = SDL_CreateTextureFromSurface(renderer, spriteSheetSurface);
     }
+
+    speedBoostPerk.texture = IMG_LoadTexture(renderer, "resources/perk.png");
     
     int frame_count = 0;
     for (int y = 0; y < 4; y++) 
@@ -422,7 +424,6 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer)
 {
     if (speedBoostPerk.active)
     {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &speedBoostPerk.rect);
+        SDL_RenderCopy(renderer, speedBoostPerk.texture, NULL, &speedBoostPerk.rect);
     }
 }
