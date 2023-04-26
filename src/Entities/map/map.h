@@ -15,4 +15,4 @@ int getTheHeightOfTheTile();
 int getTileInformation(int x, int y);
 int encountersForbiddenTile(int x, int y);
 
-#endif /* MAP_H */
+#endif 
