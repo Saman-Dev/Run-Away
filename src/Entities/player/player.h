@@ -3,9 +3,9 @@
 
 #include <stdlib.h>
 
-typedef struct Player_type *Player;
+// typedef struct Player_type *Player;
 
-Player createPlayer(int x, int y);
+// Player createPlayer(int x, int y);
 int getPlayerHeight();
 int getPlayerWidth();
 

@@ -14,6 +14,7 @@ struct Player_type
     int speed;
 };
 
+/*
 PUBLIC Player createPlayer(int x, int y)
 {
     Player s = malloc(sizeof(struct Player_type));
@@ -23,6 +24,7 @@ PUBLIC Player createPlayer(int x, int y)
     s->speed = 1;
     return s;
 }
+*/
 
 PUBLIC int getPlayerHeight()
 {

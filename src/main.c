@@ -32,8 +32,55 @@ typedef struct {
     bool active;
 } SpeedBoostPerk;
 
+typedef struct {
+    SDL_Texture *spriteSheetTexture;
+    SDL_Rect spriteClip[12];
+    SDL_Rect position;
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    int frame;
+} Player;
+
 SpeedBoostPerk speedBoostPerk;
 
+Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY) {
+    Player playerX;
+
+    playerX.spriteSheetTexture = IMG_LoadTexture(renderer, playerModel);
+    if (playerX.spriteSheetTexture == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
+    }
+
+    int frame_count = 0;
+    for (int y = 0; y < 4; y++) 
+    {
+        for (int x = 0; x < 3; x++) 
+        {
+            playerX.spriteClip[frame_count].x = x * (32) + 1; // 32 width/height
+            playerX.spriteClip[frame_count].y = y * (32) + 3;
+            playerX.spriteClip[frame_count].w = 32;
+            playerX.spriteClip[frame_count].h = 32;
+            frame_count++;
+        }
+    }
+
+    playerX.down = false;
+    playerX.up = false;
+    playerX.left = false;
+    playerX.right = false;
+
+    playerX.position.x = (positionX - FRAME_WIDTH) / 2;
+    playerX.position.y = (positionY - FRAME_HEIGHT) / 2;
+    playerX.position.w = FRAME_WIDTH;
+    playerX.position.h = FRAME_HEIGHT;
+
+    playerX.frame = 6;
+
+    return playerX;
+}
 
 bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
@@ -51,6 +98,8 @@ int main(int argc, char *args[])
     bool quit = false;
 
     int collision = 0;
+
+    Player player1;
 
     // Player
     SDL_Texture *spriteSheetTexture = NULL;
@@ -85,6 +134,8 @@ int main(int argc, char *args[])
     {
         printf("worked\n");
     }
+
+    player1 = createPlayer(renderer, "/resources/Runner_3.png", 50, 50);
 
     int playerNr = 1;
     loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
@@ -314,6 +365,7 @@ int main(int argc, char *args[])
         renderSpeedBoostPerk(renderer);
 
         // Render players
+        SDL_RenderCopyEx(renderer, player1.spriteSheetTexture, &player1.spriteClip[currentFrame], &player1.position, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
         SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
         // Present the rendered frame
