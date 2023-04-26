@@ -316,7 +316,6 @@ int main(int argc, char *args[])
         // Render players
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
         SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
-        SDL_RenderPresent(renderer);
         // Present the rendered frame
         SDL_RenderPresent(renderer);
     }

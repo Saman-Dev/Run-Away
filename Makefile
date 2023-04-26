@@ -26,19 +26,19 @@ CFLAGS_MAC := /opt/homebrew/include/
 ifeq ($(CURRENT_OS),windows)
     LDFLAGS := $(LDFLAGS)
 	CFLAGS := -I$(CFLAGS_WINDOWS) -c 
-
+	RunGame := ./game.exe
 endif
 
 ifeq ($(CURRENT_OS),mac)
     LDFLAGS := $(LDFLAGS_MAC) $(LDFLAGS)
 	CFLAGS := -I$(CFLAGS_MAC) -c 
+	RunGame := ./game
 endif
 
 
 theGame: main.o player.o map.o audio.o
 	$(CC) -o game main.o player.o map.o audio.o $(LDFLAGS)
-	./game.exe
-	./game.out
+	$(RunGame)
 main.o: src/main.c
 	@echo "Building Game" 
 	$(CC) src/main.c $(CFLAGS)
@@ -47,7 +47,7 @@ player.o: $(SRC)/player/player.c
 map.o: $(SRC)/map/map.c
 	$(CC) -c $(SRC)/map/map.c
 audio.o: $(SRC)/audio/audio.c
-	$(CC) -c $(SRC)/audio/audio.c
+	$(CC) -c $(SRC)/audio/audio.c $(CFLAGS)
 
 clean:
 	rm -f game
