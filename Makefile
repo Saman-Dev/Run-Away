@@ -45,7 +45,7 @@ main.o: src/main.c
 player.o: $(SRC)/player/player.c
 	$(CC) -c $(SRC)/player/player.c $(CFLAGS)
 map.o: $(SRC)/map/map.c
-	$(CC) -c $(SRC)/map/map.c
+	$(CC) -c $(SRC)/map/map.c $(CFLAGS)
 audio.o: $(SRC)/audio/audio.c
 	$(CC) -c $(SRC)/audio/audio.c $(CFLAGS)
 

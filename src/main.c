@@ -29,7 +29,6 @@ typedef struct {
     bool active;
 } SpeedBoostPerk;
 
-
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -40,11 +39,8 @@ typedef struct {
 void initialize(Framework *game);
 
 void handleInput(Framework *game, Player *playerX, Player *playerY);
-void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
-void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
-
-void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
-void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
+static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
+static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
@@ -54,6 +50,7 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 int main(int argc, char *args[]) 
 {
     Framework game;
+    Background resources;
     Player player1;
     Player hunter;
 
@@ -65,18 +62,12 @@ int main(int argc, char *args[])
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.active = true;
 
-    // Background
-    SDL_Texture *tilesModule = NULL;
-    SDL_Rect tilesGraphic[16];
-
     initialize(&game);
+    initiateMapResources(game.renderer, &resources);
+    speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
 
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 50, 50);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 80, 80);
-
-    loadMapGrid(game.renderer, &tilesModule, tilesGraphic);
-
-    speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
     
     while (!game.quit) 
     {
@@ -92,14 +83,14 @@ int main(int argc, char *args[])
         // Add a delay to control the speed of the player
         SDL_Delay(16);
 
-        // Clear the renderer
-        SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
-        SDL_RenderClear(game.renderer);
+        // Clear the renderer (Nödvändig?)
+        // SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
+        // SDL_RenderClear(game.renderer);
         
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(game.renderer);
-        renderBackground(game.renderer, tilesModule, tilesGraphic);
+        renderBackground(game.renderer, resources);
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk);
@@ -116,39 +107,6 @@ int main(int argc, char *args[])
     Mix_CloseAudio();
     SDL_Quit();
     return 0;
-}
-
-void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect tilesGraphic[])
-{
-    SDL_Rect position;
-    position.y = 0;
-    position.x = 0;
-    position.h = getTheHeightOfTheTile();
-    position.w = getTheWidthOfTheTile();
-    
-    for (int i = 0; i < getNumberOfColumnsInMap(); i++)
-    {
-        for (int j = 0; j < getNumberOfRowsInMap(); j++)
-        {
-            position.y = i * getTheHeightOfTheTile();
-            position.x = j * getTheWidthOfTheTile();
-            SDL_RenderCopyEx(renderer, tilesModule, &tilesGraphic[getTileInformation(i, j)], &position, 0, NULL, SDL_FLIP_NONE);
-        }
-    }
-}
-
-void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect tilesGraphic[])
-{
-
-    SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
-    *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
-    for (int i = 0; i < 5; i++)
-    {
-        tilesGraphic[i].x = i * getTheWidthOfTheTile();
-        tilesGraphic[i].y = 0;
-        tilesGraphic[i].w = getTheWidthOfTheTile();
-        tilesGraphic[i].h = getTheHeightOfTheTile();
-    }
 }
 
 void initialize(Framework *game) 
@@ -205,7 +163,7 @@ void handleInput(Framework *game, Player *playerX, Player *playerY) {
     }
 }
 
-void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) {
+static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) {
     switch (game->event.key.keysym.sym) {
         case SDLK_UP:
             playerX->up = true;
@@ -239,7 +197,7 @@ void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) {
     }
 }
 
-void handleKeyReleases(Framework *game, Player *playerX, Player *playerY) {
+static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY) {
     switch (game->event.key.keysym.sym) {
         case SDLK_UP:
             playerX->up = false;

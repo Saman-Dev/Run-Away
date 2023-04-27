@@ -116,3 +116,32 @@ int encountersForbiddenTile(int x, int y)
 
     return 0;
 }
+
+void renderBackground(SDL_Renderer *renderer, Background resources) {
+    SDL_Rect position;
+    position.x = 0;
+    position.y = 0;
+    position.w = getTheWidthOfTheTile();
+    position.h = getTheHeightOfTheTile();
+    
+    for (int i = 0; i < getNumberOfColumnsInMap(); i++)
+    {
+        for (int j = 0; j < getNumberOfRowsInMap(); j++)
+        {
+            position.x = j * getTheWidthOfTheTile();
+            position.y = i * getTheHeightOfTheTile();
+            SDL_RenderCopyEx(renderer, resources.tileAtlas, &resources.tilesGraphic[getTileInformation(i, j)], &position, 0, NULL, SDL_FLIP_NONE);
+        }
+    }
+}
+
+void initiateMapResources(SDL_Renderer *renderer, Background *resources) {
+    resources->tileAtlas = IMG_LoadTexture(renderer, "resources/Map.JPG");
+    for (int i = 0; i < 5; i++)
+    {
+        resources->tilesGraphic[i].x = i * getTheWidthOfTheTile();
+        resources->tilesGraphic[i].y = 0;
+        resources->tilesGraphic[i].w = getTheWidthOfTheTile();
+        resources->tilesGraphic[i].h = getTheHeightOfTheTile();
+    }
+}
