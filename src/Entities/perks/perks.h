@@ -16,7 +16,7 @@ typedef struct {
 } Perk;
 
 Perk* create_perk(int type, int value, SDL_Rect* perkRect, SDL_Texture* texture);
-void apply_perk(Player player, Perk* perk);
+//void apply_perk(Player player, Perk* perk);
 void destroy_perk(Perk* perk);
 
 #endif

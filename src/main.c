@@ -10,8 +10,8 @@
 #include <stdbool.h>
 
 // Player Sprite dimensions
-#define FRAME_WIDTH 32
-#define FRAME_HEIGHT 32
+#define PLAYER_FRAME_WIDTH 32
+#define PLAYER_FRAME_HEIGHT 32
 #define FRAME_COUNT 12
 
 // Screen dimensions
@@ -59,10 +59,10 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     {
         for (int x = 0; x < 3; x++) 
         {
-            playerX.spriteClip[frame_count].x = x * (32) + 1; // 32 width/height
-            playerX.spriteClip[frame_count].y = y * (32) + 3;
-            playerX.spriteClip[frame_count].w = 32;
-            playerX.spriteClip[frame_count].h = 32;
+            playerX.spriteClip[frame_count].x = x * (PLAYER_FRAME_HEIGHT) + 1; // 32 width/height
+            playerX.spriteClip[frame_count].y = y * (PLAYER_FRAME_WIDTH) + 3;
+            playerX.spriteClip[frame_count].w = PLAYER_FRAME_WIDTH;
+            playerX.spriteClip[frame_count].h = PLAYER_FRAME_HEIGHT;
             frame_count++;
         }
     }
@@ -72,10 +72,10 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     playerX.left = false;
     playerX.right = false;
 
-    playerX.position.x = (positionX - FRAME_WIDTH) / 2;
-    playerX.position.y = (positionY - FRAME_HEIGHT) / 2;
-    playerX.position.w = FRAME_WIDTH;
-    playerX.position.h = FRAME_HEIGHT;
+    playerX.position.x = (positionX - PLAYER_FRAME_WIDTH) / 2;
+    playerX.position.y = (positionY - PLAYER_FRAME_HEIGHT) / 2;
+    playerX.position.w = PLAYER_FRAME_WIDTH;
+    playerX.position.h = PLAYER_FRAME_HEIGHT;
 
     playerX.frame = 6;
 
@@ -86,7 +86,7 @@ bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
 void renderSpeedBoostPerk(SDL_Renderer *renderer);
-bool checkCollision(SDL_Rect a, SDL_Rect b);
+bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
 
 
 int main(int argc, char *args[])
@@ -105,18 +105,18 @@ int main(int argc, char *args[])
     SDL_Texture *spriteSheetTexture = NULL;
     SDL_Rect frameRects[12];
     SDL_RendererFlip flip = SDL_FLIP_NONE;
-    SDL_Rect spriteRect = {0, 0, FRAME_WIDTH, FRAME_HEIGHT};
-    spriteRect.x = (640 - FRAME_WIDTH) / 2;  // Center horizontally
-    spriteRect.y = (480 - FRAME_HEIGHT) / 2; // Center vertically
+    SDL_Rect spriteRect = {0, 0, PLAYER_FRAME_WIDTH, PLAYER_FRAME_HEIGHT};
+    spriteRect.x = (640 - PLAYER_FRAME_WIDTH) / 2;  // Center horizontally
+    spriteRect.y = (480 - PLAYER_FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame = 6;
 
     // Hunter
     SDL_Texture *spriteSheetTexture2 = NULL;
     SDL_Rect frameRects2[12];
     SDL_RendererFlip flip2 = SDL_FLIP_NONE;
-    SDL_Rect spriteRect2 = {0, 0, FRAME_WIDTH, FRAME_HEIGHT};
-    spriteRect2.x = (600 - FRAME_WIDTH) / 2;  // Center horizontally
-    spriteRect2.y = (400 - FRAME_HEIGHT) / 2; // Center vertically
+    SDL_Rect spriteRect2 = {0, 0, PLAYER_FRAME_WIDTH, PLAYER_FRAME_HEIGHT};
+    spriteRect2.x = (600 - PLAYER_FRAME_WIDTH) / 2;  // Center horizontally
+    spriteRect2.y = (400 - PLAYER_FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame2 = 6;
 
     // Perk
@@ -343,7 +343,7 @@ int main(int argc, char *args[])
             }
         }
 
-        if (speedBoostPerk.active && checkCollision(spriteRect, speedBoostPerk.rect) || speedBoostPerk.active && checkCollision(spriteRect2, speedBoostPerk.rect)) 
+        if (speedBoostPerk.active && checkPerkCollision(spriteRect, speedBoostPerk.rect) || speedBoostPerk.active && checkPerkCollision(spriteRect2, speedBoostPerk.rect)) 
         {
             // Apply the speed boost effect to the player
             PLAYER_SPEED += 2; // Increase the speed
@@ -467,7 +467,7 @@ bool init(SDL_Renderer **renderer)
     return test;
 }
 
-bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
+bool checkPerkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
 {
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
