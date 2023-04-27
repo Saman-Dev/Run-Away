@@ -36,11 +36,12 @@ typedef struct {
     SDL_Texture *spriteSheetTexture;
     SDL_Rect spriteClip[12];
     SDL_Rect position;
+    int frame;
+    int speed;
     bool up;
     bool down;
     bool left;
     bool right;
-    int frame;
 } Player;
 
 SpeedBoostPerk speedBoostPerk;
@@ -78,6 +79,7 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     playerX.position.h = PLAYER_FRAME_HEIGHT;
 
     playerX.frame = 6;
+    playerX.speed = 2;
 
     return playerX;
 }
@@ -135,11 +137,11 @@ int main(int argc, char *args[])
         printf("worked\n");
     }
 
-    player1 = createPlayer(renderer, "/resources/Runner_3.png", 50, 50);
+    player1 = createPlayer(renderer, "/resources/Runner_1.png", 50, 50);
 
     int playerNr = 1;
     loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
-    loadMedia(renderer, 2, &spriteSheetTexture2, frameRects2, &tilesModule, tilesGraphic);
+    // loadMedia(renderer, 2, &spriteSheetTexture2, frameRects2, &tilesModule, tilesGraphic);
 
     // Boolean array to keep track of which keys are pressed
     bool keysPressed[8] = {false, false, false, false, false, false, false, false};
@@ -177,16 +179,16 @@ int main(int argc, char *args[])
                     keysPressed[3] = true;
                     break;
                 case SDLK_UP:
-                    keysPressed[4] = true;
+                    player1.up = true;
                     break;
                 case SDLK_DOWN:
-                    keysPressed[5] = true;
+                    player1.down = true;
                     break;
                 case SDLK_LEFT:
-                    keysPressed[6] = true;
+                    player1.left = true;
                     break;
                 case SDLK_RIGHT:
-                    keysPressed[7] = true;
+                    player1.right = true;
                     break;
                 case SDLK_ESCAPE:
                     quit = true;
@@ -213,16 +215,16 @@ int main(int argc, char *args[])
                     keysPressed[3] = false;
                     break;
                 case SDLK_UP:
-                    keysPressed[4] = false;
+                    player1.up = false;
                     break;
                 case SDLK_DOWN:
-                    keysPressed[5] = false;
+                    player1.down = false;
                     break;
                 case SDLK_LEFT:
-                    keysPressed[6] = false;
+                    player1.left = false;
                     break;
                 case SDLK_RIGHT:
-                    keysPressed[7] = false;
+                    player1.right = false;
                     break;
                 default:
                     break;
@@ -286,60 +288,60 @@ int main(int argc, char *args[])
                     currentFrame = 6;
             }
         }
-        if (keysPressed[4])
+        if (player1.up)
         {
             // Move up
-            collision = encountersForbiddenTile(spriteRect2.x, spriteRect2.y - 5);
+            collision = encountersForbiddenTile(player1.position.x, player1.position.y - 5);
             if (collision == 0)
             {
-                printf("Player 2: UP\n");
-                spriteRect2.y -= PLAYER_SPEED;
-                if (currentFrame2 == 9 || currentFrame2 == 10)
-                    currentFrame2++;
+                printf("Player 2: Up\n");
+                player1.position.y -= player1.speed;
+                if (player1.frame == 9 || player1.frame == 10)
+                    player1.frame++;
                 else
-                    currentFrame2 = 9;
+                    player1.frame = 9;
             }
         }
-        else if (keysPressed[5])
+        else if (player1.down)
         {
             // Move down
-            collision = encountersForbiddenTile(spriteRect2.x, spriteRect2.y + 26);
+            collision = encountersForbiddenTile(player1.position.x, player1.position.y + 26);
             if (collision == 0)
             {
                 printf("Player 2: DOWN\n");
-                spriteRect2.y += PLAYER_SPEED;
-                if (currentFrame2 == 0 || currentFrame2 == 1)
-                    currentFrame2++;
+                player1.position.y += player1.speed;
+                if (player1.frame == 0 || player1.frame == 1)
+                    player1.frame++;
                 else
-                    currentFrame2 = 0;
+                    player1.frame = 0;
             }
         }
-        if (keysPressed[6])
+        if (player1.left)
         {
             // Move left
-            collision = encountersForbiddenTile(spriteRect2.x - 5, spriteRect2.y);
+            collision = encountersForbiddenTile(player1.position.x - 5, player1.position.y);
             if (collision == 0)
             {
-                printf("Player 2: LEFT\n");
-                spriteRect2.x -= PLAYER_SPEED;
-                if (currentFrame2 == 3 || currentFrame2 == 4)
-                    currentFrame2++;
+                printf("Player 2: Left\n");
+                player1.position.x -= player1.speed;
+                if (player1.frame == 3 || player1.frame == 4)
+                    player1.frame++;
                 else
-                    currentFrame2 = 3;
+                    player1.frame = 3;
             }
         }
-        else if (keysPressed[7])
+        else if (player1.right)
         {
             // Move right
-            collision = encountersForbiddenTile(spriteRect2.x + 16, spriteRect2.y);
+            collision = encountersForbiddenTile(player1.position.x + 16, player1.position.y);
             if (collision == 0)
             {
-                printf("Player 2: RIGHT\n");
-                spriteRect2.x += PLAYER_SPEED;
-                if (currentFrame2 == 6 || currentFrame2 == 7)
-                    currentFrame2++;
+                printf("Player 2: Right\n");
+                player1.position.x += player1.speed;
+                if (player1.frame == 6 || player1.frame == 7)
+                    player1.frame++;
                 else
-                    currentFrame2 = 6;
+                    player1.frame = 6;
             }
         }
 
@@ -365,7 +367,8 @@ int main(int argc, char *args[])
         renderSpeedBoostPerk(renderer);
 
         // Render players
-        SDL_RenderCopyEx(renderer, player1.spriteSheetTexture, &player1.spriteClip[currentFrame], &player1.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
+        
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
         SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
         // Present the rendered frame
@@ -426,7 +429,7 @@ void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTe
             frameRects[frame_count].h = 32;
             frame_count++;
         }
-    }
+    };
 
     SDL_Surface *gTilesSurface = IMG_Load("resources/Map.JPG");
     *tilesModule = SDL_CreateTextureFromSurface(renderer, gTilesSurface);
