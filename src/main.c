@@ -57,6 +57,10 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
 void handlePlayerMovement(Player *playerX);
 void initialize(Framework *game);
 
+void handleInput(Framework *game, Player *playerX, Player *playerY);
+void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
+void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
+
 void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
 void renderSpeedBoostPerk(SDL_Renderer *renderer);
@@ -90,80 +94,9 @@ int main(int argc, char *args[]) {
     //initSpeedBoostPerk(); // Initialize the speed boost perk
 
     speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
-
-    // Game loop - 1. Game Event 2. Game Logic 3. Render Game
-
+    
     while (!game.quit) {
-        // Game event
-        while (SDL_PollEvent(&game.event)) {
-            if (game.event.type == SDL_QUIT) {
-                game.quit = true;
-            }
-            else if (game.event.type == SDL_KEYDOWN) {
-                switch (game.event.key.keysym.sym) {
-                case SDLK_w:
-                    hunter.up = true;
-                    break;
-                case SDLK_s:
-                    hunter.down = true;
-                    break;
-                case SDLK_a:
-                    hunter.left = true;
-                    break;
-                case SDLK_d:
-                    hunter.right = true;
-                    break;
-                case SDLK_UP:
-                    player1.up = true;
-                    break;
-                case SDLK_DOWN:
-                    player1.down = true;
-                    break;
-                case SDLK_LEFT:
-                    player1.left = true;
-                    break;
-                case SDLK_RIGHT:
-                    player1.right = true;
-                    break;
-                case SDLK_ESCAPE:
-                    game.quit = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-            else if (game.event.type == SDL_KEYUP) {
-                switch (game.event.key.keysym.sym) {
-                case SDLK_w:
-                    hunter.up = false;
-                    break;
-                case SDLK_s:
-                    hunter.down = false;
-                    break;
-                case SDLK_a:
-                    hunter.left = false;
-                    break;
-                case SDLK_d:
-                    hunter.right = false;
-                    break;
-                case SDLK_UP:
-                    player1.up = false;
-                    break;
-                case SDLK_DOWN:
-                    player1.down = false;
-                    break;
-                case SDLK_LEFT:
-                    player1.left = false;
-                    break;
-                case SDLK_RIGHT:
-                    player1.right = false;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-
+        handleInput(&game, &player1, &hunter);
         handlePlayerMovement(&player1);
         handlePlayerMovement(&hunter);
 
@@ -356,4 +289,83 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     playerX.speed = 2;
 
     return playerX;
+}
+
+void handleInput(Framework *game, Player *playerX, Player *playerY) {
+    while (SDL_PollEvent(&game->event)) {
+        if (game->event.type == SDL_QUIT) {
+            game->quit = true;
+        }
+        else if (game->event.type == SDL_KEYDOWN) {
+            handleKeyPresses(game, playerX, playerY);
+        }
+        else if (game->event.type == SDL_KEYUP) {
+            handleKeyReleases(game, playerX, playerY);
+        }
+    }
+}
+
+void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) {
+    switch (game->event.key.keysym.sym) {
+        case SDLK_UP:
+            playerX->up = true;
+            break;
+        case SDLK_DOWN:
+            playerX->down = true;
+            break;
+        case SDLK_LEFT:
+            playerX->left = true;
+            break;
+        case SDLK_RIGHT:
+            playerX->right = true;
+            break;
+        case SDLK_w:
+            playerY->up = true;
+            break;
+        case SDLK_s:
+            playerY->down = true;
+            break;
+        case SDLK_a:
+            playerY->left = true;
+            break;
+        case SDLK_d:
+            playerY->right = true;
+            break;
+        case SDLK_ESCAPE:
+            game->quit = true;
+            break;
+        default:
+            break;        
+    }
+}
+
+void handleKeyReleases(Framework *game, Player *playerX, Player *playerY) {
+    switch (game->event.key.keysym.sym) {
+        case SDLK_UP:
+            playerX->up = false;
+            break;
+        case SDLK_DOWN:
+            playerX->down = false;
+            break;
+        case SDLK_LEFT:
+            playerX->left = false;
+            break;
+        case SDLK_RIGHT:
+            playerX->right = false;
+            break;
+        case SDLK_w:
+            playerY->up = false;
+            break;
+        case SDLK_s:
+            playerY->down = false;
+            break;
+        case SDLK_a:
+            playerY->left = false;
+            break;
+        case SDLK_d:
+            playerY->right = false;
+            break;
+        default:
+            break;
+    }
 }
