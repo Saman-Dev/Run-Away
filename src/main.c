@@ -32,6 +32,15 @@ typedef struct {
     bool active;
 } SpeedBoostPerk;
 
+SpeedBoostPerk speedBoostPerk;
+
+typedef struct {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Event event;
+    bool quit;
+} Foundation;
+
 typedef struct {
     SDL_Texture *spriteSheetTexture;
     SDL_Rect spriteClip[12];
@@ -43,8 +52,6 @@ typedef struct {
     bool left;
     bool right;
 } Player;
-
-SpeedBoostPerk speedBoostPerk;
 
 Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY) {
     Player playerX;
@@ -84,6 +91,8 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     return playerX;
 }
 
+void handleCharacterMovement(Player *playerX);
+
 bool init(SDL_Renderer **renderer);
 void loadMedia(SDL_Renderer *renderer, int playerNr, SDL_Texture **spriteSheetTexture, SDL_Rect frameRects[], SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
@@ -102,8 +111,9 @@ int main(int argc, char *args[])
     int collision = 0;
 
     Player player1;
+    Player hunter;
 
-    // Player
+    // Hunter
     SDL_Texture *spriteSheetTexture = NULL;
     SDL_Rect frameRects[12];
     SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -111,15 +121,6 @@ int main(int argc, char *args[])
     spriteRect.x = (640 - PLAYER_FRAME_WIDTH) / 2;  // Center horizontally
     spriteRect.y = (480 - PLAYER_FRAME_HEIGHT) / 2; // Center vertically
     int currentFrame = 6;
-
-    // Hunter
-    SDL_Texture *spriteSheetTexture2 = NULL;
-    SDL_Rect frameRects2[12];
-    SDL_RendererFlip flip2 = SDL_FLIP_NONE;
-    SDL_Rect spriteRect2 = {0, 0, PLAYER_FRAME_WIDTH, PLAYER_FRAME_HEIGHT};
-    spriteRect2.x = (600 - PLAYER_FRAME_WIDTH) / 2;  // Center horizontally
-    spriteRect2.y = (400 - PLAYER_FRAME_HEIGHT) / 2; // Center vertically
-    int currentFrame2 = 6;
 
     // Perk
     speedBoostPerk.rect.x = 300; 
@@ -138,6 +139,7 @@ int main(int argc, char *args[])
     }
 
     player1 = createPlayer(renderer, "resources/Runner_1.png", 50, 50);
+    hunter = createPlayer(renderer, "resources/Hunter.png", 80, 80);
 
     int playerNr = 1;
     loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
@@ -167,16 +169,16 @@ int main(int argc, char *args[])
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_w:
-                    keysPressed[0] = true;
+                    hunter.up = true;
                     break;
                 case SDLK_s:
-                    keysPressed[1] = true;
+                    hunter.down = true;
                     break;
                 case SDLK_a:
-                    keysPressed[2] = true;
+                    hunter.left = true;
                     break;
                 case SDLK_d:
-                    keysPressed[3] = true;
+                    hunter.right = true;
                     break;
                 case SDLK_UP:
                     player1.up = true;
@@ -203,16 +205,16 @@ int main(int argc, char *args[])
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_w:
-                    keysPressed[0] = false;
+                    hunter.up = false;
                     break;
                 case SDLK_s:
-                    keysPressed[1] = false;
+                    hunter.down = false;
                     break;
                 case SDLK_a:
-                    keysPressed[2] = false;
+                    hunter.left = false;
                     break;
                 case SDLK_d:
-                    keysPressed[3] = false;
+                    hunter.right = false;
                     break;
                 case SDLK_UP:
                     player1.up = false;
@@ -232,120 +234,10 @@ int main(int argc, char *args[])
             }
         }
 
-        // Move the player based on the state of the boolean array
-        if (keysPressed[0])
-        {
-            // Move up
-            collision = encountersForbiddenTile(spriteRect.x, spriteRect.y - 5);
-            if (collision == 0)
-            {
-                printf("UP\n");
-                spriteRect.y -= PLAYER_SPEED;
-                if (currentFrame == 9 || currentFrame == 10)
-                    currentFrame++;
-                else
-                    currentFrame = 9;
-            }
-        }
-        else if (keysPressed[1])
-        {
-            // Move down
-            collision = encountersForbiddenTile(spriteRect.x, spriteRect.y + 26);
-            if (collision == 0)
-            {
-                spriteRect.y += PLAYER_SPEED;
-                if (currentFrame == 0 || currentFrame == 1)
-                    currentFrame++;
-                else
-                    currentFrame = 0;
-            }
-        }
-        if (keysPressed[2])
-        {
-            // Move left
-            collision = encountersForbiddenTile(spriteRect.x - 5, spriteRect.y);
-            if (collision == 0)
-            {
-                printf("LEFT\n");
-                spriteRect.x -= PLAYER_SPEED;
-                if (currentFrame == 3 || currentFrame == 4)
-                    currentFrame++;
-                else
-                    currentFrame = 3;
-            }
-        }
-        else if (keysPressed[3])
-        {
-            // Move right
-            collision = encountersForbiddenTile(spriteRect.x + 16, spriteRect.y);
-            if (collision == 0)
-            {
-                printf("RIGHT\n");
-                spriteRect.x += PLAYER_SPEED;
-                if (currentFrame == 6 || currentFrame == 7)
-                    currentFrame++;
-                else
-                    currentFrame = 6;
-            }
-        }
-        if (player1.up)
-        {
-            // Move up
-            collision = encountersForbiddenTile(player1.position.x, player1.position.y - 5);
-            if (collision == 0)
-            {
-                printf("Player 2: Up\n");
-                player1.position.y -= player1.speed;
-                if (player1.frame == 9 || player1.frame == 10)
-                    player1.frame++;
-                else
-                    player1.frame = 9;
-            }
-        }
-        else if (player1.down)
-        {
-            // Move down
-            collision = encountersForbiddenTile(player1.position.x, player1.position.y + 26);
-            if (collision == 0)
-            {
-                printf("Player 2: DOWN\n");
-                player1.position.y += player1.speed;
-                if (player1.frame == 0 || player1.frame == 1)
-                    player1.frame++;
-                else
-                    player1.frame = 0;
-            }
-        }
-        if (player1.left)
-        {
-            // Move left
-            collision = encountersForbiddenTile(player1.position.x - 5, player1.position.y);
-            if (collision == 0)
-            {
-                printf("Player 2: Left\n");
-                player1.position.x -= player1.speed;
-                if (player1.frame == 3 || player1.frame == 4)
-                    player1.frame++;
-                else
-                    player1.frame = 3;
-            }
-        }
-        else if (player1.right)
-        {
-            // Move right
-            collision = encountersForbiddenTile(player1.position.x + 16, player1.position.y);
-            if (collision == 0)
-            {
-                printf("Player 2: Right\n");
-                player1.position.x += player1.speed;
-                if (player1.frame == 6 || player1.frame == 7)
-                    player1.frame++;
-                else
-                    player1.frame = 6;
-            }
-        }
+        handleCharacterMovement(&player1);
+        handleCharacterMovement(&hunter);
 
-        if (speedBoostPerk.active && checkPerkCollision(spriteRect, speedBoostPerk.rect) || speedBoostPerk.active && checkPerkCollision(spriteRect2, speedBoostPerk.rect)) 
+        if (speedBoostPerk.active && checkPerkCollision(spriteRect, speedBoostPerk.rect)) 
         {
             // Apply the speed boost effect to the player
             PLAYER_SPEED += 2; // Increase the speed
@@ -368,9 +260,10 @@ int main(int argc, char *args[])
 
         // Render players
         SDL_RenderCopyEx(renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
+
         
         SDL_RenderCopyEx(renderer, spriteSheetTexture, &frameRects[currentFrame], &spriteRect, 0, NULL, flip);
-        SDL_RenderCopyEx(renderer, spriteSheetTexture2, &frameRects2[currentFrame2], &spriteRect2, 0, NULL, flip2);
         // Present the rendered frame
         SDL_RenderPresent(renderer);
     }
@@ -446,8 +339,9 @@ bool init(SDL_Renderer **renderer)
 {
     bool test = true;
     SDL_Window *gWindow = NULL;
+
     // Initialize SDL
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO );
     // Initialize SDL2 Mixer library and play music
     if (init_audio() < 0)
     {
@@ -480,5 +374,48 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer)
     if (speedBoostPerk.active)
     {
         SDL_RenderCopy(renderer, speedBoostPerk.texture, NULL, &speedBoostPerk.rect);
+    }
+}
+
+void handleCharacterMovement(Player *playerX) {
+    if (playerX->up) {
+        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y - 5)) {
+            printf("Player: Up\n");
+            playerX->position.y -= playerX->speed;
+            if (playerX->frame == 9 || playerX->frame == 10)
+                playerX->frame++;
+            else
+                playerX->frame = 9;
+        }
+    }
+    else if (playerX->down) {
+        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + 26)) {
+            printf("Player: Down\n");
+            playerX->position.y += playerX->speed;
+            if (playerX->frame == 0 || playerX->frame == 1)
+                playerX->frame++;
+            else
+                playerX->frame = 0;
+        }
+    }
+    if (playerX->left) {
+        if (!encountersForbiddenTile(playerX->position.x - 5, playerX->position.y)) {
+            printf("Player: Left\n");
+            playerX->position.x -= playerX->speed;
+            if (playerX->frame == 3 || playerX->frame == 4)
+                playerX->frame++;
+            else
+                playerX->frame = 3;
+        }
+    }
+    else if (playerX->right) {
+        if (!encountersForbiddenTile(playerX->position.x + 16, playerX->position.y)) {
+            printf("Player: Right\n");
+            playerX->position.x += playerX->speed;
+            if (playerX->frame == 6 || playerX->frame == 7)
+                playerX->frame++;
+            else
+                playerX->frame = 6;
+        }
     }
 }
