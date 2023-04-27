@@ -39,7 +39,7 @@ typedef struct {
     SDL_Renderer *renderer;
     SDL_Event event;
     bool quit;
-} Foundation;
+} Framework;
 
 typedef struct {
     SDL_Texture *spriteSheetTexture;
@@ -53,47 +53,10 @@ typedef struct {
     bool right;
 } Player;
 
-Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY) {
-    Player playerX;
-
-    playerX.spriteSheetTexture = IMG_LoadTexture(renderer, playerModel);
-    if (playerX.spriteSheetTexture == NULL) {
-        printf("%s\n", SDL_GetError());
-        exit(1);
-    }
-
-    int frame_count = 0;
-    for (int y = 0; y < 4; y++) 
-    {
-        for (int x = 0; x < 3; x++) 
-        {
-            playerX.spriteClip[frame_count].x = x * (PLAYER_FRAME_HEIGHT) + 1; // 32 width/height
-            playerX.spriteClip[frame_count].y = y * (PLAYER_FRAME_WIDTH) + 3;
-            playerX.spriteClip[frame_count].w = PLAYER_FRAME_WIDTH;
-            playerX.spriteClip[frame_count].h = PLAYER_FRAME_HEIGHT;
-            frame_count++;
-        }
-    }
-
-    playerX.down = false;
-    playerX.up = false;
-    playerX.left = false;
-    playerX.right = false;
-
-    playerX.position.x = (positionX - PLAYER_FRAME_WIDTH) / 2;
-    playerX.position.y = (positionY - PLAYER_FRAME_HEIGHT) / 2;
-    playerX.position.w = PLAYER_FRAME_WIDTH;
-    playerX.position.h = PLAYER_FRAME_HEIGHT;
-
-    playerX.frame = 6;
-    playerX.speed = 2;
-
-    return playerX;
-}
-
+Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY);
 void handlePlayerMovement(Player *playerX);
+void initialize(Framework *game);
 
-bool init(SDL_Renderer **renderer);
 void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
 void renderSpeedBoostPerk(SDL_Renderer *renderer);
@@ -102,11 +65,7 @@ bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
 SpeedBoostPerk speedBoostPerk;
 
 int main(int argc, char *args[]) {
-    srand(time(NULL));
-    SDL_Event event;
-    SDL_Renderer *renderer = NULL;
-    bool quit = false;
-
+    Framework game;
     Player player1;
     Player hunter;
 
@@ -121,30 +80,27 @@ int main(int argc, char *args[]) {
     SDL_Texture *tilesModule = NULL;
     SDL_Rect tilesGraphic[16];
 
-    if (init(&renderer))
-    {
-        printf("worked\n");
-    }
+    initialize(&game);
 
-    player1 = createPlayer(renderer, "resources/Runner_1.png", 50, 50);
-    hunter = createPlayer(renderer, "resources/Hunter.png", 80, 80);
+    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 50, 50);
+    hunter = createPlayer(game.renderer, "resources/Hunter.png", 80, 80);
 
-    loadMapGrid(renderer, &tilesModule, tilesGraphic);
+    loadMapGrid(game.renderer, &tilesModule, tilesGraphic);
 
     //initSpeedBoostPerk(); // Initialize the speed boost perk
 
-    speedBoostPerk.texture = IMG_LoadTexture(renderer, "resources/perk.png");
+    speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
 
     // Game loop - 1. Game Event 2. Game Logic 3. Render Game
 
-    while (!quit) {
+    while (!game.quit) {
         // Game event
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                quit = true;
+        while (SDL_PollEvent(&game.event)) {
+            if (game.event.type == SDL_QUIT) {
+                game.quit = true;
             }
-            else if (event.type == SDL_KEYDOWN) {
-                switch (event.key.keysym.sym) {
+            else if (game.event.type == SDL_KEYDOWN) {
+                switch (game.event.key.keysym.sym) {
                 case SDLK_w:
                     hunter.up = true;
                     break;
@@ -170,14 +126,14 @@ int main(int argc, char *args[]) {
                     player1.right = true;
                     break;
                 case SDLK_ESCAPE:
-                    quit = true;
+                    game.quit = true;
                     break;
                 default:
                     break;
                 }
             }
-            else if (event.type == SDL_KEYUP) {
-                switch (event.key.keysym.sym) {
+            else if (game.event.type == SDL_KEYUP) {
+                switch (game.event.key.keysym.sym) {
                 case SDLK_w:
                     hunter.up = false;
                     break;
@@ -226,23 +182,23 @@ int main(int argc, char *args[]) {
         SDL_Delay(16);
 
         // Clear the renderer
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
+        SDL_RenderClear(game.renderer);
         
         // Game renderer
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(renderer);
-        renderBackground(renderer, tilesModule, tilesGraphic);
+        SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        SDL_RenderClear(game.renderer);
+        renderBackground(game.renderer, tilesModule, tilesGraphic);
 
         // Perk render
-        renderSpeedBoostPerk(renderer);
+        renderSpeedBoostPerk(game.renderer);
 
         // Render players
-        SDL_RenderCopyEx(renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
 
         // Present the rendered frame
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(game.renderer);
     }
 
     // Free resources and close SDL
@@ -253,7 +209,6 @@ int main(int argc, char *args[]) {
 
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *tilesModule, SDL_Rect tilesGraphic[])
 {
-
     SDL_Rect position;
     position.y = 0;
     position.x = 0;
@@ -285,35 +240,30 @@ void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect til
     }
 }
 
-bool init(SDL_Renderer **renderer)
-{
-    bool test = true;
-    SDL_Window *gWindow = NULL;
-
-    // Initialize SDL
+void initialize(Framework *game) {
+    game->quit = false;
+    
+    // Initialize SDL and timer
     SDL_Init(SDL_INIT_VIDEO);
+    srand(time(NULL));
 
     // Initialize SDL2 Mixer library and play music
-    if (init_audio() < 0)
-    {
+    if (init_audio() < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to initialize SDL2 Mixer");
-        SDL_Quit();
-        return -1;
+        exit(1);
     }
 
-    gWindow = SDL_CreateWindow("The Alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (gWindow == NULL)
-    {
-        printf("Fungerar ej\n");
-        test = false;
+    game->window = SDL_CreateWindow("The Alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    if (game->window == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
     }
-    *renderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (*renderer == NULL)
-    {
-        printf("Fungerar ej\n");
-        test = false;
+
+    game->renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (game->renderer == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
     }
-    return test;
 }
 
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
@@ -370,4 +320,40 @@ void handlePlayerMovement(Player *playerX) {
                 playerX->frame = 6;
         }
     }
+}
+
+Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY) {
+    Player playerX;
+
+    playerX.spriteSheetTexture = IMG_LoadTexture(renderer, playerModel);
+    if (playerX.spriteSheetTexture == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
+    }
+
+    int frame_count = 0;
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 3; x++) {
+            playerX.spriteClip[frame_count].x = x * (PLAYER_FRAME_HEIGHT) + 1; // 32 width/height
+            playerX.spriteClip[frame_count].y = y * (PLAYER_FRAME_WIDTH) + 3;
+            playerX.spriteClip[frame_count].w = PLAYER_FRAME_WIDTH;
+            playerX.spriteClip[frame_count].h = PLAYER_FRAME_HEIGHT;
+            frame_count++;
+        }
+    }
+
+    playerX.down = false;
+    playerX.up = false;
+    playerX.left = false;
+    playerX.right = false;
+
+    playerX.position.x = (positionX - PLAYER_FRAME_WIDTH) / 2;
+    playerX.position.y = (positionY - PLAYER_FRAME_HEIGHT) / 2;
+    playerX.position.w = PLAYER_FRAME_WIDTH;
+    playerX.position.h = PLAYER_FRAME_HEIGHT;
+
+    playerX.frame = 6;
+    playerX.speed = 2;
+
+    return playerX;
 }
