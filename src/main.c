@@ -29,6 +29,7 @@ typedef struct {
     bool active;
 } SpeedBoostPerk;
 
+
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -44,17 +45,20 @@ void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
 void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect tilesGraphic[]);
 void renderBackground(SDL_Renderer *renderer, SDL_Texture *mTile, SDL_Rect tilesGraphic[]);
-void renderSpeedBoostPerk(SDL_Renderer *renderer);
+
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 
-SpeedBoostPerk speedBoostPerk;
 
-int main(int argc, char *args[]) {
+int main(int argc, char *args[]) 
+{
     Framework game;
     Player player1;
     Player hunter;
 
     // Perk
+    SpeedBoostPerk speedBoostPerk;
     speedBoostPerk.rect.x = 300; 
     speedBoostPerk.rect.y = 300; 
     speedBoostPerk.rect.w = PERK_WIDTH;  
@@ -72,25 +76,18 @@ int main(int argc, char *args[]) {
 
     loadMapGrid(game.renderer, &tilesModule, tilesGraphic);
 
-    //initSpeedBoostPerk(); // Initialize the speed boost perk
-
     speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
     
-    while (!game.quit) {
+    while (!game.quit) 
+    {
+        // Handle events
         handleInput(&game, &player1, &hunter);
         handlePlayerMovement(&player1);
         handlePlayerMovement(&hunter);
 
-        /*
-
-        if (speedBoostPerk.active && checkPerkCollision(spriteRect, speedBoostPerk.rect)) 
-        {
-            // Apply the speed boost effect to the player
-            PLAYER_SPEED += 2; // Increase the speed
-            speedBoostPerk.active = false; // Deactivate the perk
-        }
-
-        */
+        // Check for perk collision
+        applySpeedBoostPerk(&player1, &speedBoostPerk);
+        applySpeedBoostPerk(&hunter, &speedBoostPerk);
 
         // Add a delay to control the speed of the player
         SDL_Delay(16);
@@ -105,7 +102,7 @@ int main(int argc, char *args[]) {
         renderBackground(game.renderer, tilesModule, tilesGraphic);
 
         // Perk render
-        renderSpeedBoostPerk(game.renderer);
+        renderSpeedBoostPerk(game.renderer, speedBoostPerk);
 
         // Render players
         SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
@@ -154,7 +151,8 @@ void loadMapGrid(SDL_Renderer *renderer, SDL_Texture **tilesModule, SDL_Rect til
     }
 }
 
-void initialize(Framework *game) {
+void initialize(Framework *game) 
+{
     game->quit = false;
     
     // Initialize SDL and timer
@@ -185,11 +183,11 @@ bool checkPerkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
 
-void renderSpeedBoostPerk(SDL_Renderer *renderer) 
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk) 
 {
-    if (speedBoostPerk.active)
+    if (perk.active)
     {
-        SDL_RenderCopy(renderer, speedBoostPerk.texture, NULL, &speedBoostPerk.rect);
+        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
     }
 }
 
@@ -269,5 +267,14 @@ void handleKeyReleases(Framework *game, Player *playerX, Player *playerY) {
             break;
         default:
             break;
+    }
+}
+
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk) 
+{
+    if (perk->active && checkPerkCollision(player->position, perk->rect)) 
+    {
+        player->speed += SPEED_BOOST_AMOUNT;
+        perk->active = false;
     }
 }
