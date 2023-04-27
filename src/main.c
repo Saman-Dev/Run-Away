@@ -137,7 +137,7 @@ int main(int argc, char *args[])
         printf("worked\n");
     }
 
-    player1 = createPlayer(renderer, "/resources/Runner_1.png", 50, 50);
+    player1 = createPlayer(renderer, "resources/Runner_1.png", 50, 50);
 
     int playerNr = 1;
     loadMedia(renderer, playerNr, &spriteSheetTexture, frameRects, &tilesModule, tilesGraphic);
