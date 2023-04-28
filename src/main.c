@@ -16,18 +16,23 @@
 #define SCREEN_HEIGHT 600
 
 // Perk dimensions
-#define PERK_WIDTH 20
-#define PERK_HEIGHT 20
+#define PERK_WIDTH 30
+#define PERK_HEIGHT 30
 #define SPEED_BOOST_AMOUNT 1
 #define PERK_SPAWN_TIME 5000 // in milliseconds
+#define PERK_FRAME_COUNT 10
+#define PERK_FRAME_DELAY 300
 
 #undef main
 
 typedef struct {
     SDL_Texture* texture;
     SDL_Rect rect;
-    bool active;
+    bool available;
+    int currentFrame;
+    int frameTimer;
 } SpeedBoostPerk;
+
 
 typedef struct {
     SDL_Window *window;
@@ -42,9 +47,11 @@ void handleInput(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames);
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
+
+
 
 
 int main(int argc, char *args[]) 
@@ -54,17 +61,35 @@ int main(int argc, char *args[])
     Player player1;
     Player hunter;
 
+    initialize(&game);
+    initiateMapResources(game.renderer, &resources);
+
+    SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
+    if (perkTexture == NULL) 
+    {
+        printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
+        exit(1);
+    }
+
     // Perk
     SpeedBoostPerk speedBoostPerk;
+    speedBoostPerk.texture = perkTexture;
     speedBoostPerk.rect.x = 300; 
     speedBoostPerk.rect.y = 300; 
     speedBoostPerk.rect.w = PERK_WIDTH;  
     speedBoostPerk.rect.h = PERK_HEIGHT; 
-    speedBoostPerk.active = true;
+    speedBoostPerk.available = true;
 
-    initialize(&game);
-    initiateMapResources(game.renderer, &resources);
-    speedBoostPerk.texture = IMG_LoadTexture(game.renderer, "resources/perk.png");
+    // Perk animation frames
+    SDL_Rect perkFrames[PERK_FRAME_COUNT];
+    for (int i = 0; i < PERK_FRAME_COUNT; i++) 
+    {
+        perkFrames[i].x = i * (30);  
+        perkFrames[i].y = i % 2 * PERK_HEIGHT;
+        perkFrames[i].w = PERK_WIDTH;
+        perkFrames[i].h = PERK_HEIGHT;
+    }
+    
 
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 50, 50);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 80, 80);
@@ -92,18 +117,19 @@ int main(int argc, char *args[])
         SDL_RenderClear(game.renderer);
         renderBackground(game.renderer, resources);
 
-        // Perk render
-        renderSpeedBoostPerk(game.renderer, speedBoostPerk);
-
         // Render players
         SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(game.renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
+
+        // Perk render
+        renderSpeedBoostPerk(game.renderer, speedBoostPerk, perkFrames);
 
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
     }
 
     // Free resources and close SDL
+    SDL_DestroyTexture(perkTexture);
     Mix_CloseAudio();
     SDL_Quit();
     return 0;
@@ -141,11 +167,12 @@ bool checkPerkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
 
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk) 
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames)
 {
-    if (perk.active)
+    if (perk.available)
     {
-        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
+        SDL_Rect clipRect = perkFrames[perk.currentFrame];
+        SDL_RenderCopy(renderer, perk.texture, &clipRect, &perk.rect);
     }
 }
 
@@ -228,11 +255,24 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY)
     }
 }
 
-void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk) 
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
 {
-    if (perk->active && checkPerkCollision(player->position, perk->rect)) 
+    if (perk->available && checkPerkCollision(player->position, perk->rect)) 
     {
         player->speed += SPEED_BOOST_AMOUNT;
-        perk->active = false;
+        perk->available = false;
+    }
+
+    if (!perk->available) 
+    {
+        return;
+    }
+
+    // Update perk animation frame
+    perk->frameTimer += 16;
+    if (perk->frameTimer >= PERK_FRAME_DELAY) 
+    {
+        perk->currentFrame = (perk->currentFrame + 1) % PERK_FRAME_COUNT;
+        perk->frameTimer = 0;
     }
 }

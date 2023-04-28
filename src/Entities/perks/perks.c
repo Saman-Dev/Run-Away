@@ -15,9 +15,9 @@ Perk* create_perk(int type, int value, SDL_Rect *perkRect, SDL_Texture* texture)
     return s;
 }
 
-void apply_perk(Player player, Perk* perk) 
+/*void apply_perk(Player player, Perk* perk) 
 {
-    /* switch(perk->type) 
+    switch(perk->type) 
     { 
         case 1: // speed boost
             player -> speed += perk -> value;
@@ -26,8 +26,8 @@ void apply_perk(Player player, Perk* perk)
         case 2: // future perks
         default:
             break;
-    }*/
-}
+    }
+}*/
 
 void destroy_perk(Perk* perk) 
 {
