@@ -16,7 +16,7 @@ ifneq ($(OS),Windows_NT)
 endif
 
 
-LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_mixer
+LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_net
 LDFLAGS_WINDOWS := -lmingw32 -mwindows
 LDFLAGS_MAC := -L /opt/homebrew/lib/
 CFLAGS_WINDOWS := C:\msys64\mingw64\include
@@ -36,8 +36,8 @@ ifeq ($(CURRENT_OS),mac)
 endif
 
 
-theGame: main.o player.o map.o audio.o
-	$(CC) -o game main.o player.o map.o audio.o $(LDFLAGS)
+theGame: main.o player.o map.o audio.o network.o
+	$(CC) -o game main.o player.o map.o audio.o network.o $(LDFLAGS)
 	$(RunGame)
 main.o: src/main.c
 	@echo "Building Game" 
@@ -48,6 +48,8 @@ map.o: $(SRC)/map/map.c
 	$(CC) -c $(SRC)/map/map.c $(CFLAGS)
 audio.o: $(SRC)/audio/audio.c
 	$(CC) -c $(SRC)/audio/audio.c $(CFLAGS)
+network.o: $(SRC)/network/network.c
+	$(CC) -c $(SRC)/network/network.c $(CFLAGS)
 
 clean:
 	rm -f game

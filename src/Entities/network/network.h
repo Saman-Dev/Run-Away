@@ -1,4 +1,4 @@
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 
 typedef struct {
     UDPsocket sourcePort;
@@ -7,4 +7,5 @@ typedef struct {
 	UDPpacket *dataToSend2;
 } Network;
 
-Network setUpNetwork(char IP_address[], char port[]);
+Network setUpNetwork(char IP_address[], int port);
+void sendData(Network *information, int x_pos, int y_pos);

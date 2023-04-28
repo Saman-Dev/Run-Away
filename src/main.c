@@ -6,10 +6,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
 
 #include "Entities/audio/audio.h"
 #include "Entities/map/map.h"
 #include "Entities/player/player.h"
+#include "Entities/network/network.h"
 
 // Screen dimensions
 #define SCREEN_WIDTH 800
@@ -33,7 +35,6 @@ typedef struct {
     int frameTimer;
 } SpeedBoostPerk;
 
-
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -51,9 +52,6 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect*
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 
-
-
-
 int main(int argc, char *args[]) 
 {
     Framework game;
@@ -63,6 +61,14 @@ int main(int argc, char *args[])
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
+
+    /////
+
+    Network information;
+    information = setUpNetwork("192.168.0.30", 2000);
+
+    /////
+
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
     if (perkTexture == NULL) 
@@ -126,6 +132,12 @@ int main(int argc, char *args[])
 
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
+
+        /////
+        sendData(&information, 60, 60);
+        /////
+
+
     }
 
     // Free resources and close SDL
