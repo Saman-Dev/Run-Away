@@ -52,8 +52,15 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect*
 bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 
-int main(int argc, char *args[]) 
+int main(int argc, char **argv) 
 {
+    /////
+    int number = 1;
+    if (argc > 1) {
+        number = 0;
+    }
+    /////
+
     Framework game;
     Background resources;
     Player player1;
@@ -63,7 +70,6 @@ int main(int argc, char *args[])
     initiateMapResources(game.renderer, &resources);
 
     /////
-
     Cargo toSend1;
     toSend1.positionX = 0;
     toSend1.positionY = 0;
@@ -71,8 +77,7 @@ int main(int argc, char *args[])
     Cargo toReceive;
 
     Network information;
-    // information = setUpNetwork("192.168.0.30", 2000);
-
+    information = setUpNetwork("192.168.0.30", 2000);
     /////
 
 
@@ -135,8 +140,14 @@ int main(int argc, char *args[])
         SDL_RenderPresent(game.renderer);
 
         /////
-        // sendData(&information, &toSend1, &player1);
-        // receiveData(information, &toReceive, &player1);
+        if (number == 1) {
+            sendData(&information, &toSend1, &player1);
+            receiveData(information, &toReceive, &hunter);
+        }
+        else {
+            sendData(&information, &toSend1, &hunter);
+            receiveData(information, &toReceive, &player1);
+        }
         /////
     }
 
