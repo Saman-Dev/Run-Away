@@ -68,8 +68,10 @@ int main(int argc, char *args[])
     toSend1.positionX = 0;
     toSend1.positionY = 0;
 
+    Cargo toReceive;
+
     Network information;
-    //information = setUpNetwork("192.168.0.30", 2000);
+    information = setUpNetwork("192.168.0.30", 2000);
 
     /////
 
@@ -133,7 +135,8 @@ int main(int argc, char *args[])
         SDL_RenderPresent(game.renderer);
 
         /////
-        //sendData(&information, &toSend1, &player1);
+        sendData(&information, &toSend1, &player1);
+        receiveData(information, &toReceive, &player1);
         /////
     }
 
