@@ -64,8 +64,8 @@ int main(int argc, char *args[])
 
     /////
 
-    Network information;
-    information = setUpNetwork("192.168.0.30", 2000);
+    //Network information;
+    //information = setUpNetwork("192.168.0.30", 2000);
 
     /////
 
@@ -134,7 +134,7 @@ int main(int argc, char *args[])
         SDL_RenderPresent(game.renderer);
 
         /////
-        sendData(&information, 60, 60);
+        //sendData(&information, 60, 60);
         /////
 
 
