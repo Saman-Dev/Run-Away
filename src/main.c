@@ -14,8 +14,8 @@
 #include "Entities/network/network.h"
 
 // Screen dimensions
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 960
+#define SCREEN_HEIGHT 955
 
 // Perk dimensions
 #define PERK_WIDTH 30
@@ -97,8 +97,8 @@ int main(int argc, char *args[])
     }
     
 
-    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 50, 50);
-    hunter = createPlayer(game.renderer, "resources/Hunter.png", 80, 80);
+    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 400, 400);
+    hunter = createPlayer(game.renderer, "resources/Hunter.png", 470, 470);
     
     while (!game.quit) 
     {
