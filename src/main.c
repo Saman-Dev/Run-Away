@@ -64,7 +64,11 @@ int main(int argc, char *args[])
 
     /////
 
-    //Network information;
+    Cargo toSend1;
+    toSend1.positionX = 0;
+    toSend1.positionY = 0;
+
+    Network information;
     //information = setUpNetwork("192.168.0.30", 2000);
 
     /////
@@ -95,7 +99,6 @@ int main(int argc, char *args[])
         perkFrames[i].w = PERK_WIDTH;
         perkFrames[i].h = PERK_HEIGHT;
     }
-    
 
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 400, 400);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 470, 470);
@@ -113,10 +116,6 @@ int main(int argc, char *args[])
 
         // Add a delay to control the speed of the player
         SDL_Delay(16);
-
-        // Clear the renderer (Nödvändig?)
-        // SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
-        // SDL_RenderClear(game.renderer);
         
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -134,10 +133,8 @@ int main(int argc, char *args[])
         SDL_RenderPresent(game.renderer);
 
         /////
-        //sendData(&information, 60, 60);
+        //sendData(&information, &toSend1, &player1);
         /////
-
-
     }
 
     // Free resources and close SDL
