@@ -38,7 +38,7 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
 
 void handlePlayerMovement(Player *playerX) {
     if (playerX->up) {
-        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y - 5)) {
+        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y - 3)) {
             printf("Player: Up\n");
             playerX->position.y -= playerX->speed;
             if (playerX->frame == 9 || playerX->frame == 10)
@@ -48,7 +48,7 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
     else if (playerX->down) {
-        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + 26)) {
+        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + 20)) {
             printf("Player: Down\n");
             playerX->position.y += playerX->speed;
             if (playerX->frame == 0 || playerX->frame == 1)
@@ -68,7 +68,7 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
     else if (playerX->right) {
-        if (!encountersForbiddenTile(playerX->position.x + 16, playerX->position.y)) {
+        if (!encountersForbiddenTile(playerX->position.x + 5, playerX->position.y)) {
             printf("Player: Right\n");
             playerX->position.x += playerX->speed;
             if (playerX->frame == 6 || playerX->frame == 7)
