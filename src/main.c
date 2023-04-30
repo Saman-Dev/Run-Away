@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     Cargo toReceive;
 
     Network information;
-    information = setUpNetwork("192.168.0.30", 2000);
+    // information = setUpNetwork("192.168.0.30", 2000);
     /////
 
 
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
-        /////
+        /*
         if (number == 1) {
             sendData(&information, &toSend1, &player1);
             receiveData(information, &toReceive, &hunter);
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
             sendData(&information, &toSend1, &hunter);
             receiveData(information, &toReceive, &player1);
         }
-        /////
+        */
     }
 
     // Free resources and close SDL

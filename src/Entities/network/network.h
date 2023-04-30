@@ -12,6 +12,7 @@ typedef struct {
 typedef struct {
 	int positionX;
 	int positionY;
+	int frame;
 } Cargo;
 
 Network setUpNetwork(char IP_address[], int port);

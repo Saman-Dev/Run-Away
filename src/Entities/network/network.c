@@ -49,6 +49,7 @@ static int checkDifference(Cargo *toSend, Player *playerX) {
 static void prepareTransfer(Cargo *toSend, Player *playerX) {
     toSend->positionX = playerX->position.x;
     toSend->positionY = playerX->position.y;
+    toSend->frame = playerX->frame;
 }
 
 static void commenceTransfer(Network *information, Cargo *toSend) {
@@ -62,6 +63,7 @@ void receiveData(Network information, Cargo *toReceive, Player *playerX) {
         memcpy(toReceive, (char *) information.packetToReceive1->data, sizeof(Cargo));
         playerX->position.x = toReceive->positionX;
         playerX->position.y = toReceive->positionY;
+        playerX->frame = toReceive->frame;
         printf("UDP packet received: %d %d\n", toReceive->positionX, toReceive->positionY);
     }
 }
