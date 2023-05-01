@@ -52,8 +52,9 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames);
-bool checkPerkCollision(SDL_Rect a, SDL_Rect b);
-void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
+bool checkCollision(SDL_Rect a, SDL_Rect b);
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter);
+
 
 int main(int argc, char **argv) 
 {
@@ -153,6 +154,7 @@ int main(int argc, char **argv)
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
         applySpeedBoostPerk(&hunter, &speedBoostPerk);
+        HuntAndRevive(&player1, &hunter);
 
         // Add a delay to control the speed of the player
         SDL_Delay(16);
@@ -220,7 +222,7 @@ void initialize(Framework *game)
     }
 }
 
-bool checkPerkCollision(SDL_Rect a, SDL_Rect b) // check perk collision
+bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
@@ -315,7 +317,7 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY)
 
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
 {
-    if (perk->available && checkPerkCollision(player->position, perk->rect)) 
+    if (perk->available && checkCollision(player->position, perk->rect)) 
     {
         player->speed += SPEED_BOOST_AMOUNT;
         perk->available = false;
@@ -333,4 +335,13 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
         perk->currentFrame = (perk->currentFrame + 1) % PERK_FRAME_COUNT;
         perk->frameTimer = 0;
     }
+}
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter)
+{
+    if (checkCollision(player1->position, hunter->position)) 
+    {
+        player1->speed = 0;
+    }/*else if(checkPlayerCollision(player1->position, player2->position)){
+        player2->speed = 2;
+    }*/
 }
