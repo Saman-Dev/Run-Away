@@ -51,6 +51,7 @@ void handleInput(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter);
