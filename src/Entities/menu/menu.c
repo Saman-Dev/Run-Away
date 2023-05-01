@@ -16,13 +16,13 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         optionRects[i].w = menu->optionWidth;
         optionRects[i].h = menu->optionHeight;
     }
-
+    int mouseX=0, mouseY=0; 
     int selectedOption = -1;
     SDL_Event event;
-
+    
     while (selectedOption == -1) {
         while (SDL_PollEvent(&event)) {
-            int mouseX, mouseY;
+            
             switch (event.type) {
                 case SDL_QUIT:
                     selectedOption = menu->numOptions - 1;
