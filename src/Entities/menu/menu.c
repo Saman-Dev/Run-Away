@@ -3,7 +3,7 @@
 
 int displayMenu(SDL_Renderer* renderer, Menu* menu) 
 {
-    TTF_Font* font = TTF_OpenFont("resources/minecraft_font.ttf", 24);
+    TTF_Font* font = TTF_OpenFont("resources/font.ttf", 24);
     SDL_Surface* optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
 
