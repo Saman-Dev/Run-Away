@@ -7,11 +7,14 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_ttf.h>
+
 
 #include "Entities/audio/audio.h"
 #include "Entities/map/map.h"
 #include "Entities/player/player.h"
 #include "Entities/network/network.h"
+#include "Entities/menu/menu.h"
 
 // Screen dimensions
 #define SCREEN_WIDTH 960
@@ -60,6 +63,7 @@ int main(int argc, char **argv)
         number = 0;
     }
     /////
+    
 
     Framework game;
     Background resources;
@@ -68,6 +72,7 @@ int main(int argc, char **argv)
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
+    TTF_Init();
 
     /////
     Cargo toSend1;
@@ -79,7 +84,6 @@ int main(int argc, char **argv)
     Network information;
     // information = setUpNetwork("192.168.0.30", 2000);
     /////
-
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
     if (perkTexture == NULL) 
@@ -109,8 +113,37 @@ int main(int argc, char **argv)
 
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 400, 400);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 470, 470);
-    
-    while (!game.quit) 
+
+    char* options[] = { "Start Game", "Options", "Quit"};
+    Menu menu = {
+        .options = options,
+        .numOptions = 3,
+        .optionWidth = 200,
+        .optionHeight = 50,
+        .optionSpacing = 10,
+        .menuX = 220,
+        .menuY = 150,
+    };
+
+    int selectedOption = displayMenu(game.renderer, &menu);
+
+    switch (selectedOption) 
+    {
+        case 0:
+            game.quit = false;
+            break;
+        case 1:
+            // options
+            break;
+        case 2:     
+            game.quit = true;
+            break;
+        default:
+            // Handle error or unexpected option
+            break;
+    }
+
+    while (!game.quit)
     {
         // Handle events
         handleInput(&game, &player1, &hunter);
@@ -153,14 +186,16 @@ int main(int argc, char **argv)
 
     // Free resources and close SDL
     SDL_DestroyTexture(perkTexture);
+    SDL_DestroyWindow(game.window);
     Mix_CloseAudio();
+    TTF_Quit();
     SDL_Quit();
     return 0;
 }
 
 void initialize(Framework *game) 
 {
-    game->quit = false;
+    //game->quit = false;
     
     // Initialize SDL and timer
     SDL_Init(SDL_INIT_VIDEO);
