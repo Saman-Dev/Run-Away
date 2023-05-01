@@ -22,12 +22,13 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
 
     while (selectedOption == -1) {
         while (SDL_PollEvent(&event)) {
+            int mouseX, mouseY;
             switch (event.type) {
                 case SDL_QUIT:
                     selectedOption = menu->numOptions - 1;
                     break;
                 case SDL_MOUSEBUTTONUP:
-                    int mouseX, mouseY;
+                    
                     SDL_GetMouseState(&mouseX, &mouseY);
                     for (int i = 0; i < menu->numOptions; i++) {
                         if (SDL_PointInRect(&(SDL_Point){mouseX, mouseY}, &optionRects[i])) {
