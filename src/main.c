@@ -114,7 +114,7 @@ int main(int argc, char **argv)
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 400, 400);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 470, 470);
 
-    char* options[] = { "Start Game", "Options", "Quit"};
+    char* options[] = {"Start Game", "Options", "Quit"};
     Menu menu = {
         .options = options,
         .numOptions = 3,
