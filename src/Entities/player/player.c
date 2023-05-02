@@ -12,7 +12,7 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     int frame_count = 0;
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 3; x++) {
-            playerX.spriteClip[frame_count].x = x * (PLAYER_FRAME_HEIGHT) + 1; // 32 width/height
+            playerX.spriteClip[frame_count].x = x * (PLAYER_FRAME_HEIGHT) + 1;
             playerX.spriteClip[frame_count].y = y * (PLAYER_FRAME_WIDTH) + 3;
             playerX.spriteClip[frame_count].w = PLAYER_FRAME_WIDTH;
             playerX.spriteClip[frame_count].h = PLAYER_FRAME_HEIGHT;
@@ -25,8 +25,8 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     playerX.left = false;
     playerX.right = false;
 
-    playerX.position.x = positionX; //(positionX - PLAYER_FRAME_WIDTH) / 2;
-    playerX.position.y = positionY; //(positionY - PLAYER_FRAME_HEIGHT) / 2;
+    playerX.position.x = positionX;
+    playerX.position.y = positionY;
     playerX.position.w = PLAYER_FRAME_WIDTH;
     playerX.position.h = PLAYER_FRAME_HEIGHT;
 

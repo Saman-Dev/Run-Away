@@ -61,8 +61,11 @@ int main(int argc, char **argv)
 {
     /////
     int number = 1;
-    if (argc > 1) {
+    if (argc == 2) {
         number = 0;
+    }
+    else if (argc == 3) {
+        number = 2;
     }
     /////
     
@@ -77,6 +80,13 @@ int main(int argc, char **argv)
     TTF_Init();
 
     /////
+    addressBook record;
+    record.clientIP1 = 0;
+    record.clientIP2 = 0;
+    record.clientPort1 = 0;
+    record.clientPort2 = 0;
+    record.clientIP1 = 0;
+
     Cargo toSend1;
     toSend1.positionX = 0;
     toSend1.positionY = 0;
@@ -84,7 +94,13 @@ int main(int argc, char **argv)
     Cargo toReceive;
 
     Network information;
-    //information = setUpNetwork("192.168.0.30", 2000);
+    /*
+    if (number != 2) {
+    information = setUpClient("192.168.0.30", 2000);
+    }
+    else {
+    information = setUpServer(2000);
+    } */
     /////
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
@@ -180,10 +196,14 @@ int main(int argc, char **argv)
             sendData(&information, &toSend1, &player1);
             receiveData(information, &toReceive, &hunter);
         }
+        else if (number == 2) {
+            manageServerDuties(&information, &record, &toSend1);
+        }
         else {
             sendData(&information, &toSend1, &hunter);
             receiveData(information, &toReceive, &player1);
-        }*/
+        }
+        */
     }
 
     // Free resources and close SDL
