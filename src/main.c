@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     Cargo toReceive;
 
     Network information;
-    // information = setUpNetwork("192.168.0.30", 2000);
+    //information = setUpNetwork("192.168.0.30", 2000);
     /////
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
@@ -113,8 +113,8 @@ int main(int argc, char **argv)
         perkFrames[i].h = PERK_HEIGHT;
     }
 
-    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 400, 400);
-    hunter = createPlayer(game.renderer, "resources/Hunter.png", 470, 470);
+    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 200, 200);
+    hunter = createPlayer(game.renderer, "resources/Hunter.png", 142, 280);
 
     char* options[] = {"Start Game", "Options", "Quit"};
     Menu menu = {
@@ -183,8 +183,7 @@ int main(int argc, char **argv)
         else {
             sendData(&information, &toSend1, &hunter);
             receiveData(information, &toReceive, &player1);
-        }
-        */
+        }*/
     }
 
     // Free resources and close SDL

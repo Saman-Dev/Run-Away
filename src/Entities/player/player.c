@@ -25,8 +25,8 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
     playerX.left = false;
     playerX.right = false;
 
-    playerX.position.x = (positionX - PLAYER_FRAME_WIDTH) / 2;
-    playerX.position.y = (positionY - PLAYER_FRAME_HEIGHT) / 2;
+    playerX.position.x = positionX; //(positionX - PLAYER_FRAME_WIDTH) / 2;
+    playerX.position.y = positionY; //(positionY - PLAYER_FRAME_HEIGHT) / 2;
     playerX.position.w = PLAYER_FRAME_WIDTH;
     playerX.position.h = PLAYER_FRAME_HEIGHT;
 
@@ -38,8 +38,9 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
 
 void handlePlayerMovement(Player *playerX) {
     if (playerX->up) {
-        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y - 3)) {
+        if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y)) {
             printf("Player: Up\n");
+            printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.y -= playerX->speed;
             if (playerX->frame == 9 || playerX->frame == 10)
                 playerX->frame++;
@@ -48,8 +49,9 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
     else if (playerX->down) {
-        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + 20)) {
+        if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y + PLAYER_FRAME_HEIGHT)) {
             printf("Player: Down\n");
+            printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.y += playerX->speed;
             if (playerX->frame == 0 || playerX->frame == 1)
                 playerX->frame++;
@@ -58,8 +60,9 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
     if (playerX->left) {
-        if (!encountersForbiddenTile(playerX->position.x - 5, playerX->position.y)) {
+        if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
             printf("Player: Left\n");
+            printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.x -= playerX->speed;
             if (playerX->frame == 3 || playerX->frame == 4)
                 playerX->frame++;
@@ -68,8 +71,9 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
     else if (playerX->right) {
-        if (!encountersForbiddenTile(playerX->position.x + 5, playerX->position.y)) {
+        if (!encountersForbiddenTile(playerX->position.x + PLAYER_FRAME_WIDTH, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
             printf("Player: Right\n");
+            printf("X: %d, Y: %d", playerX->position.x, playerX->position.y);
             playerX->position.x += playerX->speed;
             if (playerX->frame == 6 || playerX->frame == 7)
                 playerX->frame++;
