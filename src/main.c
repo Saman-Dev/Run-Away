@@ -60,15 +60,17 @@ void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter);
 int main(int argc, char **argv) 
 {
     /////
-    int number = 1;
-    if (argc == 2) {
-        number = 0;
+    int number;
+    if (argc == 1) {
+        number = 1;
     }
-    else if (argc == 3) {
+    else if (argc == 2) {
         number = 2;
     }
+    else if (argc == 3) {
+        number = 3;
+    }
     /////
-    
 
     Framework game;
     Background resources;
@@ -80,27 +82,24 @@ int main(int argc, char **argv)
     TTF_Init();
 
     /////
-    addressBook record;
-    record.clientIP1 = 0;
-    record.clientIP2 = 0;
-    record.clientPort1 = 0;
-    record.clientPort2 = 0;
-    record.clientIP1 = 0;
+    AddressBook record;
+    initiateAddressBook(&record);
 
-    Cargo toSend1;
-    toSend1.positionX = 0;
-    toSend1.positionY = 0;
+    Cargo toSend;
+    toSend.positionX = 0;
+    toSend.positionY = 0;
 
     Cargo toReceive;
 
     Network information;
+
     /*
-    if (number != 2) {
-    information = setUpClient("192.168.0.30", 2000);
+    if (number == 3) {
+    setUpServer(&information, 2000);
     }
     else {
-    information = setUpServer(2000);
-    } */
+    setUpClient(&information, "192.168.0.30", 2000);
+    }*/
     /////
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
@@ -193,17 +192,18 @@ int main(int argc, char **argv)
 
         /*
         if (number == 1) {
-            sendData(&information, &toSend1, &player1);
+            sendData(&information, &toSend, &player1);
             receiveData(information, &toReceive, &hunter);
         }
         else if (number == 2) {
-            manageServerDuties(&information, &record, &toSend1);
-        }
-        else {
-            sendData(&information, &toSend1, &hunter);
+            sendData(&information, &toSend, &hunter);
             receiveData(information, &toReceive, &player1);
         }
+        else if (number == 3) {
+            manageServerDuties(&information, &record, &toSend);
+        }
         */
+        
     }
 
     // Free resources and close SDL

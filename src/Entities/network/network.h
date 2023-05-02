@@ -5,8 +5,8 @@
 typedef struct {
     UDPsocket sourcePort;
 	IPaddress destination;
-	UDPpacket *packetToSend1;
-	UDPpacket *packetToReceive1;
+	UDPpacket *packetToSend;
+	UDPpacket *packetToReceive;
 } Network;
 
 typedef struct {
@@ -20,13 +20,14 @@ typedef struct {
     Uint32 clientPort1; 
     Uint32 clientIP2;
     Uint32 clientPort2;
-} addressBook;
+} AddressBook;
 
-Network setUpClient(char IP_address[], int port);
+void setUpClient(Network *information, char IP_address[], int port);
 void sendData(Network *information, Cargo *toSend, Player *playerX);
 static int checkDifference(Cargo *toSend, Player *playerX);
 static void prepareTransfer(Cargo *toSend, Player *playerX);
 static void commenceTransfer(Network *information, Cargo *toSend);
 void receiveData(Network information, Cargo *toReceive, Player *playerX);
-Network setUpServer(int port);
-void manageServerDuties(Network *information, addressBook *record, Cargo *toSend1);
+void setUpServer(Network *information, int port);
+void manageServerDuties(Network *information, AddressBook *record, Cargo *toSend);
+void initiateAddressBook(AddressBook *record);
