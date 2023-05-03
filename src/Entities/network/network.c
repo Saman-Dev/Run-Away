@@ -83,11 +83,7 @@ void setUpServer(Network *information, int port) {
 	}
 }
 
-// Better solution looming
-static int oldXValue = 0;
-static int oldYValue = 0;
-
-void manageServerDuties(Network *information, AddressBook *record, Player *playerX, Player *playerY, Player host) {
+void manageServerDuties(Network *information, AddressBook *record, Player *playerX, Player *playerY, Player host, Cargo *toSend) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         registerSourceInformation(information, record);
         if (information->packetToReceive->address.port == record->clientPort1) {
@@ -99,10 +95,8 @@ void manageServerDuties(Network *information, AddressBook *record, Player *playe
             sendServerCopy(information, record->clientIP1, record->clientPort1, playerY);
         }
     }
-    if (oldXValue != host.position.x || oldYValue != host.position.y) {
-        sendHostPlayerPacket(information, record, host);
-        oldXValue = host.position.x;
-        oldYValue = host.position.y;
+    if (checkDifference(toSend, &host)) {
+        sendHostPlayerPacket(information, record, toSend, host);
     }
 }
 
@@ -124,10 +118,9 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientP
     SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
 }
 
-static void sendHostPlayerPacket(Network *information, AddressBook *record, Player host) {
-    Cargo temporary;
-    prepareTransfer(&temporary, &host);
-    memcpy((char *)information->packetToSend->data, &temporary , sizeof(Cargo));
+static void sendHostPlayerPacket(Network *information, AddressBook *record, Cargo *toSend, Player host) {
+    prepareTransfer(toSend, &host);
+    memcpy((char *)information->packetToSend->data, toSend , sizeof(Cargo));
     information->packetToSend->len = sizeof(Cargo)+1;
     if (record->clientIP1) {
         information->packetToSend->address.host = record->clientIP1;	
