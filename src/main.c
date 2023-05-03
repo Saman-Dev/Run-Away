@@ -194,7 +194,7 @@ int main(int argc, char **argv)
             receiveData(information, &player1, &player3);
         }
         else if (number == 3) {
-            manageServerDuties(&information, &record, &player1, &hunter, player3);
+            manageServerDuties(&information, &record, &player1, &hunter, player3, &toSend);
         } */
     }
 
