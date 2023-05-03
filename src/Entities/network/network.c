@@ -38,6 +38,7 @@ static int checkDifference(Cargo *toSend, Player *playerX) {
 }
 
 static void prepareTransfer(Cargo *toSend, Player *playerX) {
+    toSend->player = playerX->player;
     toSend->positionX = playerX->position.x;
     toSend->positionY = playerX->position.y;
     toSend->frame = playerX->frame;
@@ -49,13 +50,19 @@ static void commenceTransfer(Network *information, Cargo *toSend) {
     SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
 }
 
-void receiveData(Network information, Cargo *toReceive, Player *playerX) {
+void receiveData(Network information, Player *playerX, Player *playerY) {
     if (SDLNet_UDP_Recv(information.sourcePort, information.packetToReceive)) {
-        memcpy(toReceive, (char *) information.packetToReceive->data, sizeof(Cargo));
-        playerX->position.x = toReceive->positionX;
-        playerX->position.y = toReceive->positionY;
-        playerX->frame = toReceive->frame;
-        printf("UDP packet received: %d %d\n", toReceive->positionX, toReceive->positionY);
+        Cargo temporary;
+        memcpy(&temporary, (char *) information.packetToReceive->data, sizeof(Cargo));
+        if (temporary.player == 1) {
+            applyReceivedData(playerX, &temporary);
+        }
+        else if (temporary.player == 2) {
+            applyReceivedData(playerX, &temporary);
+        }
+        else if (temporary.player == 3) {
+            applyReceivedData(playerY, &temporary);  
+        }
     }
 }
 
@@ -76,42 +83,26 @@ void setUpServer(Network *information, int port) {
 	}
 }
 
-void manageServerDuties(Network *information, AddressBook *record, Cargo *toSend) {
+// Better solution looming
+static int oldXValue = 0;
+static int oldYValue = 0;
+
+void manageServerDuties(Network *information, AddressBook *record, Player *playerX, Player *playerY, Player host) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
-        if (record->clientIP1 == 0 && record->clientPort1 == 0) {
-            printf("Client 1\n");
-            record->clientIP1 = information->packetToReceive->address.host;
-            record->clientPort1 = information->packetToReceive->address.port;
-        }
-        else if (information->packetToReceive->address.port != record->clientPort1  && record->clientIP2 == 0) {
-            printf("Client 2\n");
-            record->clientIP2 = information->packetToReceive->address.host;
-            record->clientPort2 = information->packetToReceive->address.port;
-        }
-        else {
-            if (information->packetToReceive->address.port == record->clientPort1) {
-                if (record->clientIP2 != 0) {
-                    printf("Send to Client 2\n");
-                    information->packetToSend->address.host = record->clientIP2;
-                    information->packetToSend->address.port = record->clientPort2;
-                    memcpy(toSend, (char * ) information->packetToReceive->data, sizeof(Cargo));
-                    printf("UDP Packet data %d %d\n", toSend->positionX, toSend->positionY);
-                    memcpy((char *)information->packetToSend->data, toSend , sizeof(Cargo)+1);
-                    information->packetToSend->len = sizeof(Cargo)+1;
-                    SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
-                }
-            } 
-            else if (information->packetToReceive->address.port == record->clientPort2) {
-                printf("Send to Client 1\n");    
-                information->packetToSend->address.host = record->clientIP1;	
-                information->packetToSend->address.port = record->clientPort1;
-                memcpy(toSend, (char * ) information->packetToReceive->data, sizeof(Cargo));
-                printf("UDP Packet data %d %d\n", toSend->positionX, toSend->positionY);
-                memcpy((char *)information->packetToSend->data, toSend , sizeof(Cargo)+1);
-                information->packetToSend->len = sizeof(Cargo)+1;
-                SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+        registerSourceInformation(information, record);
+        if (information->packetToReceive->address.port == record->clientPort1) {
+            if (record->clientIP2 != 0) {
+                sendServerCopy(information, record->clientIP2, record->clientPort2, playerX);
             }
-        }		
+        } 
+        else if (information->packetToReceive->address.port == record->clientPort2) {
+            sendServerCopy(information, record->clientIP1, record->clientPort1, playerY);
+        }
+    }
+    if (oldXValue != host.position.x || oldYValue != host.position.y) {
+        sendHostPlayerPacket(information, record, host);
+        oldXValue = host.position.x;
+        oldYValue = host.position.y;
     }
 }
 
@@ -120,5 +111,51 @@ void initiateAddressBook(AddressBook *record) {
     record->clientIP2 = 0;
     record->clientPort1 = 0;
     record->clientPort2 = 0;
-    record->clientIP1 = 0;
+}
+
+static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientPort, Player *player) {
+    Cargo temporary;
+    information->packetToSend->address.host = clientIP;
+    information->packetToSend->address.port = clientPort;
+    memcpy(&temporary, (char * ) information->packetToReceive->data, sizeof(Cargo));
+    applyReceivedData(player, &temporary); /// Implement received packet changes locally
+    memcpy((char *)information->packetToSend->data, &temporary , sizeof(Cargo));
+    information->packetToSend->len = sizeof(Cargo)+1;
+    SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+}
+
+static void sendHostPlayerPacket(Network *information, AddressBook *record, Player host) {
+    Cargo temporary;
+    prepareTransfer(&temporary, &host);
+    memcpy((char *)information->packetToSend->data, &temporary , sizeof(Cargo));
+    information->packetToSend->len = sizeof(Cargo)+1;
+    if (record->clientIP1) {
+        information->packetToSend->address.host = record->clientIP1;	
+        information->packetToSend->address.port = record->clientPort1;
+        SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+    }
+    if (record->clientIP2) {
+        information->packetToSend->address.host = record->clientIP2;	
+        information->packetToSend->address.port = record->clientPort2;
+        SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+    }
+}
+
+static void applyReceivedData(Player *playerX, Cargo *toSend) {
+    playerX->position.x = toSend->positionX;
+    playerX->position.y = toSend->positionY;
+    playerX->frame = toSend->frame;
+}
+
+static void registerSourceInformation(Network *information, AddressBook *record) {
+    if (record->clientIP1 == 0 && record->clientPort1 == 0) {
+    printf("Client 1\n");
+    record->clientIP1 = information->packetToReceive->address.host;
+    record->clientPort1 = information->packetToReceive->address.port;
+    }
+    else if (information->packetToReceive->address.port != record->clientPort1  && record->clientIP2 == 0) {
+    printf("Client 2\n");
+    record->clientIP2 = information->packetToReceive->address.host;
+    record->clientPort2 = information->packetToReceive->address.port;
+    }
 }

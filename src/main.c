@@ -75,6 +75,7 @@ int main(int argc, char **argv)
     Framework game;
     Background resources;
     Player player1;
+    Player player3;
     Player hunter;
 
     initialize(&game);
@@ -84,13 +85,7 @@ int main(int argc, char **argv)
     /////
     AddressBook record;
     initiateAddressBook(&record);
-
-    Cargo toSend;
-    toSend.positionX = 0;
-    toSend.positionY = 0;
-
-    Cargo toReceive;
-
+    Cargo toSend = {0, 0, 0, 0};
     Network information;
 
     /*
@@ -99,7 +94,7 @@ int main(int argc, char **argv)
     }
     else {
     setUpClient(&information, "192.168.0.30", 2000);
-    }*/
+    } */
     /////
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
@@ -128,8 +123,9 @@ int main(int argc, char **argv)
         perkFrames[i].h = PERK_HEIGHT;
     }
 
-    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 200, 200);
-    hunter = createPlayer(game.renderer, "resources/Hunter.png", 142, 280);
+    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
+    hunter = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
+    player3 = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
 
     char* options[] = {"Start Game", "Options", "Quit"};
     Menu menu = {
@@ -163,9 +159,16 @@ int main(int argc, char **argv)
     while (!game.quit)
     {
         // Handle events
-        handleInput(&game, &player1, &hunter);
-        handlePlayerMovement(&player1);
-        handlePlayerMovement(&hunter);
+        if (number == 3) {
+            handleInput(&game, &player3, &hunter);
+            handlePlayerMovement(&player3);
+            handlePlayerMovement(&hunter);
+        }
+        else {
+            handleInput(&game, &player1, &hunter);
+            handlePlayerMovement(&player1);
+            handlePlayerMovement(&hunter);
+        }
 
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
@@ -183,6 +186,7 @@ int main(int argc, char **argv)
         // Render players
         SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(game.renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, player3.spriteSheetTexture, &player3.spriteClip[player3.frame], &player3.position, 0, NULL, SDL_FLIP_NONE);
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk, perkFrames);
@@ -193,17 +197,15 @@ int main(int argc, char **argv)
         /*
         if (number == 1) {
             sendData(&information, &toSend, &player1);
-            receiveData(information, &toReceive, &hunter);
+            receiveData(information, &hunter, &player3);
         }
         else if (number == 2) {
             sendData(&information, &toSend, &hunter);
-            receiveData(information, &toReceive, &player1);
+            receiveData(information, &player1, &player3);
         }
         else if (number == 3) {
-            manageServerDuties(&information, &record, &toSend);
-        }
-        */
-        
+            manageServerDuties(&information, &record, &player1, &hunter, player3);
+        } */
     }
 
     // Free resources and close SDL
