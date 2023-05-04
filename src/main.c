@@ -54,8 +54,7 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY)
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter);
-
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test);
 
 int main(int argc, char **argv) 
 {
@@ -71,7 +70,7 @@ int main(int argc, char **argv)
         number = 3;
     }
     /////
-
+    int test = 0;
     Framework game;
     Background resources;
     Player player1;
@@ -170,7 +169,7 @@ int main(int argc, char **argv)
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
         applySpeedBoostPerk(&hunter, &speedBoostPerk);
-        HuntAndRevive(&player1, &hunter);
+        
 
         // Add a delay to control the speed of the player
         SDL_Delay(16);
@@ -186,6 +185,7 @@ int main(int argc, char **argv)
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk, perkFrames);
+        HuntAndRevive(&player1, &hunter, game.renderer, &test);
 
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
@@ -356,12 +356,24 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
         perk->frameTimer = 0;
     }
 }
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter)
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test)
 {
     if (checkCollision(player1->position, hunter->position)) 
     {
+        
         player1->speed = 0;
+
     }/*else if(checkPlayerCollision(player1->position, player2->position)){
         player2->speed = 2;
     }*/
+     if( player1->speed == 0){
+            SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
+            SDL_Rect cage1;
+            cage1.x = player1->position.x;
+            cage1.y = player1->position.y;
+            cage1.w = 32;
+            cage1.h = 32;
+            *test = 1;
+            SDL_RenderCopy(renderer,cage,NULL,&cage1);
+        }
 }
