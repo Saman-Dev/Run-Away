@@ -9,7 +9,6 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 
-
 #include "Entities/audio/audio.h"
 #include "Entities/map/map.h"
 #include "Entities/player/player.h"
@@ -27,6 +26,8 @@
 #define PERK_SPAWN_TIME 5000 // in milliseconds
 #define PERK_FRAME_COUNT 10
 #define PERK_FRAME_DELAY 300
+
+#define FPS 60
 
 #undef main
 
@@ -54,8 +55,11 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
 
+void manageFrameRate(int timeAtLoopBeginning);
+
 int main(int argc, char **argv) 
 {
+    int timeAtLoopBeginning;
     /////
     int number;
     if (argc == 1) {
@@ -146,7 +150,7 @@ int main(int argc, char **argv)
 
     while (!game.quit)
     {
-
+        timeAtLoopBeginning = SDL_GetTicks();
         // Handle events
         /*if (number == 3) {
             handleInput(&game, &player3, &hunter);
@@ -163,10 +167,6 @@ int main(int argc, char **argv)
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
         applySpeedBoostPerk(&hunter, &speedBoostPerk);
-        
-
-        // Add a delay to control the speed of the player
-        SDL_Delay(16);
         
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -196,6 +196,8 @@ int main(int argc, char **argv)
         else if (number == 3) {
             manageServerDuties(&information, &record, &player1, &hunter, player3, &toSend);
         } */
+
+        manageFrameRate(timeAtLoopBeginning);
     }
 
     // Free resources and close SDL
@@ -400,4 +402,12 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
+}
+
+void manageFrameRate(int timeAtLoopBeginning) {
+    int endOfLoopTime;
+    endOfLoopTime = (SDL_GetTicks()) - timeAtLoopBeginning;
+    if (endOfLoopTime < (1000 / FPS)) {
+        SDL_Delay((1000 / FPS) - endOfLoopTime);
+    }
 }
