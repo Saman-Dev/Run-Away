@@ -45,14 +45,14 @@ typedef struct {
 
 void initialize(Framework *game);
 
-void handleInput(Framework *game, Player *playerX, Player *playerY);
-static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
-static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
+void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
+static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
+static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test);
+void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
 
 int main(int argc, char **argv) 
 {
@@ -148,16 +148,17 @@ int main(int argc, char **argv)
     {
 
         // Handle events
-        if (number == 3) {
+        /*if (number == 3) {
             handleInput(&game, &player3, &hunter);
             handlePlayerMovement(&player3);
             handlePlayerMovement(&hunter);
         }
-        else {
-            handleInput(&game, &player1, &hunter);
+        else {*/
+            handleInput(&game, &player1, &hunter, &player3);
             handlePlayerMovement(&player1);
             handlePlayerMovement(&hunter);
-        }
+            handlePlayerMovement(&player3);
+        //}
 
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
@@ -179,7 +180,7 @@ int main(int argc, char **argv)
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk);
-        HuntAndRevive(&player1,/*&player2,*/&hunter,game.renderer, &test);
+        HuntAndRevive(&player1,&player3,&hunter,game.renderer, &test);
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
@@ -247,21 +248,21 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
 }
 
 
-void handleInput(Framework *game, Player *playerX, Player *playerY) {
+void handleInput(Framework *game, Player *playerX, Player *playerY,Player *playerZ) {
     while (SDL_PollEvent(&game->event)) {
         if (game->event.type == SDL_QUIT) {
             game->quit = true;
         }
         else if (game->event.type == SDL_KEYDOWN) {
-            handleKeyPresses(game, playerX, playerY);
+            handleKeyPresses(game, playerX, playerY, playerZ);
         }
         else if (game->event.type == SDL_KEYUP) {
-            handleKeyReleases(game, playerX, playerY);
+            handleKeyReleases(game, playerX, playerY, playerZ);
         }
     }
 }
 
-static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) {
+static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
     switch (game->event.key.keysym.sym) {
         case SDLK_UP:
             playerX->up = true;
@@ -287,6 +288,18 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) 
         case SDLK_d:
             playerY->right = true;
             break;
+            case SDLK_u:
+            playerZ->up = true;
+            break;
+        case SDLK_j:
+            playerZ->down = true;
+            break;
+        case SDLK_h:
+            playerZ->left = true;
+            break;
+        case SDLK_k:
+            playerZ->right = true;
+            break;
         case SDLK_ESCAPE:
             game->quit = true;
             break;
@@ -295,7 +308,7 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY) 
     }
 }
 
-static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY) {
+static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
     switch (game->event.key.keysym.sym) {
         case SDLK_UP:
             playerX->up = false;
@@ -321,6 +334,18 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY)
         case SDLK_d:
             playerY->right = false;
             break;
+            case SDLK_u:
+            playerZ->up = false;
+            break;
+        case SDLK_j:
+            playerZ->down = false;
+            break;
+        case SDLK_h:
+           playerZ->left = false;
+            break;
+        case SDLK_k:
+            playerZ->right = false;
+            break;
         default:
             break;
     }
@@ -339,21 +364,37 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
         return;
     }
 }
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test)
+void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test)
 {
     if (checkCollision(player1->position, hunter->position)) 
     {
         
         player1->speed = 0;
 
-    }/*else if(checkPlayerCollision(player1->position, player2->position)){
-        player2->speed = 2;
-    }*/
-     if( player1->speed == 0){
+    }else if (checkCollision(player3->position, hunter->position)) 
+    {
+        
+        player3->speed = 0;
+
+    }else if(checkCollision(player1->position, player3->position)){
+        player1->speed = 2;
+        player3->speed = 2;
+
+    }if( player1->speed == 0){
             SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
             SDL_Rect cage1;
             cage1.x = player1->position.x;
             cage1.y = player1->position.y;
+            cage1.w = 32;
+            cage1.h = 32;
+            *test = 1;
+            SDL_RenderCopy(renderer,cage,NULL,&cage1);
+        }
+        if( player3->speed == 0){
+            SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
+            SDL_Rect cage1;
+            cage1.x = player3->position.x;
+            cage1.y = player3->position.y;
             cage1.w = 32;
             cage1.h = 32;
             *test = 1;
