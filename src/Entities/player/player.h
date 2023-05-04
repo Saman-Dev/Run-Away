@@ -13,6 +13,7 @@
 #define PLAYER_FRAME_HEIGHT 32
 
 typedef struct {
+    int player;
     SDL_Texture *spriteSheetTexture;
     SDL_Rect spriteClip[12];
     SDL_Rect position;
@@ -24,7 +25,7 @@ typedef struct {
     bool right;
 } Player;
 
-Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY);
+Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);
 void handlePlayerMovement(Player *playerX);
 
 #endif

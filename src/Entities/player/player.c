@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, int positionY) {
+Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY) {
     Player playerX;
 
     playerX.spriteSheetTexture = IMG_LoadTexture(renderer, playerModel);
@@ -32,6 +32,8 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int positionX, i
 
     playerX.frame = 6;
     playerX.speed = 2;
+
+    playerX.player = playerNumber;
 
     return playerX;
 }

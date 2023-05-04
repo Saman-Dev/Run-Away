@@ -34,8 +34,6 @@ typedef struct {
     SDL_Texture* texture;
     SDL_Rect rect;
     bool available;
-    int currentFrame;
-    int frameTimer;
 } SpeedBoostPerk;
 
 typedef struct {
@@ -52,7 +50,7 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY);
 
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames);
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test);
 
@@ -74,6 +72,7 @@ int main(int argc, char **argv)
     Framework game;
     Background resources;
     Player player1;
+    Player player3;
     Player hunter;
 
     initialize(&game);
@@ -83,13 +82,7 @@ int main(int argc, char **argv)
     /////
     AddressBook record;
     initiateAddressBook(&record);
-
-    Cargo toSend;
-    toSend.positionX = 0;
-    toSend.positionY = 0;
-
-    Cargo toReceive;
-
+    Cargo toSend = {0, 0, 0, 0};
     Network information;
 
     /*
@@ -98,7 +91,7 @@ int main(int argc, char **argv)
     }
     else {
     setUpClient(&information, "192.168.0.30", 2000);
-    }*/
+    } */
     /////
 
     SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
@@ -117,18 +110,10 @@ int main(int argc, char **argv)
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.available = true;
 
-    // Perk animation frames
-    SDL_Rect perkFrames[PERK_FRAME_COUNT];
-    for (int i = 0; i < PERK_FRAME_COUNT; i++) 
-    {
-        perkFrames[i].x = i * (30);  
-        perkFrames[i].y = i % 2 * PERK_HEIGHT;
-        perkFrames[i].w = PERK_WIDTH;
-        perkFrames[i].h = PERK_HEIGHT;
-    }
 
-    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 200, 200);
-    hunter = createPlayer(game.renderer, "resources/Hunter.png", 142, 280);
+    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
+    hunter = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
+    player3 = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
 
     char* options[] = {"Start Game", "Options", "Quit"};
     Menu menu = {
@@ -161,10 +146,18 @@ int main(int argc, char **argv)
 
     while (!game.quit)
     {
+
         // Handle events
-        handleInput(&game, &player1, &hunter);
-        handlePlayerMovement(&player1);
-        handlePlayerMovement(&hunter);
+        if (number == 3) {
+            handleInput(&game, &player3, &hunter);
+            handlePlayerMovement(&player3);
+            handlePlayerMovement(&hunter);
+        }
+        else {
+            handleInput(&game, &player1, &hunter);
+            handlePlayerMovement(&player1);
+            handlePlayerMovement(&hunter);
+        }
 
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
@@ -182,10 +175,10 @@ int main(int argc, char **argv)
         // Render players
         SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(game.renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, player3.spriteSheetTexture, &player3.spriteClip[player3.frame], &player3.position, 0, NULL, SDL_FLIP_NONE);
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk, perkFrames);
-        HuntAndRevive(&player1, &hunter, game.renderer, &test);
 
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
@@ -193,17 +186,15 @@ int main(int argc, char **argv)
         /*
         if (number == 1) {
             sendData(&information, &toSend, &player1);
-            receiveData(information, &toReceive, &hunter);
+            receiveData(information, &hunter, &player3);
         }
         else if (number == 2) {
             sendData(&information, &toSend, &hunter);
-            receiveData(information, &toReceive, &player1);
+            receiveData(information, &player1, &player3);
         }
         else if (number == 3) {
-            manageServerDuties(&information, &record, &toSend);
-        }
-        */
-        
+            manageServerDuties(&information, &record, &player1, &hunter, player3, &toSend);
+        } */
     }
 
     // Free resources and close SDL
@@ -247,14 +238,14 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
 
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk, SDL_Rect* perkFrames)
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
 {
     if (perk.available)
     {
-        SDL_Rect clipRect = perkFrames[perk.currentFrame];
-        SDL_RenderCopy(renderer, perk.texture, &clipRect, &perk.rect);
+        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
     }
 }
+
 
 void handleInput(Framework *game, Player *playerX, Player *playerY) {
     while (SDL_PollEvent(&game->event)) {
@@ -347,16 +338,8 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
     {
         return;
     }
-
-    // Update perk animation frame
-    perk->frameTimer += 16;
-    if (perk->frameTimer >= PERK_FRAME_DELAY) 
-    {
-        perk->currentFrame = (perk->currentFrame + 1) % PERK_FRAME_COUNT;
-        perk->frameTimer = 0;
-    }
 }
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test)
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter)
 {
     if (checkCollision(player1->position, hunter->position)) 
     {
