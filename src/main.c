@@ -178,8 +178,8 @@ int main(int argc, char **argv)
         SDL_RenderCopyEx(game.renderer, player3.spriteSheetTexture, &player3.spriteClip[player3.frame], &player3.position, 0, NULL, SDL_FLIP_NONE);
 
         // Perk render
-        renderSpeedBoostPerk(game.renderer, speedBoostPerk, perkFrames);
-
+        renderSpeedBoostPerk(game.renderer, speedBoostPerk);
+        HuntAndRevive(&player1,/*&player2,*/&hunter,game.renderer, &test);
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
@@ -339,7 +339,7 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
         return;
     }
 }
-void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter)
+void HuntAndRevive(Player *player1,/*Player *player2,*/Player *hunter,SDL_Renderer *renderer, int *test)
 {
     if (checkCollision(player1->position, hunter->position)) 
     {
