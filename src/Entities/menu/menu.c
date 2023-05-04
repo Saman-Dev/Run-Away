@@ -1,6 +1,9 @@
 #include "menu.h"
 #include <SDL2/SDL_ttf.h>
 
+#define SCREEN_WIDTH 960
+#define SCREEN_HEIGHT 955
+
 int displayMenu(SDL_Renderer* renderer, Menu* menu) 
 {
     TTF_Font* font = TTF_OpenFont("resources/font.ttf", 24);
@@ -8,30 +11,54 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
     SDL_Rect optionRects[menu->numOptions];
 
     SDL_Color textColor = {255, 255, 255};
+    int maxOptionWidth = 0;
+    int totalOptionHeight = 0;
+    
     for (int i = 0; i < menu->numOptions; i++) 
     {
         optionSurfaces[i] = TTF_RenderText_Solid(font, menu->options[i], textColor);
-        optionRects[i].x = menu->menuX;
-        optionRects[i].y = menu->menuY + (i * (menu->optionHeight + menu->optionSpacing));
-        optionRects[i].w = menu->optionWidth;
-        optionRects[i].h = menu->optionHeight;
+        optionRects[i].x = 0;
+        optionRects[i].y = totalOptionHeight;
+        optionRects[i].w = optionSurfaces[i]->w;
+        optionRects[i].h = optionSurfaces[i]->h;
+        totalOptionHeight += optionRects[i].h + menu->optionSpacing;
+        if (optionRects[i].w > maxOptionWidth) {
+            maxOptionWidth = optionRects[i].w;
+        }
     }
+
+    int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
+    int menuHeight = totalOptionHeight - menu->optionSpacing;
+    int menuX = 405;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
+    int menuY = 600;//(SCREEN_HEIGHT - menuHeight) / 2;
+
+    for (int i = 0; i < menu->numOptions; i++) 
+    {
+        optionRects[i].x = menuX + (maxOptionWidth - optionRects[i].w) / 2;
+        optionRects[i].y = menuY + optionRects[i].y;
+    }
+
     int mouseX=0, mouseY=0; 
     int selectedOption = -1;
     SDL_Event event;
     
-    while (selectedOption == -1) {
-        while (SDL_PollEvent(&event)) {
+    while (selectedOption == -1) 
+    {
+        while (SDL_PollEvent(&event)) 
+        {
             
-            switch (event.type) {
+            switch (event.type) 
+            {
                 case SDL_QUIT:
                     selectedOption = menu->numOptions - 1;
                     break;
                 case SDL_MOUSEBUTTONUP:
                     
                     SDL_GetMouseState(&mouseX, &mouseY);
-                    for (int i = 0; i < menu->numOptions; i++) {
-                        if (SDL_PointInRect(&(SDL_Point){mouseX, mouseY}, &optionRects[i])) {
+                    for (int i = 0; i < menu->numOptions; i++) 
+                    {
+                        if (SDL_PointInRect(&(SDL_Point){mouseX, mouseY}, &optionRects[i])) 
+                        {
                             selectedOption = i;
                         }
                     }
@@ -42,7 +69,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for (int i = 0; i < menu->numOptions; i++) {
+        for (int i = 0; i < menu->numOptions; i++) 
+        {
             SDL_Texture* optionTexture = SDL_CreateTextureFromSurface(renderer, optionSurfaces[i]);
             SDL_RenderCopy(renderer, optionTexture, NULL, &optionRects[i]);
             SDL_DestroyTexture(optionTexture);
@@ -51,7 +79,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         SDL_RenderPresent(renderer);
     }
 
-    for (int i = 0; i < menu->numOptions; i++) {
+    for (int i = 0; i < menu->numOptions; i++) 
+    {
         SDL_FreeSurface(optionSurfaces[i]);
     }
 
