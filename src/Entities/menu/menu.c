@@ -11,7 +11,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
     SDL_Surface* optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
 
-    SDL_Color textColor = {255, 255, 255};
+    SDL_Color textColor = {000, 000, 000};
+    TTF_SetFontStyle(font, TTF_STYLE_BOLD);
     int maxOptionWidth = 0;
     int totalOptionHeight = 0;
     
@@ -28,7 +29,7 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         }
     }
 
-    SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "resources/MenuBackground.jpg"); 
+    SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "resources/FINAL_menu2.png"); 
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;

@@ -83,6 +83,7 @@ int main(int argc, char **argv)
     initiateMapResources(game.renderer, &resources);
     TTF_Init();
 
+
     /////
     AddressBook record;
     initiateAddressBook(&record);
@@ -126,19 +127,13 @@ int main(int argc, char **argv)
         .optionWidth = 200,
         .optionHeight = 50,
         .optionSpacing = 10,
-        //.menuX = 480,
-        //.menuY = 477,
+        .menuX = 480,
+        .menuY = 477,
     };
 
     int selectedOption = displayMenu(game.renderer, &menu);
 
-    // Center menu horizontally
-    int menuLeft = (SCREEN_WIDTH - (menu.optionWidth + menu.optionSpacing) * menu.numOptions) / 2;
-    menu.menuX = menuLeft;
 
-// Center menu vertically
-    int menuTop = (SCREEN_HEIGHT - menu.optionHeight) / 2;
-    menu.menuY = menuTop;
 
     switch (selectedOption) 
     {
