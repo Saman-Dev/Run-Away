@@ -1,5 +1,6 @@
 #include "menu.h"
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 #define SCREEN_WIDTH 960
 #define SCREEN_HEIGHT 955
@@ -26,6 +27,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
             maxOptionWidth = optionRects[i].w;
         }
     }
+
+    SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "resources/MenuBackground.jpg"); 
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
@@ -69,6 +72,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        SDL_RenderCopy(renderer, imageTexture, NULL, NULL);
+
         for (int i = 0; i < menu->numOptions; i++) 
         {
             SDL_Texture* optionTexture = SDL_CreateTextureFromSurface(renderer, optionSurfaces[i]);
@@ -78,6 +83,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
 
         SDL_RenderPresent(renderer);
     }
+
+    
 
     for (int i = 0; i < menu->numOptions; i++) 
     {
