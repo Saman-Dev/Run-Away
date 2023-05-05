@@ -388,20 +388,20 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
     }if( player1->speed == 0){
             SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
             SDL_Rect cage1;
-            cage1.x = player1->position.x;
-            cage1.y = player1->position.y;
-            cage1.w = 32;
-            cage1.h = 32;
+            cage1.x = (player1->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+            cage1.y = (player1->position.y-2);
+            cage1.w = 40;
+            cage1.h = 40;
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
         if( player3->speed == 0){
             SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
             SDL_Rect cage1;
-            cage1.x = player3->position.x;
-            cage1.y = player3->position.y;
-            cage1.w = 32;
-            cage1.h = 32;
+            cage1.x = (player3->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+            cage1.y = (player3->position.y-2);
+            cage1.w = 40;
+            cage1.h = 40;
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
