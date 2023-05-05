@@ -90,27 +90,9 @@ int main(int argc, char **argv)
     setUpClient(&information, "192.168.0.30", 2000);
     } */
     /////
-<<<<<<< HEAD
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
-=======
-    SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
-    if (perkTexture == NULL) 
-    {
-        printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
-        exit(1);
-    }
-    // Perk
-    SpeedBoostPerk speedBoostPerk;
-    speedBoostPerk.texture = perkTexture;
-    speedBoostPerk.rect.x = 300; 
-    speedBoostPerk.rect.y = 300; 
-    speedBoostPerk.rect.w = PERK_WIDTH;  
-    speedBoostPerk.rect.h = PERK_HEIGHT; 
-    speedBoostPerk.available = true;
-    /////
->>>>>>> 21751a31060aaa7377b5f035c1ce4bcbe7d5b9cb
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
     player3 = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
