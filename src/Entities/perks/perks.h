@@ -9,6 +9,7 @@ typedef struct {
     SDL_Texture* texture;
     SDL_Rect rect;
     bool available;
+    int duration;
 } SpeedBoostPerk;
 
 SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer);

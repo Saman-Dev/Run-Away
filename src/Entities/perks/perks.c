@@ -48,5 +48,6 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.rect.w = PERK_WIDTH;  
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.available = true;
+    speedBoostPerk.duration = PERK_DURATION;
     return speedBoostPerk;
 }
