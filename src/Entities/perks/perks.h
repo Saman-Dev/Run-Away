@@ -1,22 +1,19 @@
 #ifndef PERKS_H
 #define PERKS_H
 
-#include <SDL2/SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "../player/player.h"
 #include <stdbool.h>
+#include <SDL2/SDL.h>
+#include "../player/player.h"
 
 typedef struct {
-    int type;
-    int value;
-    int duration;
-    SDL_Rect perkRect;
     SDL_Texture* texture;
-} Perk;
+    SDL_Rect rect;
+    bool available;
+} SpeedBoostPerk;
 
-Perk* create_perk(int type, int value, SDL_Rect* perkRect, SDL_Texture* texture);
-//void apply_perk(Player player, Perk* perk);
-void destroy_perk(Perk* perk);
+SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer);
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
+bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 #endif

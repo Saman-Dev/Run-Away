@@ -9,6 +9,7 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "Entities/perks/perks.h"
 #include "Entities/audio/audio.h"
 #include "Entities/map/map.h"
 #include "Entities/player/player.h"
@@ -31,11 +32,6 @@
 
 #undef main
 
-typedef struct {
-    SDL_Texture* texture;
-    SDL_Rect rect;
-    bool available;
-} SpeedBoostPerk;
 
 typedef struct {
     SDL_Window *window;
@@ -50,15 +46,13 @@ void handleInput(Framework *game, Player *playerX, Player *playerY, Player *play
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 
-void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
-bool checkCollision(SDL_Rect a, SDL_Rect b);
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
 
 void manageFrameRate(int timeAtLoopBeginning);
 
 int main(int argc, char **argv) 
 {
+    int timer_length = 10; // Sätt timerens längd i sekunder
     int timeAtLoopBeginning;
     /////
     int number;
@@ -82,14 +76,12 @@ int main(int argc, char **argv)
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
     TTF_Init();
-
-
     /////
     AddressBook record;
     initiateAddressBook(&record);
     Cargo toSend = {0, 0, 0, 0};
     Network information;
-
+    /////
     /*
     if (number == 3) {
     setUpServer(&information, 2000);
@@ -99,27 +91,12 @@ int main(int argc, char **argv)
     } */
     /////
 
-    SDL_Texture* perkTexture = IMG_LoadTexture(game.renderer, "resources/perk.png");
-    if (perkTexture == NULL) 
-    {
-        printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
-        exit(1);
-    }
-
-    // Perk
-    SpeedBoostPerk speedBoostPerk;
-    speedBoostPerk.texture = perkTexture;
-    speedBoostPerk.rect.x = 300; 
-    speedBoostPerk.rect.y = 300; 
-    speedBoostPerk.rect.w = PERK_WIDTH;  
-    speedBoostPerk.rect.h = PERK_HEIGHT; 
-    speedBoostPerk.available = true;
-
+    SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
     player1 = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
     hunter = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
     player3 = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
-
+    /////
     char* options[] = {"Host Game", "Join Game", "Quit"};
     Menu menu = {
         .options = options,
@@ -130,11 +107,9 @@ int main(int argc, char **argv)
         .menuX = 480,
         .menuY = 477,
     };
-
+    /////
     int selectedOption = displayMenu(game.renderer, &menu);
-
-
-
+    /////
     switch (selectedOption) 
     {
         case 0:
@@ -150,9 +125,14 @@ int main(int argc, char **argv)
             // Handle error or unexpected option
             break;
     }
-
+    /////
+    time_t start_time = time(NULL); // Sätt starttiden till nu
+    /////
     while (!game.quit)
     {
+        time_t current_time = time(NULL); // Hämta aktuell tid
+        double elapsed_time = difftime(current_time, start_time); // Beräkna tiden som har gått
+        /////
         timeAtLoopBeginning = SDL_GetTicks();
         // Handle events
         /*if (number == 3) {
@@ -201,10 +181,15 @@ int main(int argc, char **argv)
         } */
 
         manageFrameRate(timeAtLoopBeginning);
+        
+        if (elapsed_time >= timer_length) { // Kontrollera om tiden har gått ut
+            printf("Tiden ar ute!\n"); // Skriv ut meddelandet
+            break;
+        }
     }
 
     // Free resources and close SDL
-    SDL_DestroyTexture(perkTexture);
+    SDL_DestroyTexture(speedBoostPerk.texture);
     SDL_DestroyWindow(game.window);
     Mix_CloseAudio();
     TTF_Quit();
@@ -238,20 +223,6 @@ void initialize(Framework *game)
         exit(1);
     }
 }
-
-bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
-{
-    return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
-}
-
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
-{
-    if (perk.available)
-    {
-        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
-    }
-}
-
 
 void handleInput(Framework *game, Player *playerX, Player *playerY,Player *playerZ) {
     while (SDL_PollEvent(&game->event)) {
@@ -356,19 +327,7 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
     }
 }
 
-void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
-{
-    if (perk->available && checkCollision(player->position, perk->rect)) 
-    {
-        player->speed += SPEED_BOOST_AMOUNT;
-        perk->available = false;
-    }
 
-    if (!perk->available) 
-    {
-        return;
-    }
-}
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test)
 {
     if (checkCollision(player1->position, hunter->position)) 
@@ -388,20 +347,20 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
     }if( player1->speed == 0){
             SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
             SDL_Rect cage1;
-            cage1.x = player1->position.x;
-            cage1.y = player1->position.y;
-            cage1.w = 32;
-            cage1.h = 32;
+            cage1.x = (player1->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+            cage1.y = (player1->position.y-2);
+            cage1.w = 40;
+            cage1.h = 40;
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
         if( player3->speed == 0){
             SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
             SDL_Rect cage1;
-            cage1.x = player3->position.x;
-            cage1.y = player3->position.y;
-            cage1.w = 32;
-            cage1.h = 32;
+            cage1.x = (player3->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+            cage1.y = (player3->position.y-2);
+            cage1.w = 40;
+            cage1.h = 40;
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }

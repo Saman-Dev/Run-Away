@@ -4,33 +4,49 @@
 #define PERK_WIDTH 32
 #define PERK_HEIGHT 32
 #define PERK_DURATION 10
+#define SPEED_BOOST_AMOUNT 1
 
-Perk* create_perk(int type, int value, SDL_Rect *perkRect, SDL_Texture* texture) {
-    Perk* s = malloc(sizeof(Perk));
-    s->type = type;
-    s->value = value;
-    s->duration = PERK_DURATION;
-    s->perkRect = *perkRect;
-    s->texture = texture;
-    return s;
+
+void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
+{
+    if (perk->available && checkCollision(player->position, perk->rect)) 
+    {
+        player->speed += SPEED_BOOST_AMOUNT;
+        perk->available = false;
+    }
+
+    if (!perk->available) 
+    {
+        return;
+    }
 }
 
-/*void apply_perk(Player player, Perk* perk) 
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
 {
-    switch(perk->type) 
-    { 
-        case 1: // speed boost
-            player -> speed += perk -> value;
-            printf("Speed boost: %d \n", player -> speed);
-            break;
-        case 2: // future perks
-        default:
-            break;
+    if (perk.available)
+    {
+        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
     }
-}*/
+}
 
-void destroy_perk(Perk* perk) 
+bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
-    SDL_DestroyTexture(perk -> texture);
-    free(perk);
+    return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
+}
+
+SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer) 
+{
+    SpeedBoostPerk speedBoostPerk;
+    SDL_Texture* perkTexture = IMG_LoadTexture(renderer, "resources/perk.png");
+    if (perkTexture == NULL) {
+        printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
+        exit(1);
+    }
+    speedBoostPerk.texture = perkTexture;
+    speedBoostPerk.rect.x = 300; 
+    speedBoostPerk.rect.y = 300; 
+    speedBoostPerk.rect.w = PERK_WIDTH;  
+    speedBoostPerk.rect.h = PERK_HEIGHT; 
+    speedBoostPerk.available = true;
+    return speedBoostPerk;
 }
