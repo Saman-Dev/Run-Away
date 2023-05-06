@@ -213,7 +213,7 @@ int main(int argc, char **argv)
 }
 
 void initialize(Framework *game) 
-{
+{   
     //game->quit = false;
     
     // Initialize SDL and timer
@@ -226,7 +226,7 @@ void initialize(Framework *game)
         exit(1);
     }
 
-    game->window = SDL_CreateWindow("The Alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (game->window == NULL) {
         printf("%s\n", SDL_GetError());
         exit(1);
