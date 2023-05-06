@@ -16,7 +16,7 @@ ifneq ($(OS),Windows_NT)
 endif
 
 
-LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_net -lSDL2_ttf
+LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_net -lSDL2_ttf  `pkg-config --cflags --libs sdl2` -lSDL2main
 LDFLAGS_WINDOWS := -lmingw32 -mwindows
 LDFLAGS_MAC := -L /opt/homebrew/lib/
 CFLAGS_WINDOWS := C:\msys64\mingw64\include
