@@ -1,5 +1,7 @@
 #include "perks.h"
 #include "../player/player.h"
+#include <stdlib.h>
+#include <time.h>
 
 #define PERK_WIDTH 32
 #define PERK_HEIGHT 32
@@ -37,14 +39,28 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer) 
 {
     SpeedBoostPerk speedBoostPerk;
-    SDL_Texture* perkTexture = IMG_LoadTexture(renderer, "resources/perk.png");
+    SDL_Texture* perkTexture = IMG_LoadTexture(renderer, "resources/newperk.png");
     if (perkTexture == NULL) {
         printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
         exit(1);
     }
+
+    srand(time(NULL));
+    int randomLocation = rand() % 2; // generate random number to determine perk location between 2 spawnpoints
+
     speedBoostPerk.texture = perkTexture;
-    speedBoostPerk.rect.x = 300; 
-    speedBoostPerk.rect.y = 300; 
+
+    if(randomLocation == 1) 
+    {
+        speedBoostPerk.rect.x = 435; 
+        speedBoostPerk.rect.y = 350; 
+    }
+    else 
+    {
+        speedBoostPerk.rect.x = 750; 
+        speedBoostPerk.rect.y = 750; 
+    }
+
     speedBoostPerk.rect.w = PERK_WIDTH;  
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.available = true;
