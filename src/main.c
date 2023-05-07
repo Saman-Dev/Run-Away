@@ -136,7 +136,7 @@ int main(int argc, char **argv)
         timeAtLoopBeginning = SDL_GetTicks();
         // Handle events
         /*if (number == 3) {
-            handleInput(&game, &player3, &hunter);
+            handleInput(&game, &player3, &hunter, &player1);
             handlePlayerMovement(&player3);
             handlePlayerMovement(&hunter);
         }
