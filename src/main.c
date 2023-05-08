@@ -52,7 +52,7 @@ void manageFrameRate(int timeAtLoopBeginning);
 
 int main(int argc, char **argv) 
 {
-    int timer_length = 10; // Sätt timerens längd i sekunder
+    int timer_length = 1000; // Sätt timerens längd i sekunder
     int timeAtLoopBeginning;
     /////
     int number;

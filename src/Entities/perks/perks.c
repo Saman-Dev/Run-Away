@@ -11,16 +11,27 @@
 
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
 {
-    if (perk->available && checkCollision(player->position, perk->rect)) 
+    static bool hasCollectedPerkThisFrame = false; // new static variable to track whether perk has been collected this frame
+    if (perk->available && checkCollision(player->position, perk->rect) && !hasCollectedPerkThisFrame) // only apply perk if it hasn't been collected this frame
     {
         player->speed += SPEED_BOOST_AMOUNT;
         perk->available = false;
+        resetPerkDuration(perk);
+        printf("Player speed after collecting perk: %f (boost amount: %d)\n", player->speed, SPEED_BOOST_AMOUNT); // debug output
+        hasCollectedPerkThisFrame = true;
     }
 
     if (!perk->available) 
     {
+        perk->timer++;
+        if (perk->timer >= perk->duration) {
+            player->speed -= SPEED_BOOST_AMOUNT;
+            printf("Player speed after perk expires: %f\n", player->speed); // debug output
+        }
         return;
     }
+    
+    hasCollectedPerkThisFrame = false; // reset flag at the end of the frame
 }
 
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
@@ -67,3 +78,8 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.duration = PERK_DURATION;
     return speedBoostPerk;
 }
+
+void resetPerkDuration(SpeedBoostPerk *perk) {
+    perk->timer = 0;
+}
+
