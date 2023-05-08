@@ -150,7 +150,7 @@ int main(int argc, char **argv)
         // Check for perk collision
         applySpeedBoostPerk(&player1, &speedBoostPerk);
         applySpeedBoostPerk(&hunter, &speedBoostPerk);
-        
+
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(game.renderer);
