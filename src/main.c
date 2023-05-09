@@ -334,11 +334,13 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
     {
         
         player1->speed = 0;
+        player1->frame = 0;
 
     }else if (checkCollision(player3->position, hunter->position)) 
     {
         
         player3->speed = 0;
+        player3->frame = 0;
 
     }else if(checkCollision(player1->position, player3->position)){
         player1->speed = 2;
