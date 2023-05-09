@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
         manageFrameRate(timeAtLoopBeginning);
         
         if (elapsed_time >= timer_length) { // Kontrollera om tiden har gått ut
-            printf("Tiden ar ute!\n"); // Skriv ut meddelandet
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game.window);
             break;
         }
     }
