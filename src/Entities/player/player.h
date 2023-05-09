@@ -8,6 +8,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "../map/map.h"
+#include "../audio/audio.h"
 
 #define PLAYER_FRAME_WIDTH 32
 #define PLAYER_FRAME_HEIGHT 32

@@ -1,6 +1,10 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-int init_audio();
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
-#endif /* AUDIO_H */
+void initializeAudio(void);
+void playWalkingSound(void);
+
+#endif

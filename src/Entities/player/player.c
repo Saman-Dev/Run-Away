@@ -41,6 +41,7 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber
 void handlePlayerMovement(Player *playerX) {
     if (playerX->up) {
         if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y)) {
+            playWalkingSound();
             printf("Player: Up\n");
             printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.y -= playerX->speed;
@@ -52,6 +53,7 @@ void handlePlayerMovement(Player *playerX) {
     }
     else if (playerX->down) {
         if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y + PLAYER_FRAME_HEIGHT)) {
+            playWalkingSound();
             printf("Player: Down\n");
             printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.y += playerX->speed;
@@ -63,6 +65,7 @@ void handlePlayerMovement(Player *playerX) {
     }
     if (playerX->left) {
         if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
+            playWalkingSound();
             printf("Player: Left\n");
             printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
             playerX->position.x -= playerX->speed;
@@ -74,6 +77,7 @@ void handlePlayerMovement(Player *playerX) {
     }
     else if (playerX->right) {
         if (!encountersForbiddenTile(playerX->position.x + PLAYER_FRAME_WIDTH, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
+            playWalkingSound();
             printf("Player: Right\n");
             printf("X: %d, Y: %d", playerX->position.x, playerX->position.y);
             playerX->position.x += playerX->speed;

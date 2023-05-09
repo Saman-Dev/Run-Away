@@ -1,30 +1,45 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
 #include "audio.h"
 
-int init_audio()
-{
-    // Initialize SDL2 Mixer library
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+void initializeAudio(void) {
+    // Open audio device
+    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to initialize SDL2 Mixer: %s", Mix_GetError());
-        return -1;
+        exit(1);
     }
 
-    // Load OGG file
+    // Load wav file
     Mix_Music *music = Mix_LoadMUS("resources/main_theme.wav");
     if (!music)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
-        Mix_CloseAudio();
-        return -1;
+        exit(1);
     }
 
     // Set the music volume to 20%
     Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
 
-    // Play music in a loop
+    // Play the main theme in a loop
     Mix_PlayMusic(music, -1);
 
-    return 0;
+    // Load walking sound
+    playWalkingSound();
+
+}
+
+void playWalkingSound(void) {
+    static Mix_Chunk *sound;
+    static int timeSinceLastCalled;
+    int CurrentTime;
+    if (!sound) {
+        sound = Mix_LoadWAV("resources/WalkingSound.mp3");
+        Mix_VolumeChunk(sound, 16);
+    }
+    else {
+        CurrentTime = SDL_GetTicks() - timeSinceLastCalled;
+        if (CurrentTime > 460) {
+            Mix_PlayChannelTimed(-1, sound, 0, 460);
+            timeSinceLastCalled = SDL_GetTicks();
+        }
+    }
 }

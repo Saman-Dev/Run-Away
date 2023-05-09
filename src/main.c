@@ -30,9 +30,6 @@
 
 #define FPS 60
 
-#undef main
-
-
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -50,8 +47,7 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
 
 void manageFrameRate(int timeAtLoopBeginning);
 
-int main(int argc, char **argv) 
-{
+int main(int argc, char **argv) {
     int timer_length = 1000; // Sätt timerens längd i sekunder
     int timeAtLoopBeginning;
     /////
@@ -197,19 +193,11 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void initialize(Framework *game) 
-{   
-    //game->quit = false;
-    
-    // Initialize SDL and timer
+void initialize(Framework *game) {
+    // Initialize SDL, timer and Mixer Library
     SDL_Init(SDL_INIT_VIDEO);
     srand(time(NULL));
-
-    // Initialize SDL2 Mixer library and play music
-    if (init_audio() < 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to initialize SDL2 Mixer");
-        exit(1);
-    }
+    initializeAudio();
 
     game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (game->window == NULL) {
