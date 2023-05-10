@@ -65,9 +65,7 @@ int main(int argc, char **argv) {
     int test = 0;
     Framework game;
     Background resources;
-    Player player1;
-    Player player3;
-    Player hunter;
+    Player players[5];
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -89,9 +87,9 @@ int main(int argc, char **argv) {
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
-    player1 = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
-    hunter = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
-    player3 = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
+    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
+    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
+    players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
     /////
     char* options[] = {"Host Game", "Join Game", "Quit"};
     Menu menu = {
@@ -137,15 +135,15 @@ int main(int argc, char **argv) {
             handlePlayerMovement(&hunter);
         }
         else {*/
-            handleInput(&game, &player1, &hunter, &player3);
-            handlePlayerMovement(&player1);
-            handlePlayerMovement(&hunter);
-            handlePlayerMovement(&player3);
+            handleInput(&game, &players[0], &players[1], &players[2]);
+            handlePlayerMovement(&players[0]);
+            handlePlayerMovement(&players[1]);
+            handlePlayerMovement(&players[2]);
         //}
 
         // Check for perk collision
-        applySpeedBoostPerk(&player1, &speedBoostPerk);
-        applySpeedBoostPerk(&hunter, &speedBoostPerk);
+        applySpeedBoostPerk(&players[0], &speedBoostPerk);
+        applySpeedBoostPerk(&players[1], &speedBoostPerk);
 
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -153,13 +151,13 @@ int main(int argc, char **argv) {
         renderBackground(game.renderer, resources);
 
         // Render players
-        SDL_RenderCopyEx(game.renderer, player1.spriteSheetTexture, &player1.spriteClip[player1.frame], &player1.position, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(game.renderer, hunter.spriteSheetTexture, &hunter.spriteClip[hunter.frame], &hunter.position, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(game.renderer, player3.spriteSheetTexture, &player3.spriteClip[player3.frame], &player3.position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, players[0].spriteSheetTexture, &players[0].spriteClip[players[0].frame], &players[0].position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, players[1].spriteSheetTexture, &players[1].spriteClip[players[1].frame], &players[1].position, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game.renderer, players[2].spriteSheetTexture, &players[2].spriteClip[players[2].frame], &players[2].position, 0, NULL, SDL_FLIP_NONE);
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk);
-        HuntAndRevive(&player1,&player3,&hunter,game.renderer, &test);
+        HuntAndRevive(&players[0],&players[2],&players[1],game.renderer, &test);
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
