@@ -45,7 +45,7 @@ void playWalkingSound(void) {
 }
 
 void changeThemeSong(void) {
-    music = Mix_LoadMUS("resources/main_theme.wav");
+    music = Mix_LoadMUS("resources/main_theme2.mp3");
     if (!music)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
