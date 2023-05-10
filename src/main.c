@@ -20,13 +20,8 @@
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-void renderPlayers(Framework game, Player players[]);
 
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
-
-void checkTimeLeft(Framework *game, double elapsedTime);
-
-void manageMenu(Framework *game, Menu* menu);
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
@@ -286,36 +281,4 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
-}
-
-void renderPlayers(Framework game, Player players[]) {
-    for (int i = 0; players[i].player != 0; i++) {
-        SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &players[i].position, 0, NULL, SDL_FLIP_NONE);
-    }
-}
-
-void checkTimeLeft(Framework *game, double elapsedTime) {
-    if (elapsedTime >= TIMER_LENGTH) {
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game->window);
-    game->quit = true;
-    }
-}
-
-void manageMenu(Framework *game, Menu* menu) {
-    TTF_Init();
-    int selectedOption = displayMenu(game->renderer, menu);
-    switch (selectedOption) {
-        case 0:
-            game->quit = false;
-            break;
-        case 1:
-            // options
-            break;
-        case 2:     
-            game->quit = true;
-            break;
-        default:
-            break;
-    }
-    TTF_Quit();
 }

@@ -23,5 +23,6 @@ typedef struct {
 
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
+void checkTimeLeft(Framework *game, double elapsedTime);
 
 #endif

@@ -2,24 +2,16 @@
 #define PLAYER_H
 
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include "../map/map.h"
 #include "../audio/audio.h"
+#include "../foundation/foundation.h"
 
 #define PLAYER_FRAME_WIDTH 32
 #define PLAYER_FRAME_HEIGHT 32
-#define SPEED_BOOST_AMOUNT 1
-
-/*
-// Perk dimensions
-#define PERK_SPAWN_TIME 5000 // in milliseconds
-#define PERK_FRAME_COUNT 10
-#define PERK_FRAME_DELAY 300
-*/
 
 typedef struct {
     int player;
@@ -36,5 +28,6 @@ typedef struct {
 
 Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);
 void handlePlayerMovement(Player *playerX);
+void renderPlayers(Framework game, Player players[]);
 
 #endif

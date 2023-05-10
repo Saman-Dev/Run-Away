@@ -26,3 +26,10 @@ void manageFrameRate(int timeAtLoopBeginning) {
         SDL_Delay((1000 / FPS) - endOfLoopTime);
     }
 }
+
+void checkTimeLeft(Framework *game, double elapsedTime) {
+    if (elapsedTime >= TIMER_LENGTH) {
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game->window);
+    game->quit = true;
+    }
+}

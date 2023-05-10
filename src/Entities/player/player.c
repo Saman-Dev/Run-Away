@@ -88,3 +88,9 @@ void handlePlayerMovement(Player *playerX) {
         }
     }
 }
+
+void renderPlayers(Framework game, Player players[]) {
+    for (int i = 0; players[i].player != 0; i++) {
+        SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &players[i].position, 0, NULL, SDL_FLIP_NONE);
+    }
+}

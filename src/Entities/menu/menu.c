@@ -1,9 +1,23 @@
 #include "menu.h"
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
 
-#define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 955
+void manageMenu(Framework *game, Menu* menu) {
+    TTF_Init();
+    int selectedOption = displayMenu(game->renderer, menu);
+    switch (selectedOption) {
+        case 0:
+            game->quit = false;
+            break;
+        case 1:
+            // options
+            break;
+        case 2:     
+            game->quit = true;
+            break;
+        default:
+            break;
+    }
+    TTF_Quit();
+}
 
 int displayMenu(SDL_Renderer* renderer, Menu* menu) 
 {
