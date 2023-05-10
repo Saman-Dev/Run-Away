@@ -76,6 +76,8 @@ int main(int argc, char **argv) {
 
     manageMenu(&game, &menu);
 
+    changeThemeSong();
+
     time_t start_time = time(NULL); // Sätt starttiden till nu
     while (!game.quit)
     {

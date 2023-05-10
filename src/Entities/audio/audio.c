@@ -9,7 +9,7 @@ void initializeAudio(void) {
     }
 
     // Load wav file
-    Mix_Music *music = Mix_LoadMUS("resources/main_theme.wav");
+    music = Mix_LoadMUS("resources/ThemeSong.mp3");
     if (!music)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
@@ -33,7 +33,7 @@ void playWalkingSound(void) {
     int CurrentTime;
     if (!sound) {
         sound = Mix_LoadWAV("resources/WalkingSound.mp3");
-        Mix_VolumeChunk(sound, 14);
+        Mix_VolumeChunk(sound, 1);
     }
     else {
         CurrentTime = SDL_GetTicks() - timeSinceLastCalled;
@@ -42,4 +42,16 @@ void playWalkingSound(void) {
             timeSinceLastCalled = SDL_GetTicks();
         }
     }
+}
+
+void changeThemeSong(void) {
+    music = Mix_LoadMUS("resources/main_theme.wav");
+    if (!music)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
+        exit(1);
+    }
+
+    // Play the main theme in a loop
+    Mix_PlayMusic(music, -1);
 }
