@@ -12,6 +12,14 @@
 
 #define PLAYER_FRAME_WIDTH 32
 #define PLAYER_FRAME_HEIGHT 32
+#define SPEED_BOOST_AMOUNT 1
+
+/*
+// Perk dimensions
+#define PERK_SPAWN_TIME 5000 // in milliseconds
+#define PERK_FRAME_COUNT 10
+#define PERK_FRAME_DELAY 300
+*/
 
 typedef struct {
     int player;

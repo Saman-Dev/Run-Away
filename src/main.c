@@ -16,17 +16,8 @@
 #include "Entities/network/network.h"
 #include "Entities/menu/menu.h"
 
-// Screen dimensions
 #define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 955
-
-// Perk dimensions
-#define PERK_WIDTH 30
-#define PERK_HEIGHT 30
-#define SPEED_BOOST_AMOUNT 1
-#define PERK_SPAWN_TIME 5000 // in milliseconds
-#define PERK_FRAME_COUNT 10
-#define PERK_FRAME_DELAY 300
+#define SCREEN_HEIGHT 900
 
 #define FPS 60
 

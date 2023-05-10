@@ -1,13 +1,4 @@
 #include "perks.h"
-#include "../player/player.h"
-#include <stdlib.h>
-#include <time.h>
-
-#define PERK_WIDTH 32
-#define PERK_HEIGHT 32
-#define PERK_DURATION 10
-#define SPEED_BOOST_AMOUNT 1
-
 
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
 {
@@ -67,4 +58,3 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.duration = PERK_DURATION;
     return speedBoostPerk;
 }
-

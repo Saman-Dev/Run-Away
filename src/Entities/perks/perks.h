@@ -2,8 +2,18 @@
 #define PERKS_H
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include <SDL2/SDL.h>
+
 #include "../player/player.h"
+#include "../player/player.h"
+
+#define PERK_WIDTH 32
+#define PERK_HEIGHT 32
+#define PERK_DURATION 10
+#define SPEED_BOOST_AMOUNT 1
 
 typedef struct {
     SDL_Texture* texture;
