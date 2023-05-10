@@ -33,7 +33,7 @@ void playWalkingSound(void) {
     int CurrentTime;
     if (!sound) {
         sound = Mix_LoadWAV("resources/WalkingSound.mp3");
-        Mix_VolumeChunk(sound, 16);
+        Mix_VolumeChunk(sound, 14);
     }
     else {
         CurrentTime = SDL_GetTicks() - timeSinceLastCalled;
