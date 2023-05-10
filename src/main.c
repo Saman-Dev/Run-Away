@@ -42,6 +42,7 @@ void initialize(Framework *game);
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
+void renderPlayers(Framework game, Player players[]);
 
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
 
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
     int test = 0;
     Framework game;
     Background resources;
-    Player players[5];
+    Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -151,13 +152,12 @@ int main(int argc, char **argv) {
         renderBackground(game.renderer, resources);
 
         // Render players
-        SDL_RenderCopyEx(game.renderer, players[0].spriteSheetTexture, &players[0].spriteClip[players[0].frame], &players[0].position, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(game.renderer, players[1].spriteSheetTexture, &players[1].spriteClip[players[1].frame], &players[1].position, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(game.renderer, players[2].spriteSheetTexture, &players[2].spriteClip[players[2].frame], &players[2].position, 0, NULL, SDL_FLIP_NONE);
+        renderPlayers(game, players);
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk);
         HuntAndRevive(&players[0],&players[2],&players[1],game.renderer, &test);
+
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
@@ -359,5 +359,11 @@ void manageFrameRate(int timeAtLoopBeginning) {
     endOfLoopTime = (SDL_GetTicks()) - timeAtLoopBeginning;
     if (endOfLoopTime < (1000 / FPS)) {
         SDL_Delay((1000 / FPS) - endOfLoopTime);
+    }
+}
+
+void renderPlayers(Framework game, Player players[]) {
+    for (int i = 0; players[i].player != 0; i++) {
+        SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &players[i].position, 0, NULL, SDL_FLIP_NONE);
     }
 }
