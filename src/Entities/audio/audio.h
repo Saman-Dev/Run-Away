@@ -5,9 +5,12 @@
 #include <SDL2/SDL_mixer.h>
 
 static Mix_Music *music;
+static Mix_Chunk *walkingSound;
+static Mix_Chunk *cageSound;
 
 void initializeAudio(void);
-void playWalkingSound(void);
 void changeThemeSong(void);
+void playWalkingSound(void);
+void playCageSound(void);
 
 #endif
