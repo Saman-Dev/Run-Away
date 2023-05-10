@@ -52,10 +52,13 @@ void manageFrameRate(int timeAtLoopBeginning);
 
 void checkTimeLeft(Framework *game, double elapsedTime);
 
+void manageMenu(Framework *game, Menu* menu);
+
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    /////
+    int test = 0;
     int number;
+
     if (argc == 1) {
         number = 1;
     }
@@ -65,21 +68,18 @@ int main(int argc, char **argv) {
     else if (argc == 3) {
         number = 3;
     }
-    /////
-    int test = 0;
+
     Framework game;
     Background resources;
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    Cargo toSend = {0, 0, 0, 0};
+    AddressBook record;
+    Network information;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
-    TTF_Init();
-    /////
-    AddressBook record;
     initiateAddressBook(&record);
-    Cargo toSend = {0, 0, 0, 0};
-    Network information;
-    /////
+
     /*
     if (number == 3) {
     setUpServer(&information, 2000);
@@ -87,14 +87,13 @@ int main(int argc, char **argv) {
     else {
     setUpClient(&information, "192.168.0.30", 2000);
     } */
-    /////
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
     players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
     players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
     players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
-    /////
+
     char* options[] = {"Host Game", "Join Game", "Quit"};
     Menu menu = {
         .options = options,
@@ -105,27 +104,10 @@ int main(int argc, char **argv) {
         .menuX = 480,
         .menuY = 477,
     };
-    /////
-    int selectedOption = displayMenu(game.renderer, &menu);
-    /////
-    switch (selectedOption) 
-    {
-        case 0:
-            game.quit = false;
-            break;
-        case 1:
-            // options
-            break;
-        case 2:     
-            game.quit = true;
-            break;
-        default:
-            // Handle error or unexpected option
-            break;
-    }
-    /////
+
+    manageMenu(&game, &menu);
+
     time_t start_time = time(NULL); // Sätt starttiden till nu
-    /////
     while (!game.quit)
     {
         time_t current_time = time(NULL); // Hämta aktuell tid
@@ -185,7 +167,6 @@ int main(int argc, char **argv) {
     SDL_DestroyTexture(speedBoostPerk.texture);
     SDL_DestroyWindow(game.window);
     Mix_CloseAudio();
-    TTF_Quit();
     SDL_Quit();
     return 0;
 }
@@ -372,4 +353,23 @@ void checkTimeLeft(Framework *game, double elapsedTime) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game->window);
     game->quit = true;
     }
+}
+
+void manageMenu(Framework *game, Menu* menu) {
+    TTF_Init();
+    int selectedOption = displayMenu(game->renderer, menu);
+    switch (selectedOption) {
+        case 0:
+            game->quit = false;
+            break;
+        case 1:
+            // options
+            break;
+        case 2:     
+            game->quit = true;
+            break;
+        default:
+            break;
+    }
+    TTF_Quit();
 }
