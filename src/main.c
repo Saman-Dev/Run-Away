@@ -15,22 +15,7 @@
 #include "Entities/player/player.h"
 #include "Entities/network/network.h"
 #include "Entities/menu/menu.h"
-
-#define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 900
-
-#define FPS 60
-
-#define TIMER_LENGTH 1000
-
-typedef struct {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Event event;
-    bool quit;
-} Framework;
-
-void initialize(Framework *game);
+#include "Entities/foundation/foundation.h"
 
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
@@ -38,8 +23,6 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
 void renderPlayers(Framework game, Player players[]);
 
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
-
-void manageFrameRate(int timeAtLoopBeginning);
 
 void checkTimeLeft(Framework *game, double elapsedTime);
 
@@ -162,25 +145,6 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void initialize(Framework *game) {
-    // Initialize SDL, timer and Mixer Library
-    SDL_Init(SDL_INIT_VIDEO);
-    srand(time(NULL));
-    initializeAudio();
-
-    game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    if (game->window == NULL) {
-        printf("%s\n", SDL_GetError());
-        exit(1);
-    }
-
-    game->renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (game->renderer == NULL) {
-        printf("%s\n", SDL_GetError());
-        exit(1);
-    }
-}
-
 void handleInput(Framework *game, Player *playerX, Player *playerY,Player *playerZ) {
     while (SDL_PollEvent(&game->event)) {
         if (game->event.type == SDL_QUIT) {
@@ -284,7 +248,6 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
     }
 }
 
-
 void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test)
 {
     if (checkCollision(player1->position, hunter->position)) 
@@ -323,14 +286,6 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
             *test = 1;
             SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
-}
-
-void manageFrameRate(int timeAtLoopBeginning) {
-    int endOfLoopTime;
-    endOfLoopTime = (SDL_GetTicks()) - timeAtLoopBeginning;
-    if (endOfLoopTime < (1000 / FPS)) {
-        SDL_Delay((1000 / FPS) - endOfLoopTime);
-    }
 }
 
 void renderPlayers(Framework game, Player players[]) {
