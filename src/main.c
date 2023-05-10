@@ -30,6 +30,8 @@
 
 #define FPS 60
 
+#define TIMER_LENGTH 1000
+
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -48,8 +50,9 @@ void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer
 
 void manageFrameRate(int timeAtLoopBeginning);
 
+void checkTimeLeft(Framework *game, double elapsedTime);
+
 int main(int argc, char **argv) {
-    int timer_length = 1000; // Sätt timerens längd i sekunder
     int timeAtLoopBeginning;
     /////
     int number;
@@ -175,11 +178,7 @@ int main(int argc, char **argv) {
         } */
 
         manageFrameRate(timeAtLoopBeginning);
-        
-        if (elapsed_time >= timer_length) { // Kontrollera om tiden har gått ut
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game.window);
-            break;
-        }
+        checkTimeLeft(&game, elapsed_time);
     }
 
     // Free resources and close SDL
@@ -365,5 +364,12 @@ void manageFrameRate(int timeAtLoopBeginning) {
 void renderPlayers(Framework game, Player players[]) {
     for (int i = 0; players[i].player != 0; i++) {
         SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &players[i].position, 0, NULL, SDL_FLIP_NONE);
+    }
+}
+
+void checkTimeLeft(Framework *game, double elapsedTime) {
+    if (elapsedTime >= TIMER_LENGTH) {
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, NULL, "Tiden är ute!", game->window);
+    game->quit = true;
     }
 }
