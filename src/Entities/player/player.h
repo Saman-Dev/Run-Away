@@ -20,6 +20,7 @@ typedef struct {
     SDL_Rect position;
     int frame;
     int speed;
+    bool captured;
     bool up;
     bool down;
     bool left;

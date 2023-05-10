@@ -20,12 +20,10 @@
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-
-void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test);
+void HuntAndRevive(SDL_Renderer *renderer, Player players[]);
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    int test = 0;
     int number;
 
     if (argc == 1) {
@@ -40,7 +38,7 @@ int main(int argc, char **argv) {
 
     Framework game;
     Background resources;
-    Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     Cargo toSend = {0, 0, 0, 0};
     AddressBook record;
     Network information;
@@ -112,7 +110,7 @@ int main(int argc, char **argv) {
 
         // Perk render
         renderSpeedBoostPerk(game.renderer, speedBoostPerk);
-        HuntAndRevive(&players[0],&players[2],&players[1],game.renderer, &test);
+        HuntAndRevive(game.renderer, players);
 
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
@@ -245,48 +243,45 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
     }
 }
 
-void HuntAndRevive(Player *player1, Player *player3, Player *hunter,SDL_Renderer *renderer, int *test)
-{
-    if (checkCollision(player1->position, hunter->position)) 
-    {
-        
-        player1->speed = 0;
-        player1->frame = 0;
-
-    }else if (checkCollision(player3->position, hunter->position)) 
-    {
-        
-        player3->speed = 0;
-        player3->frame = 0;
-
-    }else if(checkCollision(player1->position, player3->position)){
-        player1->speed = 2;
-        player3->speed = 2;
-
-    }if(player1->speed == 0){
-            if (*test == 0) {
+void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
+    if (checkCollision(players[0].position, players[1].position)) {
+        players[0].speed = 0;
+        players[0].frame = 0;
+    }
+    else if (checkCollision(players[2].position, players[1].position)) {
+        players[2].speed = 0;
+        players[2].frame = 0;
+    }
+    else if (checkCollision(players[0].position, players[2].position)) {
+        players[0].speed = 2;
+        players[0].captured = false;
+        players[2].speed = 2;
+        players[2].captured = false;
+    }
+    if (players[0].speed == 0) {
+        if (!players[0].captured) {
             playCageSound();
-            }
-            SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
-            SDL_Rect cage1;
-            cage1.x = (player1->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
-            cage1.y = (player1->position.y-2);
-            cage1.w = 40;
-            cage1.h = 40;
-            *test = 1;
-            SDL_RenderCopy(renderer,cage,NULL,&cage1);
+            players[0].captured = true;
         }
-        if( player3->speed == 0){
-            if (*test == 0) {
-                playCageSound();
-            }
-            SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
-            SDL_Rect cage1;
-            cage1.x = (player3->position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
-            cage1.y = (player3->position.y-2);
-            cage1.w = 40;
-            cage1.h = 40;
-            *test = 1;
-            SDL_RenderCopy(renderer,cage,NULL,&cage1);
+        SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
+        SDL_Rect cage1;
+        cage1.x = (players[0].position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+        cage1.y = (players[0].position.y-2);
+        cage1.w = 40;
+        cage1.h = 40;
+        SDL_RenderCopy(renderer,cage,NULL,&cage1);
         }
+    if (players[2].speed == 0) {
+        if (!players[2].captured) {
+            playCageSound();
+            players[2].captured = true;
+        }
+        SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
+        SDL_Rect cage1;
+        cage1.x = (players[2].position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+        cage1.y = (players[2].position.y-2);
+        cage1.w = 40;
+        cage1.h = 40;
+        SDL_RenderCopy(renderer,cage,NULL,&cage1);
+    }
 }
