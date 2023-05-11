@@ -20,7 +20,7 @@
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-void HuntAndRevive(SDL_Renderer *renderer, Player players[]);
+void HuntAndRevive(SDL_Renderer *renderer, Player players[0]);
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
@@ -47,18 +47,10 @@ int main(int argc, char **argv) {
     initiateMapResources(game.renderer, &resources);
     initiateAddressBook(&record);
 
-    /*
-    if (number == 3) {
-    setUpServer(&information, 2000);
-    }
-    else {
-    setUpClient(&information, "192.168.0.30", 2000);
-    } */
-
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
-    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
-    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
+    players[0] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
+    players[1] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
     players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
 
     char* options[] = {"Host Game", "Join Game", "Quit"};
@@ -72,7 +64,8 @@ int main(int argc, char **argv) {
         .menuY = 477,
     };
 
-    manageMenu(&game, &menu);
+    int selectedOption;
+    selectedOption = manageMenu(&game, &menu, &information);
 
     changeThemeSong();
 
@@ -90,15 +83,15 @@ int main(int argc, char **argv) {
             handlePlayerMovement(&hunter);
         }
         else {*/
-            handleInput(&game, &players[0], &players[1], &players[2]);
-            handlePlayerMovement(&players[0]);
+            handleInput(&game, &players[1], &players[0], &players[2]);
             handlePlayerMovement(&players[1]);
+            handlePlayerMovement(&players[0]);
             handlePlayerMovement(&players[2]);
         //}
 
         // Check for perk collision
-        applySpeedBoostPerk(&players[0], &speedBoostPerk);
         applySpeedBoostPerk(&players[1], &speedBoostPerk);
+        applySpeedBoostPerk(&players[0], &speedBoostPerk);
 
         // Game renderer
         SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -115,18 +108,20 @@ int main(int argc, char **argv) {
         // Present the rendered frame
         SDL_RenderPresent(game.renderer);
 
-        /*
+        if (selectedOption == 0) {
+            manageServerDuties(&information, &record, &players[1], &players[0], &players[2], &toSend);
+        } 
+        
         if (number == 1) {
-            sendData(&information, &toSend, &player1);
-            receiveData(information, &hunter, &player3);
-        }
-        else if (number == 2) {
-            sendData(&information, &toSend, &hunter);
-            receiveData(information, &player1, &player3);
-        }
-        else if (number == 3) {
-            manageServerDuties(&information, &record, &player1, &hunter, player3, &toSend);
-        } */
+            sendData(&information, &toSend, &players[1]);
+            receiveData(&information, &players[1], &players[0], &players[2]);
+        }else if (number == 2) {
+            sendData(&information, &toSend, &players[0]);
+            receiveData(&information, &players[1], &players[0], &players[2]);
+        }else if (number == 4) {
+            sendData(&information, &toSend, &players[2]);
+            receiveData(&information, &players[1], &players[0], &players[2]);
+        } 
 
         manageFrameRate(timeAtLoopBeginning);
         checkTimeLeft(&game, elapsed_time);
@@ -243,33 +238,33 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
     }
 }
 
-void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
-    if (checkCollision(players[0].position, players[1].position)) {
-        players[0].speed = 0;
-        players[0].frame = 0;
+void HuntAndRevive(SDL_Renderer *renderer, Player players[0]) {
+    if (checkCollision(players[1].position, players[0].position)) {
+        players[1].speed = 0;
+        players[1].frame = 0;
     }
-    else if (checkCollision(players[2].position, players[1].position)) {
+    else if (checkCollision(players[2].position, players[0].position)) {
         players[2].speed = 0;
         players[2].frame = 0;
     }
-    else if (checkCollision(players[0].position, players[2].position)) {
-        if (players[0].captured == true || players[2].captured == true) {
+    else if (checkCollision(players[1].position, players[2].position)) {
+        if (players[1].captured == true || players[2].captured == true) {
             playCageUnlockSound();
         }
-        players[0].speed = 2;
-        players[0].captured = false;
+        players[1].speed = 2;
+        players[1].captured = false;
         players[2].speed = 2;
         players[2].captured = false;
     }
-    if (players[0].speed == 0) {
-        if (!players[0].captured) {
+    if (players[1].speed == 0) {
+        if (!players[1].captured) {
             playCageLockSound();
-            players[0].captured = true;
+            players[1].captured = true;
         }
         SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
         SDL_Rect cage1;
-        cage1.x = (players[0].position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
-        cage1.y = (players[0].position.y-2);
+        cage1.x = (players[1].position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
+        cage1.y = (players[1].position.y-2);
         cage1.w = 40;
         cage1.h = 40;
         SDL_RenderCopy(renderer,cage,NULL,&cage1);
