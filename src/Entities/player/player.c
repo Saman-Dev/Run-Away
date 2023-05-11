@@ -34,6 +34,7 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber
     playerX.speed = 2;
 
     playerX.player = playerNumber;
+    playerX.captured = false;
 
     return playerX;
 }
