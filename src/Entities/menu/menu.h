@@ -7,6 +7,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "../foundation/foundation.h"
+#include "../network/network.h"
 
 typedef struct {
     char** options;
@@ -18,7 +19,7 @@ typedef struct {
     int menuY;
 } Menu;
 
-void manageMenu(Framework *game, Menu* menu);
+int manageMenu(Framework *game, Menu* menu, Network *information);
 int displayMenu(SDL_Renderer* renderer, Menu* menu);
 
 #endif
