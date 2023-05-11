@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 
 #include "../audio/audio.h"
 
