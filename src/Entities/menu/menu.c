@@ -1,14 +1,16 @@
 #include "menu.h"
 
-void manageMenu(Framework *game, Menu* menu) {
+int manageMenu(Framework *game, Menu* menu, Network *information) {
     TTF_Init();
     int selectedOption = displayMenu(game->renderer, menu);
     switch (selectedOption) {
         case 0:
             game->quit = false;
+            setUpServer(information, 2000);
             break;
         case 1:
             // options
+            setUpClient(information, "127.0.0.1", 2000);
             break;
         case 2:     
             game->quit = true;
@@ -16,6 +18,7 @@ void manageMenu(Framework *game, Menu* menu) {
         default:
             break;
     }
+    return selectedOption;
     TTF_Quit();
 }
 
