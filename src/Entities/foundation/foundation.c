@@ -5,6 +5,13 @@ void initialize(Framework *game) {
     // Initialize SDL, timer and Mixer Library
     SDL_Init(SDL_INIT_VIDEO);
     srand(time(NULL));
+    
+    /* Initialize SDL_net */
+	if (SDLNet_Init() < 0)
+	{
+		fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
+        exit(1);
+	}
     initializeAudio();
 
     game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
