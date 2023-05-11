@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
     Cargo toSend = {0, 0, 0, 0};
     AddressBook record;
     Network information;
+    game.isMutet = false;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -195,6 +196,14 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, 
             break;
         case SDLK_k:
             playerZ->right = true;
+            break;
+        case SDLK_m:
+            game->isMutet = !game->isMutet;
+            if (game->isMutet) {
+                Mix_VolumeMusic(0);
+            } else {
+                Mix_VolumeMusic(MIX_MAX_VOLUME);
+            }
             break;
         case SDLK_ESCAPE:
             game->quit = true;

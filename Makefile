@@ -26,13 +26,13 @@ CFLAGS_MAC := /opt/homebrew/include/
 ifeq ($(CURRENT_OS),windows)
     LDFLAGS := $(LDFLAGS)
 	CFLAGS := -I$(CFLAGS_WINDOWS) -c 
-	RunGame := ./game.exe 1 1
+	RunGame := ./game.exe
 endif
 
 ifeq ($(CURRENT_OS),mac)
     LDFLAGS := $(LDFLAGS_MAC) $(LDFLAGS)
 	CFLAGS := -I$(CFLAGS_MAC) -c 
-	RunGame := ./game 1 1
+	RunGame := ./game
 endif
 
 
