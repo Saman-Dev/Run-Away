@@ -24,12 +24,19 @@ void initializeAudio(void) {
     }
     Mix_VolumeChunk(walkingSound, 1);
 
-    cageSound = Mix_LoadWAV("resources/CageSound.mp3");
-    if (cageSound == NULL) {
+    cageLockSound = Mix_LoadWAV("resources/CageLockSound.mp3");
+    if (cageLockSound == NULL) {
         printf("%s\n", Mix_GetError());
         exit(1);
     }
-    Mix_VolumeChunk(cageSound, 20);
+    Mix_VolumeChunk(cageLockSound, 20);
+    
+    cageUnlockSound = Mix_LoadWAV("resources/CageUnlockSound.mp3");
+    if (cageUnlockSound == NULL) {
+        printf("%s\n", Mix_GetError());
+        exit(1);
+    }
+    Mix_VolumeChunk(cageUnlockSound, 20);
 }
 
 void playWalkingSound(void) {
@@ -51,6 +58,10 @@ void changeThemeSong(void) {
     Mix_PlayMusic(music, -1);
 }
 
-void playCageSound(void) {
-    Mix_PlayChannel(-1, cageSound, 0);
+void playCageLockSound(void) {
+    Mix_PlayChannel(-1, cageLockSound, 0);
+}
+
+void playCageUnlockSound(void) {
+    Mix_PlayChannel(-1, cageUnlockSound, 0);
 }

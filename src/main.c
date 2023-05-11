@@ -253,6 +253,9 @@ void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
         players[2].frame = 0;
     }
     else if (checkCollision(players[0].position, players[2].position)) {
+        if (players[0].captured == true || players[2].captured == true) {
+            playCageUnlockSound();
+        }
         players[0].speed = 2;
         players[0].captured = false;
         players[2].speed = 2;
@@ -260,7 +263,7 @@ void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
     }
     if (players[0].speed == 0) {
         if (!players[0].captured) {
-            playCageSound();
+            playCageLockSound();
             players[0].captured = true;
         }
         SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
@@ -273,7 +276,7 @@ void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
         }
     if (players[2].speed == 0) {
         if (!players[2].captured) {
-            playCageSound();
+            playCageLockSound();
             players[2].captured = true;
         }
         SDL_Texture* cage = IMG_LoadTexture(renderer,"resources/cage.png");
