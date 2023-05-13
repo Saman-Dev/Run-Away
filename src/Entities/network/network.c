@@ -16,10 +16,8 @@ void setUpClient(Network *information, char IP_address[], int port) {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         exit(1);
     }
-    printf(
-        "Client connected to server at %s on port %d.\n", IP_address, port
-    );
     
+    printf("Client connected to server at %s on port %d.\n", IP_address, port);
     
     information->packetToSend->address.host = information->destination.host;
     information->packetToSend->address.port = information->destination.port;
@@ -125,6 +123,7 @@ void manageServerDuties(Network *information, AddressBook *record, Player *playe
         );*/
 
         registerSourceInformation(information, record, player1, player2, player3);
+        forwardreceivedPacket(information, record, player1, player2, player3);
 
         /*if (checkDifference(toSend, player3)){
             sendHostPlayerPacket(information, record, toSend, player3);
@@ -195,39 +194,48 @@ static void registerSourceInformation(Network *information, AddressBook *record,
         printf("Client 1 joined\n");
         record->clientIP1 = information->packetToReceive->address.host;
         record->clientPort1 = information->packetToReceive->address.port;
-    }else if (information->packetToReceive->address.port != record->clientPort1  && record->clientIP2 == 0) {
+    }
+    else if (information->packetToReceive->address.port != record->clientPort1  && record->clientIP2 == 0) {
         printf("Client 2 joined\n");
         record->clientIP2 = information->packetToReceive->address.host;
         record->clientPort2 = information->packetToReceive->address.port;
-    }else if (information->packetToReceive->address.port != record->clientPort2  && record->clientIP3 == 0) {
+    }
+    else if (information->packetToReceive->address.port != record->clientPort2  &&  information->packetToReceive->address.port != record->clientPort1 && record->clientIP3 == 0) {
         printf("Client 3 joined\n");
         record->clientIP3 = information->packetToReceive->address.host;
         record->clientPort3 = information->packetToReceive->address.port;
-    }else{
-        if (information->packetToReceive->address.port == record->clientPort1) {
-            printf("Client 1, ");
-            if (record->clientIP2 != 0) {
-                sendServerCopy(information, record->clientIP2, record->clientPort2, player1);
-            }
-            if (record->clientIP3 != 0) {
-                sendServerCopy(information, record->clientIP3, record->clientPort3, player1);
-            }
-        }else if (information->packetToReceive->address.port == record->clientPort2) {
-            printf("Client 2, ");
-            if (record->clientIP1 != 0) {
-                sendServerCopy(information, record->clientIP1, record->clientPort1, player2);
-            }
-            if (record->clientIP3 != 0) {
-                sendServerCopy(information, record->clientIP3, record->clientPort3, player2);
-            }
-        }else if (information->packetToReceive->address.port == record->clientPort3) {
-            printf("Client 3, ");
-            if (record->clientIP1 != 0) {
-                sendServerCopy(information, record->clientIP1, record->clientPort1, player3);
-            }
-            if (record->clientIP2 != 0) {
-                sendServerCopy(information, record->clientIP2, record->clientPort2, player3);
-            }
+        printf("Du har rätt.\n");
+    }
+}
+
+void forwardreceivedPacket(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3) {
+    if (information->packetToReceive->address.port == record->clientPort1) {
+        printf("Received data from client 1\n");
+        if (record->clientIP2 != 0) {
+            sendServerCopy(information, record->clientIP2, record->clientPort2, player1);
+            printf("\nSkickar mottaget data till client 2 med port: %d\n", record->clientPort2);
+        }
+        if (record->clientIP3 != 0) {
+            sendServerCopy(information, record->clientIP3, record->clientPort3, player1);
+        }
+    }
+    else if (information->packetToReceive->address.port == record->clientPort2) {
+        printf("Received data from client 2\n");
+        if (record->clientIP1 != 0) {
+            sendServerCopy(information, record->clientIP1, record->clientPort1, player2);
+            printf("\nSkickar mottaget data till client 1 med port: %d\n", record->clientPort1);
+        }
+        if (record->clientIP3 != 0) {
+            sendServerCopy(information, record->clientIP3, record->clientPort3, player2);
+        }
+    }
+    else if (information->packetToReceive->address.port == record->clientPort3) {
+        printf("Received data from client 3\n");
+        if (record->clientIP1 != 0) {
+            sendServerCopy(information, record->clientIP1, record->clientPort1, player3);
+        }
+        if (record->clientIP2 != 0) {
+            sendServerCopy(information, record->clientIP2, record->clientPort2, player3);
         }
     }
 }

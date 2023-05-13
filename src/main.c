@@ -77,6 +77,10 @@ int main(int argc, char **argv) {
     int selectedOption;
     selectedOption = manageMenu(&game, &menu, &information);
 
+    if (selectedOption == 0) {
+        number = 0;
+    }
+
     changeThemeSong();
 
     time_t start_time = time(NULL); // Sätt starttiden till nu
@@ -87,17 +91,10 @@ int main(int argc, char **argv) {
         /////
         timeAtLoopBeginning = SDL_GetTicks();
         // Handle events
-        /*if (number == 3) {
-            handleInput(&game, &player3, &hunter, &player1);
-            handlePlayerMovement(&player3);
-            handlePlayerMovement(&hunter);
-        }
-        else {*/
-            handleInput(&game, &players[1], &players[0], &players[2]);
-            handlePlayerMovement(&players[1]);
-            handlePlayerMovement(&players[0]);
-            handlePlayerMovement(&players[2]);
-        //}
+        handleInput(&game, &players[1], &players[0], &players[2]);
+        handlePlayerMovement(&players[1]);
+        handlePlayerMovement(&players[0]);
+        handlePlayerMovement(&players[2]);
 
         // Check for perk collision
         applySpeedBoostPerk(&players[1], &speedBoostPerk);

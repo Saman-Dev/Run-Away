@@ -42,5 +42,5 @@ static void registerSourceInformation(Network *information, AddressBook *record,
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientPort, Player *host);
 static void sendHostPlayerPacket(Network *information, AddressBook *record, Cargo *toSend, Player *host);
 static void applyReceivedData(Player *player, Cargo *toSend);
-
+void forwardreceivedPacket(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3);
 #endif
