@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     PlayerData toSend = {0, 0, 0, 0, 0, 0};
     AddressBook record;
 
-    game.isMutet = false;
+    game.isMuted = false;
     game.quit = false;
 
     initialize(&game);
@@ -220,8 +220,8 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, 
             playerZ->right = true;
             break;
         case SDLK_m:
-            game->isMutet = !game->isMutet;
-            if (game->isMutet) {
+            game->isMuted = !game->isMuted;
+            if (game->isMuted) {
                 Mix_VolumeMusic(0);
             } else {
                 Mix_VolumeMusic(MIX_MAX_VOLUME);
@@ -323,7 +323,7 @@ static void checkCapturedStatus(Player players[]) {
                 playCageLockSound();
                 players[i].captured = true;
                 players[i].speed = 0;
-                players[i].frame = 0;
+                players[i].frame = 1;
             }
             else if (checkCollision(players[1].position, players[2].position)) {
                 if (players[1].captured == true || players[2].captured == true) {

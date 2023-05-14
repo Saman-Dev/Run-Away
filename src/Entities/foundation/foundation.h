@@ -19,7 +19,7 @@ typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
-    bool isMutet;
+    bool isMuted;
     bool quit;
 } Framework;
 
