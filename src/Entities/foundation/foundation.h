@@ -23,6 +23,12 @@ typedef struct {
     bool quit;
 } Framework;
 
+typedef struct {
+    bool active;
+    SDL_Texture* texture;
+    SDL_Rect rectangle;
+} Image;
+
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
 void checkTimeLeft(Framework *game, double elapsedTime);

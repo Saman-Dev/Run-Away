@@ -36,8 +36,8 @@ ifeq ($(CURRENT_OS),mac)
 endif
 
 
-theGame: main.o player.o map.o audio.o network.o menu.o perks.o foundation.o
-	$(CC) -o game main.o player.o map.o audio.o network.o menu.o perks.o foundation.o $(LDFLAGS)
+theGame: main.o player.o map.o audio.o network.o menu.o perks.o foundation.o mechanics.o
+	$(CC) -o game main.o player.o map.o audio.o network.o menu.o perks.o foundation.o mechanics.o $(LDFLAGS)
 	$(RunGame)
 main.o: src/main.c
 	@echo "Building Game" 
@@ -56,6 +56,8 @@ perks.o: $(SRC)/perks/perks.c
 	$(CC) -c $(SRC)/perks/perks.c $(CFLAGS)
 foundation.o: $(SRC)/foundation/foundation.c
 	$(CC) -c $(SRC)/foundation/foundation.c $(CFLAGS)
+mechanics.o: $(SRC)/mechanics/mechanics.c
+	$(CC) -c $(SRC)/mechanics/mechanics.c $(CFLAGS)
 
 clean:
 	rm -f game
