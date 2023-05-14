@@ -1,5 +1,4 @@
 #include "network.h"
-#define MAX_CLIENTS 3
 
 void setUpClient(Network *information, char IP_address[], int port) {
     // Open a socket on random port

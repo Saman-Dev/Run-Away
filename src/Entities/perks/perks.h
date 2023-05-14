@@ -8,7 +8,6 @@
 #include <SDL2/SDL.h>
 
 #include "../player/player.h"
-#include "../player/player.h"
 
 #define PERK_WIDTH 32
 #define PERK_HEIGHT 32
