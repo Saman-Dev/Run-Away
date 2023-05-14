@@ -124,10 +124,9 @@ void manageServerDuties(Network *information, AddressBook *record, Player *playe
 
         registerSourceInformation(information, record, player1, player2, player3);
         forwardreceivedPacket(information, record, player1, player2, player3);
-
-        /*if (checkDifference(toSend, player3)){
-            sendHostPlayerPacket(information, record, toSend, player3);
-        }*/
+    }
+    if (checkDifference(toSend, player3)){
+        sendHostPlayerPacket(information, record, toSend, player3);
     }
 }
 
