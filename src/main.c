@@ -23,6 +23,9 @@ typedef struct {
     SDL_Rect rectangle;
 } Image;
 
+#define WINDOW_WIDTH 900//1280
+#define WINDOW_HEIGHT 560//960
+
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
@@ -48,10 +51,13 @@ int main(int argc, char **argv) {
     Framework game;
     Background resources;
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    Cargo toSend = {0, 0, 0, 0};
-    AddressBook record;
+    GameState state;
     Network information;
+    PlayerData toSend = {0, 0, 0, 0, 0, 0};
+    AddressBook record;
+
     game.isMutet = false;
+    game.quit = false;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -75,7 +81,8 @@ int main(int argc, char **argv) {
     };
 
     int selectedOption;
-    selectedOption = manageMenu(&game, &menu, &information);
+
+    state = START;
 
     if (selectedOption == 0) {
         number = 0;
@@ -84,54 +91,72 @@ int main(int argc, char **argv) {
     changeThemeSong();
 
     time_t start_time = time(NULL); // Sätt starttiden till nu
+
     while (!game.quit)
-    {
+    {   
         time_t current_time = time(NULL); // Hämta aktuell tid
         double elapsed_time = difftime(current_time, start_time); // Beräkna tiden som har gått
-        /////
         timeAtLoopBeginning = SDL_GetTicks();
-        // Handle events
-        handleInput(&game, &players[1], &players[0], &players[2]);
-        handlePlayerMovement(&players[1]);
-        handlePlayerMovement(&players[0]);
-        handlePlayerMovement(&players[2]);
 
-        // Check for perk collision
-        applySpeedBoostPerk(&players[1], &speedBoostPerk);
-        applySpeedBoostPerk(&players[0], &speedBoostPerk);
+        switch (state)
+        {
+            case ONGOING:
+                // Handle events
+                handleInput(&game, &players[1], &players[0], &players[2]);
+                handlePlayerMovement(&players[1]);
+                handlePlayerMovement(&players[0]);
+                handlePlayerMovement(&players[2]);
 
-        // Game renderer
-        SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(game.renderer);
-        renderBackground(game.renderer, resources);
+                // Check for perk collision
+                applySpeedBoostPerk(&players[1], &speedBoostPerk);
+                applySpeedBoostPerk(&players[0], &speedBoostPerk);
 
-        // Render players
-        renderPlayers(game, players);
+                // Game renderer
+                SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_RenderClear(game.renderer);
+                renderBackground(game.renderer, resources);
 
-        // Perk render
-        renderSpeedBoostPerk(game.renderer, speedBoostPerk);
-        HuntAndRevive(game.renderer, players);
+                // Render players
+                renderPlayers(game, players);
 
-        // Present the rendered frame
-        SDL_RenderPresent(game.renderer);
+                // Perk render
+                renderSpeedBoostPerk(game.renderer, speedBoostPerk);
+                HuntAndRevive(game.renderer, players);
 
-        if (selectedOption == 0) {
-            manageServerDuties(&information, &record, &players[1], &players[0], &players[2], &toSend);
-        } 
-        
-        if (number == 1) {
-            sendData(&information, &toSend, &players[1]);
-            receiveData(&information, &players[1], &players[0], &players[2]);
-        }else if (number == 2) {
-            sendData(&information, &toSend, &players[0]);
-            receiveData(&information, &players[1], &players[0], &players[2]);
-        }else if (number == 4) {
-            sendData(&information, &toSend, &players[2]);
-            receiveData(&information, &players[1], &players[0], &players[2]);
-        } 
+                // Present the rendered frame
+                SDL_RenderPresent(game.renderer);
 
-        manageFrameRate(timeAtLoopBeginning);
-        checkTimeLeft(&game, elapsed_time);
+                if (selectedOption == 0) {
+                    manageServerDuties(&information, &record, &players[1], &players[0], &players[2], &toSend);
+                } 
+                
+                
+                if (number == 1) {
+                    sendData(&information, &toSend, &players[1]);
+                    receiveData(&information, &players[1], &players[0], &players[2]);
+                }else if (number == 2) {
+                    sendData(&information, &toSend, &players[0]);
+                    receiveData(&information, &players[1], &players[0], &players[2]);
+                }else if (number == 3) {
+                    sendData(&information, &toSend, &players[2]);
+                    receiveData(&information, &players[1], &players[0], &players[2]);
+                } 
+
+                manageFrameRate(timeAtLoopBeginning);
+                checkTimeLeft(&game, elapsed_time);
+                break;
+            case GAME_OVER:
+                printf(
+                    "GAME_OVER"
+                );
+                break;
+            case START:
+                printf(
+                    "START\n"
+                );
+                selectedOption = manageMenu(&game, &menu, &information, &state);
+                break;
+        }
     }
 
     // Free resources and close SDL
@@ -243,7 +268,7 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
             playerZ->down = false;
             break;
         case SDLK_h:
-           playerZ->left = false;
+            playerZ->left = false;
             break;
         case SDLK_k:
             playerZ->right = false;

@@ -1,4 +1,5 @@
 #include "network.h"
+#define MAX_CLIENTS 3
 
 void setUpClient(Network *information, char IP_address[], int port) {
     // Open a socket on random port
@@ -7,30 +8,35 @@ void setUpClient(Network *information, char IP_address[], int port) {
         exit(1);
     }
 
-    if (SDLNet_ResolveHost(&information->destination, IP_address, port) == -1) {
+    if (SDLNet_ResolveHost(&information->serverAdress, IP_address, port) == -1) {
         fprintf(stderr, "SDLNet_ResolveHost(%s %d): %s\n", IP_address, port, SDLNet_GetError());
         exit(1);
     }
 
-    if (!((information->packetToSend = SDLNet_AllocPacket(sizeof(Cargo))) && (information->packetToReceive = SDLNet_AllocPacket(sizeof(Cargo))))) {
+    if (!((information->packetToSend = SDLNet_AllocPacket(sizeof(PlayerData))) && (information->packetToReceive = SDLNet_AllocPacket(sizeof(PlayerData))))) {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         exit(1);
     }
     
-    printf("Client connected to server at %s on port %d.\n", IP_address, port);
     
-    information->packetToSend->address.host = information->destination.host;
-    information->packetToSend->address.port = information->destination.port;
+    printf(
+        "Client connected to server at %s on port %d.\n", IP_address, port
+    );
+    
+    information->gState = START;
+    
+    information->packetToSend->address.host = information->serverAdress.host;
+    information->packetToSend->address.port = information->serverAdress.port;
 }
 
-void sendData(Network *information, Cargo *toSend, Player *playerX) {
+void sendData(Network *information, PlayerData *toSend, Player *playerX) {
     if (checkDifference(toSend, playerX)) {
         prepareTransfer(toSend, playerX);
         commenceTransfer(information, toSend);
     }
 }
 
-static int checkDifference(Cargo *toSend, Player *playerX) {
+static int checkDifference(PlayerData *toSend, Player *playerX) {
     if (toSend->positionX != playerX->position.x || toSend->positionY != playerX->position.y) {
         return 1;
     }
@@ -39,22 +45,22 @@ static int checkDifference(Cargo *toSend, Player *playerX) {
     }
 }
 
-static void prepareTransfer(Cargo *toSend, Player *playerX) {
+static void prepareTransfer(PlayerData *toSend, Player *playerX) {
     toSend->player = playerX->player;
     toSend->positionX = playerX->position.x;
     toSend->positionY = playerX->position.y;
     toSend->frame = playerX->frame;
 }
 
-static void commenceTransfer(Network *information, Cargo *toSend) {
+static void commenceTransfer(Network *information, PlayerData *toSend) {
     // Serialize the struct into a byte array
-    char buf[sizeof(Cargo)];
-    memcpy(buf, toSend, sizeof(Cargo));
+    char buf[sizeof(PlayerData)];
+    memcpy(buf, toSend, sizeof(PlayerData));
 
     // Send the byte array as the payload of the UDP packet
     information->packetToSend->data = (Uint8*)buf;
-    information->packetToSend->len = sizeof(Cargo);
-    information->packetToSend->address = information->destination;
+    information->packetToSend->len = sizeof(PlayerData);
+    information->packetToSend->address = information->serverAdress;
     information->packetToSend->channel = -1;
 
     if (SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend))
@@ -66,9 +72,9 @@ static void commenceTransfer(Network *information, Cargo *toSend) {
 void receiveData(Network *information, Player *player1, Player *player2, Player *player3) {
     
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
-        Cargo temporary;
-        memcpy(&temporary, (char *) information->packetToReceive->data, sizeof(Cargo));
-        //printf("receiveData-Received: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
+        PlayerData temporary;
+        memcpy(&temporary, (char *) information->packetToReceive->data, sizeof(PlayerData));
+        printf("receiveData-Received: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
         if (temporary.player == 1) {
             applyReceivedData(player1, &temporary);
         }
@@ -96,61 +102,58 @@ void setUpServer(Network *information, int port) {
         //printf("Server opened on port %d.\n", port);
     }
 
-	if (!((information->packetToReceive = SDLNet_AllocPacket(sizeof(Cargo))) && (information->packetToSend = SDLNet_AllocPacket(sizeof(Cargo))))) {
+	if (!((information->packetToReceive = SDLNet_AllocPacket(sizeof(PlayerData))) && (information->packetToSend = SDLNet_AllocPacket(sizeof(PlayerData))))) {
 		fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
 		exit(1);
 	}else{
         //printf("Packets allocated.\n");
     }
+
+    information->gState = START;
+    information->nrOfClients = 0;
     printf(
         "Server opened on port %d.\n",
         port
     );
+
 }
 
-void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, Cargo *toSend) {
-    
+
+void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend) {
+
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         // Assuming `buf` is the received byte array
-        Cargo *toRecv = (Cargo *) information->packetToReceive->data;
-        memcpy(toRecv, information->packetToReceive->data, sizeof(Cargo));
-        /*printf(
-            "UDP Packet incoming: %d %d %d %d\n", 
-            toRecv->player, 
-            toRecv->positionX, 
-            toRecv->positionY, 
-            toRecv->frame
-        );*/
+        PlayerData *receivedData = (PlayerData *) information->packetToReceive->data;
+        memcpy(receivedData, information->packetToReceive->data, sizeof(PlayerData));
 
-        registerSourceInformation(information, record, player1, player2, player3);
-        forwardreceivedPacket(information, record, player1, player2, player3);
+        registerSourceInformation(information, receivedData, record, player1, player2, player3);
+        forwardreceivedPacket(information, receivedData, record, player1, player2, player3);
     }
-    if (checkDifference(toSend, player3)){
-        sendHostPlayerPacket(information, record, toSend, player3);
-    }
+    /*if (checkDifference(toSend, player2)){
+        sendHostPlayerPacket(information, record, toSend, player2);
+    }*/
 }
 
+
 void initiateAddressBook(AddressBook *record) {
-    record->clientIP1 = 0;
-    record->clientIP2 = 0;
-    record->clientIP3 = 0;
-    record->clientPort1 = 0;
-    record->clientPort2 = 0;
-    record->clientPort3 = 0;
+    for(int i = 0; i < MAX_CLIENTS; i++){
+        record->clients[i].id.ip = 0;
+        record->clients[i].id.port = 0;
+    }
 }
 
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientPort, Player *player) {
-    Cargo temporary;
+    PlayerData temporary;
 
     // Serialize the struct into a byte array
-    char buf[sizeof(Cargo)];
-    memcpy(&temporary, (char * ) information->packetToReceive->data, sizeof(Cargo));
+    char buf[sizeof(PlayerData)];
+    memcpy(&temporary, (char * ) information->packetToReceive->data, sizeof(PlayerData));
     applyReceivedData(player, &temporary); /// Implement received packet changes locally
-    memcpy(buf, &temporary, sizeof(Cargo));
+    memcpy(buf, &temporary, sizeof(PlayerData));
 
     // Send the byte array as the payload of the UDP packet
     information->packetToSend->data = (Uint8*)buf;
-    information->packetToSend->len = sizeof(Cargo);
+    information->packetToSend->len = sizeof(PlayerData);
     information->packetToSend->address.host = clientIP;
     information->packetToSend->address.port = clientPort;
     information->packetToSend->channel = -1;
@@ -161,80 +164,118 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientP
     }
 }
 
-static void sendHostPlayerPacket(Network *information, AddressBook *record, Cargo *toSend, Player *host) {
+static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host) {
+    printf("1");
     prepareTransfer(toSend, host);
-    memcpy((char *)information->packetToSend->data, toSend , sizeof(Cargo));
-    information->packetToSend->len = sizeof(Cargo)+1;
-    if (record->clientIP1) {
-        information->packetToSend->address.host = record->clientIP1;	
-        information->packetToSend->address.port = record->clientPort1;
-        SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+    printf(
+        "About to send: %d %d %d %d\n",
+        toSend->player,
+        toSend->positionX,
+        toSend->positionY,
+        toSend->frame
+    );
+    printf("2");
+    if (record->clients[0].id.ip != 0) {
+        PlayerData temporary;
+        // Serialize the struct into a byte array
+        char buf[sizeof(PlayerData)];
+        memcpy(&temporary, toSend, sizeof(PlayerData));
+        memcpy(buf, &temporary, sizeof(PlayerData));
+
+        // Send the byte array as the payload of the UDP packet
+        information->packetToSend->data = (Uint8*)buf;
+        information->packetToSend->len = sizeof(PlayerData);
+        information->packetToSend->address.host = record->clients[0].id.ip;
+        information->packetToSend->address.port = record->clients[0].id.port;
+        information->packetToSend->channel = -1;
+
+        if (SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend))
+        {
+            printf("Sent: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
+        }
     }
-    if (record->clientIP2) {
-        information->packetToSend->address.host = record->clientIP2;	
-        information->packetToSend->address.port = record->clientPort2;
-        SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+    if (record->clients[1].id.ip != 0) {
+        information->packetToSend->address.host = record->clients[1].id.ip;	
+        information->packetToSend->address.port = record->clients[1].id.port;
+        if(SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend)){
+            printf("Sent 2: %d %d %d %d\n", toSend->player, toSend->positionX, toSend->positionY, toSend->frame);
+        };
     }    
-    if (record->clientIP3) {
-        information->packetToSend->address.host = record->clientIP3;	
-        information->packetToSend->address.port = record->clientPort3;
-        SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
+    if (record->clients[2].id.ip != 0) {
+        information->packetToSend->address.host = record->clients[2].id.ip;	
+        information->packetToSend->address.port = record->clients[2].id.port;
+        if(SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend)){
+            printf("Sent 3: %d %d %d %d\n", toSend->player, toSend->positionX, toSend->positionY, toSend->frame);
+        };
     }
 }
 
-static void applyReceivedData(Player *playerX, Cargo *toSend) {
+static void applyReceivedData(Player *playerX, PlayerData *toSend) {
     playerX->position.x = toSend->positionX;
     playerX->position.y = toSend->positionY;
     playerX->frame = toSend->frame;
 }
 
-static void registerSourceInformation(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3) {
-    if (record->clientIP1 == 0 && record->clientPort1 == 0) {
-        printf("Client 1 joined\n");
-        record->clientIP1 = information->packetToReceive->address.host;
-        record->clientPort1 = information->packetToReceive->address.port;
+static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3) {
+    if (record->clients[0].id.ip == 0 && record->clients[0].id.port == 0) {
+        printf("Client 1 joined\n--------------------\n");
+        record->clients[0].id.ip = information->packetToReceive->address.host;
+        record->clients[0].id.port = information->packetToReceive->address.port;
+        record->clients[0].player.isConnected = true;
+        // Increment the number of clients that have joined
+        (information->nrOfClients)++;
+    }else if (information->packetToReceive->address.port != record->clients[0].id.port  && record->clients[1].id.ip == 0) {
+        printf("Client 2 joined\n--------------------\n");
+        record->clients[1].id.ip = information->packetToReceive->address.host;
+        record->clients[1].id.port = information->packetToReceive->address.port;
+        record->clients[1].player.isConnected = true;
+        // Increment the number of clients that have joined
+        (information->nrOfClients)++;
+    }else if (
+        information->packetToReceive->address.port != record->clients[0].id.port && 
+        information->packetToReceive->address.port != record->clients[1].id.port && 
+        record->clients[2].id.ip == 0
+        ) {
+        printf("Client 3 joined\n--------------------\n");
+        record->clients[2].id.ip = information->packetToReceive->address.host;
+        record->clients[2].id.port = information->packetToReceive->address.port;
+        record->clients[2].player.isConnected = true;
+        // Increment the number of clients that have joined
+        (information->nrOfClients)++;
     }
-    else if (information->packetToReceive->address.port != record->clientPort1  && record->clientIP2 == 0) {
-        printf("Client 2 joined\n");
-        record->clientIP2 = information->packetToReceive->address.host;
-        record->clientPort2 = information->packetToReceive->address.port;
-    }
-    else if (information->packetToReceive->address.port != record->clientPort2  &&  information->packetToReceive->address.port != record->clientPort1 && record->clientIP3 == 0) {
-        printf("Client 3 joined\n");
-        record->clientIP3 = information->packetToReceive->address.host;
-        record->clientPort3 = information->packetToReceive->address.port;
-        printf("Du har rätt.\n");
-    }
+    for (int i = 0; i < MAX_CLIENTS; i++){
+            printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
+        }
 }
 
-void forwardreceivedPacket(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3) {
-    if (information->packetToReceive->address.port == record->clientPort1) {
-        printf("Received data from client 1\n");
-        if (record->clientIP2 != 0) {
-            sendServerCopy(information, record->clientIP2, record->clientPort2, player1);
-            printf("\nSkickar mottaget data till client 2 med port: %d\n", record->clientPort2);
+void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3) {
+    if (information->packetToReceive->address.port == record->clients[0].id.port) {
+        printf("Client 1, ");
+        if (record->clients[1].id.ip != 0) {
+            sendServerCopy(information, record->clients[1].id.ip, record->clients[1].id.port, player1);
         }
-        if (record->clientIP3 != 0) {
-            sendServerCopy(information, record->clientIP3, record->clientPort3, player1);
+        if (record->clients[2].id.ip != 0) {
+            sendServerCopy(information, record->clients[2].id.ip, record->clients[2].id.port, player1);
+        }
+    }else if (information->packetToReceive->address.port == record->clients[1].id.port) {
+        printf("Client 2, ");
+        if (record->clients[0].id.ip != 0) {
+            sendServerCopy(information, record->clients[0].id.ip, record->clients[0].id.port, player2);
+        }
+        if (record->clients[2].id.ip != 0) {
+            sendServerCopy(information, record->clients[2].id.ip, record->clients[2].id.port, player2);
+        }
+    }else if (information->packetToReceive->address.port == record->clients[2].id.port) {
+        printf("Client 3, ");
+        if (record->clients[0].id.ip != 0) {
+            sendServerCopy(information, record->clients[0].id.ip, record->clients[0].id.port, player3);
+        }
+        if (record->clients[1].id.ip != 0) {
+            sendServerCopy(information, record->clients[1].id.ip, record->clients[1].id.port, player3);
         }
     }
-    else if (information->packetToReceive->address.port == record->clientPort2) {
-        printf("Received data from client 2\n");
-        if (record->clientIP1 != 0) {
-            sendServerCopy(information, record->clientIP1, record->clientPort1, player2);
-            printf("\nSkickar mottaget data till client 1 med port: %d\n", record->clientPort1);
-        }
-        if (record->clientIP3 != 0) {
-            sendServerCopy(information, record->clientIP3, record->clientPort3, player2);
-        }
-    }
-    else if (information->packetToReceive->address.port == record->clientPort3) {
-        printf("Received data from client 3\n");
-        if (record->clientIP1 != 0) {
-            sendServerCopy(information, record->clientIP1, record->clientPort1, player3);
-        }
-        if (record->clientIP2 != 0) {
-            sendServerCopy(information, record->clientIP2, record->clientPort2, player3);
-        }
+
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
     }
 }

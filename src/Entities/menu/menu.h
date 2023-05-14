@@ -19,7 +19,7 @@ typedef struct {
     int menuY;
 } Menu;
 
-int manageMenu(Framework *game, Menu* menu, Network *information);
+int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state);
 int displayMenu(SDL_Renderer* renderer, Menu* menu);
 
 #endif

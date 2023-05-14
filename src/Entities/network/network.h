@@ -1,46 +1,78 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#define MAX_CLIENTS 3
+
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 
 #include "../player/player.h"
 
 typedef struct {
-    UDPsocket sourcePort;
-	IPaddress destination;
-	UDPpacket *packetToSend;
-	UDPpacket *packetToReceive;
-} Network;
-
-typedef struct {
 	int player;
 	int positionX;
 	int positionY;
+	int alive;
+	bool isConnected;
 	int frame;
-} Cargo;
+} PlayerData;
+
+typedef enum {
+	READY,
+} ClientCommand;
+
+typedef struct{
+    ClientCommand command;
+    int playerNumber;
+} ClientData;
+
+typedef enum {
+	START,
+	ONGOING,
+	GAME_OVER
+} GameState;
 
 typedef struct {
-    Uint32 clientIP1; 
-    Uint32 clientPort1; 
-    Uint32 clientIP2;
-    Uint32 clientPort2;
-	Uint32 clientIP3;
-    Uint32 clientPort3;
+    UDPsocket sourcePort;
+	IPaddress serverAdress;
+	UDPpacket *packetToSend;
+	UDPpacket *packetToReceive;
+	bool lobbyActive;
+	int nrOfClients;
+    GameState gState; // add this variable to track the game state
+	PlayerData players[MAX_CLIENTS];
+	int playerNr;
+} Network;
+
+typedef struct {
+    Uint32 ip;
+    Uint16 port;
+} ClientID;
+
+typedef struct {
+    ClientID id;
+	PlayerData player;
+    // add any other relevant information about the client here
+} Client;
+
+typedef struct {
+    Client clients[3];
 } AddressBook;
 
 void setUpClient(Network *information, char IP_address[], int port);
-void sendData(Network *information, Cargo *toSend, Player *playerX);
-static int checkDifference(Cargo *toSend, Player *playerX);
-static void prepareTransfer(Cargo *toSend, Player *playerX);
-static void commenceTransfer(Network *information, Cargo *toSend);
+void sendData(Network *information, PlayerData *toSend, Player *playerX);
+static int checkDifference(PlayerData *toSend, Player *playerX);
+static void prepareTransfer(PlayerData *toSend, Player *playerX);
+static void commenceTransfer(Network *information, PlayerData *toSend);
 void receiveData(Network *information, Player *player1, Player *player2, Player *player3);
 void setUpServer(Network *information, int port);
-void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, Cargo *toSend);
+void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend);
 void initiateAddressBook(AddressBook *record);
-static void registerSourceInformation(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientPort, Player *host);
-static void sendHostPlayerPacket(Network *information, AddressBook *record, Cargo *toSend, Player *host);
-static void applyReceivedData(Player *player, Cargo *toSend);
-void forwardreceivedPacket(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host);
+static void applyReceivedData(Player *player, PlayerData *toSend);
+void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
+
 #endif
