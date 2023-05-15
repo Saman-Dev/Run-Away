@@ -143,16 +143,8 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientP
 
 static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host) {
     prepareTransfer(toSend, host);
-    if (record->clients[0].id.ip != 0) {
-        changeDestination(information, record->clients[0].id.ip,record->clients[0].id.port);
-        commenceTransfer(information, toSend);
-    }
-    if (record->clients[1].id.ip != 0) {
-        changeDestination(information, record->clients[1].id.ip,record->clients[1].id.port);
-        commenceTransfer(information, toSend);
-    }    
-    if (record->clients[2].id.ip != 0) {
-        changeDestination(information, record->clients[2].id.ip,record->clients[2].id.port);
+    for (int i = 0; record->clients[i].id.port != 0; i++) {
+        changeDestination(information, record->clients[i].id.ip,record->clients[i].id.port);
         commenceTransfer(information, toSend);
     }
 }
