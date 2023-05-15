@@ -97,17 +97,17 @@ void setUpServer(Network *information, AddressBook *record, int port) {
 }
 
 
-void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend) {
+void manageServerDuties(Network *information, AddressBook *record, Player players[], PlayerData *toSend) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         // Assuming `buf` is the received byte array
         PlayerData *receivedData = (PlayerData *) information->packetToReceive->data;
         memcpy(receivedData, information->packetToReceive->data, sizeof(PlayerData));
 
-        registerSourceInformation(information, receivedData, record, player1, player2, player3);
-        forwardreceivedPacket(information, receivedData, record, player1, player2, player3);
+        registerSourceInformation(information, receivedData, record);
+        forwardreceivedPacket(information, receivedData, record, players);
     }
-    if (checkDifference(toSend, player3)) {
-        sendHostPlayerPacket(information, record, toSend, player3);
+    if (checkDifference(toSend, &players[2])) {
+        sendHostPlayerPacket(information, record, toSend, &players[2]);
     }
 }
 
@@ -155,7 +155,7 @@ static void applyReceivedData(Player *playerX, PlayerData *toSend) {
     playerX->frame = toSend->frame;
 }
 
-static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3) {
+static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record) {
     if (record->clients[0].id.ip == 0 && record->clients[0].id.port == 0) {
         printf("Client 1 joined\n--------------------\n");
         record->clients[0].id.ip = information->packetToReceive->address.host;
@@ -187,33 +187,21 @@ static void registerSourceInformation(Network *information, PlayerData *received
         }
 }
 
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3) {
-    if (information->packetToReceive->address.port == record->clients[0].id.port) {
-        printf("Client 1, ");
-        if (record->clients[1].id.ip != 0) {
-            sendServerCopy(information, record->clients[1].id.ip, record->clients[1].id.port, player1);
-        }
-        if (record->clients[2].id.ip != 0) {
-            sendServerCopy(information, record->clients[2].id.ip, record->clients[2].id.port, player1);
-        }
-    }else if (information->packetToReceive->address.port == record->clients[1].id.port) {
-        printf("Client 2, ");
-        if (record->clients[0].id.ip != 0) {
-            sendServerCopy(information, record->clients[0].id.ip, record->clients[0].id.port, player2);
-        }
-        if (record->clients[2].id.ip != 0) {
-            sendServerCopy(information, record->clients[2].id.ip, record->clients[2].id.port, player2);
-        }
-    }else if (information->packetToReceive->address.port == record->clients[2].id.port) {
-        printf("Client 3, ");
-        if (record->clients[0].id.ip != 0) {
-            sendServerCopy(information, record->clients[0].id.ip, record->clients[0].id.port, player3);
-        }
-        if (record->clients[1].id.ip != 0) {
-            sendServerCopy(information, record->clients[1].id.ip, record->clients[1].id.port, player3);
+static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player players[]) {
+    for (int i = 0; record->clients[i].id.port != 0; i++) {
+        if (record->clients[i].id.port == information->packetToReceive->address.port) {
+            for (int j = 0; record->clients[j].id.ip != 0; j++) {
+                if (i == j) {
+                    continue;
+                }
+                else {
+                    sendServerCopy(information, record->clients[j].id.ip, record->clients[j].id.port, &players[i]);
+                }
+            }
+            break;
         }
     }
-
+    
     for (int i = 0; i < MAX_CLIENTS; i++){
         printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
     }

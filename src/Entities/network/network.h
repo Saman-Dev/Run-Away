@@ -62,18 +62,19 @@ typedef struct {
 
 void setUpClient(Network *information, char IP_address[], int port);
 void sendData(Network *information, PlayerData *toSend, Player *playerX);
+void receiveData(Network *information, Player players[]);
+void setUpServer(Network *information, AddressBook *record, int port);
+void manageServerDuties(Network *information, AddressBook *record, Player players[], PlayerData *toSend);
+
 static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
 static void commenceTransfer(Network *information, PlayerData *toSend);
-void receiveData(Network *information, Player players[]);
-void setUpServer(Network *information, AddressBook *record, int port);
-void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend);
 static void initiateAddressBook(AddressBook *record);
-static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record);
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *host);
 static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host);
 static void applyReceivedData(Player *player, PlayerData *toSend);
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player players[]);
 static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
 
 #endif

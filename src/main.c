@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
-    players[0] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
-    players[1] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
+    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
+    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
     players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
 
     char* options[] = {"Host Game", "Join Game", "Quit"};
@@ -88,14 +88,14 @@ int main(int argc, char **argv) {
         {
             case ONGOING:
                 // Handle events
-                handleInput(&game, &players[1], &players[0], &players[2]);
-                handlePlayerMovement(&players[1]);
+                handleInput(&game, &players[0], &players[1], &players[2]);
                 handlePlayerMovement(&players[0]);
+                handlePlayerMovement(&players[1]);
                 handlePlayerMovement(&players[2]);
 
                 // Check for perk collision
-                applySpeedBoostPerk(&players[1], &speedBoostPerk);
                 applySpeedBoostPerk(&players[0], &speedBoostPerk);
+                applySpeedBoostPerk(&players[1], &speedBoostPerk);
 
                 // Game renderer
                 SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -113,14 +113,14 @@ int main(int argc, char **argv) {
                 SDL_RenderPresent(game.renderer);
 
                 if (selectedOption == 0) {
-                    manageServerDuties(&information, &record, &players[1], &players[0], &players[2], &toSend);
+                    manageServerDuties(&information, &record, players, &toSend);
                 }
                 
                 if (number == 1) {
-                    sendData(&information, &toSend, &players[1]);
+                    sendData(&information, &toSend, &players[0]);
                     receiveData(&information, players);
                 }else if (number == 2) {
-                    sendData(&information, &toSend, &players[0]);
+                    sendData(&information, &toSend, &players[1]);
                     receiveData(&information, players);
                 }
 
