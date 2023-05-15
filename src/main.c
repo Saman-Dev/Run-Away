@@ -118,10 +118,10 @@ int main(int argc, char **argv) {
                 
                 if (number == 1) {
                     sendData(&information, &toSend, &players[1]);
-                    receiveData(&information, &players[1], &players[0], &players[2]);
+                    receiveData(&information, players);
                 }else if (number == 2) {
                     sendData(&information, &toSend, &players[0]);
-                    receiveData(&information, &players[1], &players[0], &players[2]);
+                    receiveData(&information, players);
                 }
 
                 manageFrameRate(timeAtLoopBeginning);

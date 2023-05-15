@@ -65,7 +65,7 @@ void sendData(Network *information, PlayerData *toSend, Player *playerX);
 static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
 static void commenceTransfer(Network *information, PlayerData *toSend);
-void receiveData(Network *information, Player *player1, Player *player2, Player *player3);
+void receiveData(Network *information, Player players[]);
 void setUpServer(Network *information, AddressBook *record, int port);
 void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend);
 static void initiateAddressBook(AddressBook *record);

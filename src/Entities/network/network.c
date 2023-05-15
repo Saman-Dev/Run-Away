@@ -60,19 +60,16 @@ static void commenceTransfer(Network *information, PlayerData *toSend) {
     SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
 }
 
-void receiveData(Network *information, Player *player1, Player *player2, Player *player3) {
+void receiveData(Network *information, Player players[]) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         PlayerData temporary;
         memcpy(&temporary, (char *) information->packetToReceive->data, sizeof(PlayerData));
-        printf("receiveData-Received: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
-        if (temporary.player == 1) {
-            applyReceivedData(player1, &temporary);
-        }
-        else if (temporary.player == 2) {
-            applyReceivedData(player2, &temporary);
-        }
-        else if (temporary.player == 3) {
-            applyReceivedData(player3, &temporary);  
+        //printf("receiveData-Received: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
+        for (int i = 0; players[i].player != 0; i++) {
+            if (temporary.player == players[i].player) {
+                applyReceivedData(&players[i], &temporary);
+                break;
+            }
         }
     }
 }
