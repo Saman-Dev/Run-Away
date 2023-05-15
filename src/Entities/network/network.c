@@ -156,35 +156,23 @@ static void applyReceivedData(Player *playerX, PlayerData *toSend) {
 }
 
 static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record) {
-    if (record->clients[0].id.ip == 0 && record->clients[0].id.port == 0) {
-        printf("Client 1 joined\n--------------------\n");
-        record->clients[0].id.ip = information->packetToReceive->address.host;
-        record->clients[0].id.port = information->packetToReceive->address.port;
-        record->clients[0].player.isConnected = true;
-        // Increment the number of clients that have joined
+    if (information->nrOfClients < MAX_CLIENTS) {
+        for (int i = 0; record->clients[i].id.ip != 0; i++) {
+            if (record->clients[i].id.ip == information->packetToReceive->address.host && record->clients[i].id.port == information->packetToReceive->address.port) {
+                return;
+            }
+        }
+
+        printf("Client %d joined\n--------------------\n", information->nrOfClients + 1);
+        record->clients[information->nrOfClients].id.ip = information->packetToReceive->address.host;
+        record->clients[information->nrOfClients].id.port = information->packetToReceive->address.port;
+        record->clients[information->nrOfClients].player.isConnected = true;
         (information->nrOfClients)++;
-    }else if (information->packetToReceive->address.port != record->clients[0].id.port  && record->clients[1].id.ip == 0) {
-        printf("Client 2 joined\n--------------------\n");
-        record->clients[1].id.ip = information->packetToReceive->address.host;
-        record->clients[1].id.port = information->packetToReceive->address.port;
-        record->clients[1].player.isConnected = true;
-        // Increment the number of clients that have joined
-        (information->nrOfClients)++;
-    }else if (
-        information->packetToReceive->address.port != record->clients[0].id.port && 
-        information->packetToReceive->address.port != record->clients[1].id.port && 
-        record->clients[2].id.ip == 0
-        ) {
-        printf("Client 3 joined\n--------------------\n");
-        record->clients[2].id.ip = information->packetToReceive->address.host;
-        record->clients[2].id.port = information->packetToReceive->address.port;
-        record->clients[2].player.isConnected = true;
-        // Increment the number of clients that have joined
-        (information->nrOfClients)++;
-    }
-    for (int i = 0; i < MAX_CLIENTS; i++){
+
+        for (int i = 0; i < MAX_CLIENTS; i++) {
             printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
         }
+    }
 }
 
 static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player players[]) {
@@ -200,10 +188,6 @@ static void forwardreceivedPacket(Network *information, PlayerData *receivedData
             }
             break;
         }
-    }
-    
-    for (int i = 0; i < MAX_CLIENTS; i++){
-        printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
     }
 }
 
