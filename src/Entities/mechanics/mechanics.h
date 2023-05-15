@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 
 #include "../player/player.h"
-#include "../mechanics/mechanics.h"
 #include "../perks/perks.h"
 
 void HuntAndRevive(SDL_Renderer *renderer, Player players[]);

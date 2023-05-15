@@ -1,5 +1,4 @@
 #include "foundation.h"
-#include <time.h>
 
 void initialize(Framework *game) {
     // Initialize SDL, timer and Mixer Library
