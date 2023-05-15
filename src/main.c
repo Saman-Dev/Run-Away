@@ -21,10 +21,6 @@
 #define WINDOW_WIDTH 900 //1280
 #define WINDOW_HEIGHT 560 //960
 
-void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
-
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     int number;
@@ -46,6 +42,12 @@ int main(int argc, char **argv) {
     Network information;
     PlayerData toSend = {0, 0, 0, 0, 0, 0};
     AddressBook record;
+    TTF_Font* font;
+    SDL_Color textColor = { 0, 0, 0 }; // Black color for the text
+    SDL_Surface* timerSurface = NULL;
+    SDL_Texture* timerTexture = NULL;
+    SDL_Rect timerRect;
+
 
     game.isMuted = false;
     game.quit = false;
@@ -77,6 +79,22 @@ int main(int argc, char **argv) {
     changeThemeSong();
 
     time_t start_time = time(NULL); // Sätt starttiden till nu
+    
+    if (TTF_Init() == -1) {
+        printf("TTF_Init error: %s\n", TTF_GetError());
+        // Handle error
+    }
+
+    font = TTF_OpenFont("resources/font.ttf", 28); // Adjust the path and font size as needed
+    if (font == NULL) {
+        printf("TTF_OpenFont error: %s\n", TTF_GetError());
+        // Handle error
+    }
+
+    if (font == NULL) {
+        printf("TTF_OpenFont error: %s\n", TTF_GetError());
+        // Handle error
+    }
 
     while (!game.quit)
     {   
@@ -108,6 +126,9 @@ int main(int argc, char **argv) {
                 // Perk render
                 renderSpeedBoostPerk(game.renderer, speedBoostPerk);
                 HuntAndRevive(game.renderer, players);
+                
+                //
+                SDL_RenderCopy(game.renderer, timerTexture, NULL, &timerRect);
 
                 // Present the rendered frame
                 SDL_RenderPresent(game.renderer);
@@ -115,6 +136,36 @@ int main(int argc, char **argv) {
                 if (selectedOption == 0) {
                     manageServerDuties(&information, &record, players, &toSend);
                 }
+                // Calculate elapsed time in seconds
+                int elapsedSeconds = (int)elapsed_time;
+
+                // Create timer string
+                char timerText[10];
+                snprintf(timerText, sizeof(timerText), "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60);
+
+                // Render timer text to a surface
+                timerSurface = TTF_RenderText_Solid(font, timerText, textColor);
+                if (timerSurface == NULL) {
+                    printf("TTF_RenderText_Solid error: %s\n", TTF_GetError());
+                    // Handle error
+                }
+
+                // Create a texture from the surface
+                timerTexture = SDL_CreateTextureFromSurface(game.renderer, timerSurface);
+                if (timerTexture == NULL) {
+                    printf("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
+                    // Handle error
+                }
+
+                // Set the destination rectangle for rendering the timer texture
+                timerRect.x = 200; // Adjust the position as needed
+                timerRect.y = 200; // Adjust the position as needed
+                timerRect.w = timerSurface->w;
+                timerRect.h = timerSurface->h;
+
+                // Free the timer surface since it's not needed anymore
+                SDL_FreeSurface(timerSurface);
+
                 
                 if (number == 1) {
                     sendData(&information, &toSend, &players[0]);
@@ -151,116 +202,9 @@ int main(int argc, char **argv) {
     SDL_DestroyWindow(game.window);
     Mix_CloseAudio();
     SDL_Quit();
+    SDL_DestroyTexture(timerTexture);
+    TTF_CloseFont(font);
+    TTF_Quit();
+
     return 0;
-}
-
-void handleInput(Framework *game, Player *playerX, Player *playerY,Player *playerZ) {
-    while (SDL_PollEvent(&game->event)) {
-        if (game->event.type == SDL_QUIT) {
-            game->quit = true;
-        }
-        else if (game->event.type == SDL_KEYDOWN) {
-            handleKeyPresses(game, playerX, playerY, playerZ);
-        }
-        else if (game->event.type == SDL_KEYUP) {
-            handleKeyReleases(game, playerX, playerY, playerZ);
-        }
-    }
-}
-
-static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
-    switch (game->event.key.keysym.sym) {
-        case SDLK_UP:
-            playerX->up = true;
-            break;
-        case SDLK_DOWN:
-            playerX->down = true;
-            break;
-        case SDLK_LEFT:
-            playerX->left = true;
-            break;
-        case SDLK_RIGHT:
-            playerX->right = true;
-            break;
-        case SDLK_w:
-            playerY->up = true;
-            break;
-        case SDLK_s:
-            playerY->down = true;
-            break;
-        case SDLK_a:
-            playerY->left = true;
-            break;
-        case SDLK_d:
-            playerY->right = true;
-            break;
-            case SDLK_u:
-            playerZ->up = true;
-            break;
-        case SDLK_j:
-            playerZ->down = true;
-            break;
-        case SDLK_h:
-            playerZ->left = true;
-            break;
-        case SDLK_k:
-            playerZ->right = true;
-            break;
-        case SDLK_m:
-            game->isMuted = !game->isMuted;
-            if (game->isMuted) {
-                Mix_VolumeMusic(0);
-            } else {
-                Mix_VolumeMusic(MIX_MAX_VOLUME);
-            }
-            break;
-        case SDLK_ESCAPE:
-            game->quit = true;
-            break;
-        default:
-            break;        
-    }
-}
-
-static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
-    switch (game->event.key.keysym.sym) {
-        case SDLK_UP:
-            playerX->up = false;
-            break;
-        case SDLK_DOWN:
-            playerX->down = false;
-            break;
-        case SDLK_LEFT:
-            playerX->left = false;
-            break;
-        case SDLK_RIGHT:
-            playerX->right = false;
-            break;
-        case SDLK_w:
-            playerY->up = false;
-            break;
-        case SDLK_s:
-            playerY->down = false;
-            break;
-        case SDLK_a:
-            playerY->left = false;
-            break;
-        case SDLK_d:
-            playerY->right = false;
-            break;
-            case SDLK_u:
-            playerZ->up = false;
-            break;
-        case SDLK_j:
-            playerZ->down = false;
-            break;
-        case SDLK_h:
-            playerZ->left = false;
-            break;
-        case SDLK_k:
-            playerZ->right = false;
-            break;
-        default:
-            break;
-    }
 }

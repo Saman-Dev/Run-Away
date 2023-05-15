@@ -3,6 +3,7 @@
         "sdl.h": "c",
         "math.h": "c",
         "numbers": "c",
-        "sdl_mixer.h": "c"
+        "sdl_mixer.h": "c",
+        "stdbool.h": "c"
     }
 }
