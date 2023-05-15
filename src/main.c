@@ -114,6 +114,9 @@ int main(int argc, char **argv) {
                 // Check for perk collision
                 applySpeedBoostPerk(&players[0], &speedBoostPerk);
                 applySpeedBoostPerk(&players[1], &speedBoostPerk);
+                updateSpeedBoost(&players[1]);
+                updateSpeedBoost(&players[0]);
+
 
                 // Game renderer
                 SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);

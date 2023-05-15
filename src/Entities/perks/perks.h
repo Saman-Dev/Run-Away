@@ -13,6 +13,7 @@
 #define PERK_HEIGHT 32
 #define PERK_DURATION 10
 #define SPEED_BOOST_AMOUNT 1
+#define SPEED_BOOST_DURATION 4
 
 typedef struct {
     SDL_Texture* texture;
@@ -25,5 +26,6 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer);
 void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk);
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
+void updateSpeedBoost(Player *player);
 
 #endif
