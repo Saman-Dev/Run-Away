@@ -52,7 +52,6 @@ int main(int argc, char **argv) {
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
-    initiateAddressBook(&record);
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
 
@@ -74,10 +73,6 @@ int main(int argc, char **argv) {
     int selectedOption;
 
     state = START;
-
-    if (selectedOption == 0) {
-        number = 0;
-    }
 
     changeThemeSong();
 
@@ -119,8 +114,7 @@ int main(int argc, char **argv) {
 
                 if (selectedOption == 0) {
                     manageServerDuties(&information, &record, &players[1], &players[0], &players[2], &toSend);
-                } 
-                
+                }
                 
                 if (number == 1) {
                     sendData(&information, &toSend, &players[1]);
@@ -128,10 +122,7 @@ int main(int argc, char **argv) {
                 }else if (number == 2) {
                     sendData(&information, &toSend, &players[0]);
                     receiveData(&information, &players[1], &players[0], &players[2]);
-                }else if (number == 3) {
-                    sendData(&information, &toSend, &players[2]);
-                    receiveData(&information, &players[1], &players[0], &players[2]);
-                } 
+                }
 
                 manageFrameRate(timeAtLoopBeginning);
                 checkTimeLeft(&game, elapsed_time);
@@ -145,7 +136,12 @@ int main(int argc, char **argv) {
                 printf(
                     "START\n"
                 );
-                selectedOption = manageMenu(&game, &menu, &information, &state);
+                selectedOption = manageMenu(&game, &menu, &information, &state, &record);
+                if (selectedOption == 0) {
+                    number = 0;
+                }
+                break;
+            default:
                 break;
         }
     }

@@ -1,6 +1,6 @@
 #include "menu.h"
 
-int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state) {
+int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, AddressBook *record) {
     TTF_Init();
     char* options[] = {"Host Game", "Join Game", "Quit"};
     Menu menus = {
@@ -15,7 +15,7 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
     int selectedOption = displayMenu(game->renderer, &menus);
     switch (selectedOption) {
         case 0:
-            setUpServer(information, 2000);
+            setUpServer(information, record, 2000);
             *state = ONGOING;
             break;
         case 1:

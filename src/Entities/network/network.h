@@ -35,7 +35,7 @@ typedef enum {
 
 typedef struct {
     UDPsocket sourcePort;
-	IPaddress serverAdress;
+	IPaddress destination;
 	UDPpacket *packetToSend;
 	UDPpacket *packetToReceive;
 	bool lobbyActive;
@@ -66,13 +66,14 @@ static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
 static void commenceTransfer(Network *information, PlayerData *toSend);
 void receiveData(Network *information, Player *player1, Player *player2, Player *player3);
-void setUpServer(Network *information, int port);
+void setUpServer(Network *information, AddressBook *record, int port);
 void manageServerDuties(Network *information, AddressBook *record, Player *player1, Player *player2, Player *player3, PlayerData *toSend);
-void initiateAddressBook(AddressBook *record);
+static void initiateAddressBook(AddressBook *record);
 static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
-static void sendServerCopy(Network *information, Uint32 clientIP, Uint32 clientPort, Player *host);
+static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *host);
 static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host);
 static void applyReceivedData(Player *player, PlayerData *toSend);
-void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player *player1, Player *player2, Player *player3);
+static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
 
 #endif
