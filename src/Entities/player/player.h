@@ -26,9 +26,9 @@ typedef struct {
     bool left;
     bool right;
 
-    int baseSpeed; 
-    int boostedSpeed;
-    Uint32 speedBoostStartTime;
+    //int baseSpeed; 
+    //int boostedSpeed;
+    //Uint32 speedBoostStartTime;
 } Player;
 
 Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);

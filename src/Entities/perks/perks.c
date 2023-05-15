@@ -4,8 +4,7 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
 {
     if (perk->available && checkCollision(player->position, perk->rect)) 
     {
-        player->boostedSpeed = player->baseSpeed + SPEED_BOOST_AMOUNT;
-        player->speedBoostStartTime = SDL_GetTicks();
+        player->speed += SPEED_BOOST_AMOUNT;
         perk->available = false;
     }
 
@@ -14,6 +13,7 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
         return;
     }
 }
+
 
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
 {
@@ -57,16 +57,7 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.available = true;
     speedBoostPerk.duration = PERK_DURATION;
+
     return speedBoostPerk;
 }
 
-void updateSpeedBoost(Player *player)
-{
-    Uint32 now = SDL_GetTicks();
-    if (player->speedBoostStartTime && now - player->speedBoostStartTime >= SPEED_BOOST_DURATION) 
-    {
-        player->boostedSpeed = player->baseSpeed; // reset speed
-        player->speedBoostStartTime = 0; // reset time
-    }
-    player->speed = player->boostedSpeed; // use the boosted speed
-}
