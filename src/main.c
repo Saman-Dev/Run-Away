@@ -77,8 +77,6 @@ int main(int argc, char **argv) {
     state = START;
 
     changeThemeSong();
-
-    time_t start_time = time(NULL); // Sätt starttiden till nu
     
     if (TTF_Init() == -1) {
         printf("TTF_Init error: %s\n", TTF_GetError());
@@ -96,10 +94,13 @@ int main(int argc, char **argv) {
         // Handle error
     }
 
+    time_t start_time = time(NULL); // Set start time 
+
     while (!game.quit)
     {   
+       
         time_t current_time = time(NULL); // Hämta aktuell tid
-        double elapsed_time = difftime(current_time, start_time); // Beräkna tiden som har gått
+        double elapsed_time = (1 * 60) - difftime(current_time, start_time); // Den här funktion är ansvarig för hur många minuter en timer har
         timeAtLoopBeginning = SDL_GetTicks();
 
         switch (state)
@@ -128,7 +129,7 @@ int main(int argc, char **argv) {
                 renderSpeedBoostPerk(game.renderer, speedBoostPerk);
                 HuntAndRevive(game.renderer, players);
                 
-                //
+                // Timer render
                 SDL_RenderCopy(game.renderer, timerTexture, NULL, &timerRect);
 
                 // Present the rendered frame
@@ -141,8 +142,10 @@ int main(int argc, char **argv) {
                 int elapsedSeconds = (int)elapsed_time;
 
                 // Create timer string
+                int remainingMinutes = (int)elapsed_time / 60;
+                int remainingSeconds = (int)elapsed_time % 60;
                 char timerText[10];
-                snprintf(timerText, sizeof(timerText), "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60);
+                snprintf(timerText, sizeof(timerText), "%02d:%02d", remainingMinutes, remainingSeconds);
 
                 // Render timer text to a surface
                 timerSurface = TTF_RenderText_Solid(font, timerText, textColor);
@@ -166,7 +169,10 @@ int main(int argc, char **argv) {
 
                 // Free the timer surface since it's not needed anymore
                 SDL_FreeSurface(timerSurface);
-
+                if (remainingMinutes == 0 &&  remainingSeconds == 0){
+                    printf("Game over!");
+                    break; 
+                }
                 
                 if (number == 1) {
                     sendData(&information, &toSend, &players[0]);
