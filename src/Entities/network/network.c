@@ -74,7 +74,7 @@ void receiveData(Network *information, Player players[]) {
     }
 }
 
-void setUpServer(Network *information, AddressBook *record, int port) {
+void setUpServer(Network *information, ClientID record[], int port) {
 	if (SDLNet_Init() < 0) {
 		fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
 		exit(1);
@@ -97,7 +97,7 @@ void setUpServer(Network *information, AddressBook *record, int port) {
 }
 
 
-void manageServerDuties(Network *information, AddressBook *record, Player players[], PlayerData *toSend) {
+void manageServerDuties(Network *information, ClientID record[], Player players[], PlayerData *toSend) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         // Assuming `buf` is the received byte array
         PlayerData *receivedData = (PlayerData *) information->packetToReceive->data;
@@ -112,10 +112,11 @@ void manageServerDuties(Network *information, AddressBook *record, Player player
 }
 
 
-static void initiateAddressBook(AddressBook *record) {
+static void initiateAddressBook(ClientID record[]) {
     for(int i = 0; i < MAX_CLIENTS; i++){
-        record->clients[i].id.ip = 0;
-        record->clients[i].id.port = 0;
+        record[i].ip = 0;
+        record[i].port = 0;
+        record[i].connectedStatus = false;
     }
 }
 
@@ -141,10 +142,10 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientP
     }
 }
 
-static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host) {
+static void sendHostPlayerPacket(Network *information, ClientID record[], PlayerData *toSend, Player *host) {
     prepareTransfer(toSend, host);
-    for (int i = 0; record->clients[i].id.port != 0; i++) {
-        changeDestination(information, record->clients[i].id.ip,record->clients[i].id.port);
+    for (int i = 0; record[i].port != 0; i++) {
+        changeDestination(information, record[i].ip, record[i].port);
         commenceTransfer(information, toSend);
     }
 }
@@ -155,35 +156,35 @@ static void applyReceivedData(Player *playerX, PlayerData *toSend) {
     playerX->frame = toSend->frame;
 }
 
-static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record) {
+static void registerSourceInformation(Network *information, PlayerData *receivedData, ClientID record[]) {
     if (information->nrOfClients < MAX_CLIENTS) {
-        for (int i = 0; record->clients[i].id.ip != 0; i++) {
-            if (record->clients[i].id.ip == information->packetToReceive->address.host && record->clients[i].id.port == information->packetToReceive->address.port) {
+        for (int i = 0; record[i].ip != 0; i++) {
+            if (record[i].ip == information->packetToReceive->address.host && record[i].port == information->packetToReceive->address.port) {
                 return;
             }
         }
 
         printf("Client %d joined\n--------------------\n", information->nrOfClients + 1);
-        record->clients[information->nrOfClients].id.ip = information->packetToReceive->address.host;
-        record->clients[information->nrOfClients].id.port = information->packetToReceive->address.port;
-        record->clients[information->nrOfClients].player.isConnected = true;
+        record[information->nrOfClients].ip = information->packetToReceive->address.host;
+        record[information->nrOfClients].port = information->packetToReceive->address.port;
+        record[information->nrOfClients].connectedStatus = true;
         (information->nrOfClients)++;
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            printf("Client %d: %d %d\n", i+1, record->clients[i].id.ip, record->clients[i].id.port);
+            printf("Client %d: %d %d\n", i+1, record[i].ip, record[i].port);
         }
     }
 }
 
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player players[]) {
-    for (int i = 0; record->clients[i].id.port != 0; i++) {
-        if (record->clients[i].id.port == information->packetToReceive->address.port) {
-            for (int j = 0; record->clients[j].id.ip != 0; j++) {
+static void forwardreceivedPacket(Network *information, PlayerData *receivedData, ClientID record[], Player players[]) {
+    for (int i = 0; record[i].port != 0; i++) {
+        if (record[i].port == information->packetToReceive->address.port) {
+            for (int j = 0; record[j].ip != 0; j++) {
                 if (i == j) {
                     continue;
                 }
                 else {
-                    sendServerCopy(information, record->clients[j].id.ip, record->clients[j].id.port, &players[i]);
+                    sendServerCopy(information, record[j].ip, record[j].port, &players[i]);
                 }
             }
             break;

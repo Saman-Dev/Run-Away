@@ -40,14 +40,14 @@ int main(int argc, char **argv) {
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     GameState state;
     Network information;
-    PlayerData toSend = {0, 0, 0, 0, 0, 0};
-    AddressBook record;
+    PlayerData toSend = {0, 0, 0, 0, 0};
+    ClientID record[MAX_CLIENTS];
+    
     TTF_Font* font;
     SDL_Color textColor = { 0, 0, 0 }; // Black color for the text
     SDL_Surface* timerSurface = NULL;
     SDL_Texture* timerTexture = NULL;
     SDL_Rect timerRect;
-
 
     game.isMuted = false;
     game.quit = false;
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
                 SDL_RenderPresent(game.renderer);
 
                 if (selectedOption == 0) {
-                    manageServerDuties(&information, &record, players, &toSend);
+                    manageServerDuties(&information, record, players, &toSend);
                 }
                 // Calculate elapsed time in seconds
                 int elapsedSeconds = (int)elapsed_time;
@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
                 printf(
                     "START\n"
                 );
-                selectedOption = manageMenu(&game, &menu, &information, &state, &record);
+                selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 if (selectedOption == 0) {
                     number = 0;
                 }
