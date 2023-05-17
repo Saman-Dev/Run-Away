@@ -22,6 +22,16 @@
 #define WINDOW_HEIGHT 560 //960
 
 int main(int argc, char **argv) {
+    TCPLocalInformation TCPInformation = {0, 0, NULL, 0};
+    TCPClientInformation client[MAX_CLIENTS];
+    
+    initiateServerTCPCapability(&TCPInformation);
+    /*
+    while (1) {
+        manageServerTCPActivity(&TCPInformation, client);
+    }
+    */
+
     int timeAtLoopBeginning;
     int number;
 

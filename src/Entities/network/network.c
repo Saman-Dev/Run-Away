@@ -253,9 +253,63 @@ void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *cli
         client->active = false;
 }
 
-void receiveClientNumber(TCPsocket clientSocket, int *playerNumber) {
+void receiveClientNumber(TCPLocalInformation *TCPInformation) {
     TCPPacket toReceive = {0, 0};
-    SDLNet_TCP_Recv(clientSocket, &toReceive, sizeof(TCPPacket));
+    SDLNet_TCP_Recv(TCPInformation->socket, &toReceive, sizeof(TCPPacket));
     printf("Received the following number from server: %d\n", toReceive.playerNumber);
-    *(playerNumber) = toReceive.playerNumber;
+    TCPInformation->playerNumber = toReceive.playerNumber;
+}
+
+void initiateServerTCPCapability(TCPLocalInformation *TCPInformation) {
+    TCPInformation->set = SDLNet_AllocSocketSet(MAX_CLIENTS+1);
+
+    if(SDLNet_ResolveHost(&TCPInformation->ip, NULL, 9999) == -1) {
+        printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+        exit(1);
+    }
+
+    TCPInformation->socket = SDLNet_TCP_Open(&TCPInformation->ip);
+    if(!TCPInformation->socket) {
+        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+        exit(1);
+    }
+
+    SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);
+}
+
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation) {
+    TCPInformation->set = SDLNet_AllocSocketSet(2);
+
+    if(SDLNet_ResolveHost(&TCPInformation->ip, "127.0.0.1", 9999) == -1) {
+        printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+        exit(1);
+    }
+
+    TCPInformation->socket = SDLNet_TCP_Open(&TCPInformation->ip);
+    if(!TCPInformation->socket) {
+        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+        exit(1);
+    }
+
+    SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);
+
+    receiveClientNumber(TCPInformation);
+}
+
+void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[]) {
+    TCPPacket toSend = {0, 0};
+
+    SDLNet_CheckSockets(TCPInformation->set, 0);
+
+    if (SDLNet_SocketReady(TCPInformation->socket)) {
+        addClient(TCPInformation, client);
+    }
+
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (client[i].active) {
+            if (SDLNet_SocketReady(client[i].socket) > 0) {
+                receiveTCPData(TCPInformation, client, i);
+            }
+        }
+    }
 }

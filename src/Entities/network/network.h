@@ -37,6 +37,7 @@ typedef struct {
     IPaddress ip;
     TCPsocket socket;
     SDLNet_SocketSet set;
+	int playerNumber;
 } TCPLocalInformation;
 
 typedef enum {
@@ -86,6 +87,8 @@ void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
 void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], int clientNumber);
 void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
 void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
-void receiveClientNumber(TCPsocket clientSocket, int *clientNumber);
+void receiveClientNumber(TCPLocalInformation *TCPInformation);
+void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
+void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
 
 #endif
