@@ -188,7 +188,7 @@ void renderBackground(SDL_Renderer *renderer, Background resources) {
         {
             position.x = j * getTheWidthOfTheTile();
             position.y = i * getTheHeightOfTheTile();
-            SDL_RenderCopyEx(renderer, resources.tileAtlas, &resources.tilesGraphic[getTileInformation(i, j, &alternativMap)], &position, 0, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(renderer, resources.tileAtlas, &resources.tilesGraphic[getTileInformation(i, j)], &position, 0, NULL, SDL_FLIP_NONE);
         }
     }
 }
