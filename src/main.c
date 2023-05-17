@@ -98,7 +98,6 @@ int main(int argc, char **argv) {
 
     while (!game.quit)
     {   
-       
         time_t current_time = time(NULL); // Hämta aktuell tid
         double elapsed_time = (1 * 60) - difftime(current_time, start_time); // Den här funktion är ansvarig för hur många minuter en timer har
         timeAtLoopBeginning = SDL_GetTicks();

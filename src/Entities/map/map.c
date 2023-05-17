@@ -98,10 +98,10 @@ int encountersForbiddenTile(int x, int y)
     //The code is used to find the tile that a pixel is in. It takes the x and y position of the pixel and divides each by 3, and then adds 32 to each result. It then returns the result of each division. The result is the tile that the pixel is in. 
     int tileX = y / 32;
     int tileY = x / 32;
-    printf("TileX: %d TileY: %d TileValue:%d\n", tileX, tileY,dangerTiles[tileX][tileY]);
+    //printf("TileX: %d TileY: %d TileValue:%d\n", tileX, tileY,dangerTiles[tileX][tileY]);
     if (dangerTiles[tileX][tileY] == 95 )
     {
-        printf("Collision!\n");
+        //printf("Collision!\n");
         return 1;
     }
 
