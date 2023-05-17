@@ -196,3 +196,66 @@ static void changeDestination(Network *information, Uint32 clientIP, Uint16 clie
     information->destination.host = clientIP;
     information->destination.port = clientPort;
 }
+
+///// TCP /////
+
+void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (!client[i].active) {
+            client[i].socket = SDLNet_TCP_Accept(TCPInformation->socket);
+            if (client[i].socket == NULL) {
+                return;
+            }
+            client[i].active = true;
+            printf("Established a connection with client: %d\n", i);
+            SDLNet_TCP_AddSocket(TCPInformation->set, client[i].socket);
+            sendClientNumber(client[i].socket, i);
+            break;
+        }
+    }
+}
+
+void sendClientNumber(TCPsocket clientSocket, int numberToAssign) {
+    TCPPacket toSend = {0, 0};
+    toSend.playerNumber = numberToAssign;
+    SDLNet_TCP_Send(clientSocket, &toSend, sizeof(TCPPacket));
+}
+
+void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], int clientNumber) {
+    TCPPacket toSend = {0, 0};
+    if (SDLNet_TCP_Recv(client[clientNumber].socket, &toSend, sizeof(TCPPacket)) <= 0) {
+        removeClient(TCPInformation, &client[clientNumber], clientNumber);
+    }
+    else {
+        printf("Received the following data: \"%u\"\n", toSend.command);
+        sendTCPData(client, toSend);
+    }
+}
+
+void sendTCPData(TCPClientInformation client[], TCPPacket toSend) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (client[i].active) {
+            if (i == toSend.playerNumber) {
+                continue;
+            }
+            else {
+                SDLNet_TCP_Send(client[i].socket, &toSend, sizeof(TCPPacket));
+            }
+        }
+    }
+}
+
+void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber) {
+        printf("Lost connection with client: %d\n", clientNumber);
+        SDLNet_TCP_DelSocket(TCPInformation->set, client->socket);
+        SDLNet_TCP_Close(client->socket);
+        client->socket = NULL;
+        client->active = false;
+}
+
+void receiveClientNumber(TCPsocket clientSocket, int *playerNumber) {
+    TCPPacket toReceive = {0, 0};
+    SDLNet_TCP_Recv(clientSocket, &toReceive, sizeof(TCPPacket));
+    printf("Received the following number from server: %d\n", toReceive.playerNumber);
+    *(playerNumber) = toReceive.playerNumber;
+}

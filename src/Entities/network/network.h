@@ -26,7 +26,18 @@ typedef enum {
 typedef struct{
     ClientCommand command;
     int playerNumber;
-} ClientData;
+} TCPPacket;
+
+typedef struct {
+    TCPsocket socket;
+    bool active;
+} TCPClientInformation;
+
+typedef struct {
+    IPaddress ip;
+    TCPsocket socket;
+    SDLNet_SocketSet set;
+} TCPLocalInformation;
 
 typedef enum {
 	START,
@@ -68,5 +79,13 @@ static void sendHostPlayerPacket(Network *information, ClientID record[], Player
 static void applyReceivedData(Player *player, PlayerData *toSend);
 static void forwardreceivedPacket(Network *information, PlayerData *receivedData, ClientID record[], Player players[]);
 static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
+
+///// TCP /////
+void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
+void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
+void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], int clientNumber);
+void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
+void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
+void receiveClientNumber(TCPsocket clientSocket, int *clientNumber);
 
 #endif
