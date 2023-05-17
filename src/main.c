@@ -40,14 +40,14 @@ int main(int argc, char **argv) {
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     GameState state;
     Network information;
-    PlayerData toSend = {0, 0, 0, 0, 0, 0};
-    AddressBook record;
+    PlayerData toSend = {0, 0, 0, 0, 0};
+    ClientID record[MAX_CLIENTS];
+    
     TTF_Font* font;
     SDL_Color textColor = { 0, 0, 0 }; // Black color for the text
     SDL_Surface* timerSurface = NULL;
     SDL_Texture* timerTexture = NULL;
     SDL_Rect timerRect;
-
 
     game.isMuted = false;
     game.quit = false;
@@ -77,8 +77,6 @@ int main(int argc, char **argv) {
     state = START;
 
     changeThemeSong();
-
-    time_t start_time = time(NULL); // Sätt starttiden till nu
     
     if (TTF_Init() == -1) {
         printf("TTF_Init error: %s\n", TTF_GetError());
@@ -96,10 +94,12 @@ int main(int argc, char **argv) {
         // Handle error
     }
 
+    time_t start_time = time(NULL); // Set start time 
+
     while (!game.quit)
     {   
         time_t current_time = time(NULL); // Hämta aktuell tid
-        double elapsed_time = difftime(current_time, start_time); // Beräkna tiden som har gått
+        double elapsed_time = (1 * 60) - difftime(current_time, start_time); // Den här funktion är ansvarig för hur många minuter en timer har
         timeAtLoopBeginning = SDL_GetTicks();
 
         switch (state)
@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
                 applySpeedBoostPerk(&players[0], &speedBoostPerk);
                 applySpeedBoostPerk(&players[1], &speedBoostPerk);
 
+
                 // Game renderer
                 SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                 SDL_RenderClear(game.renderer);
@@ -127,21 +128,23 @@ int main(int argc, char **argv) {
                 renderSpeedBoostPerk(game.renderer, speedBoostPerk);
                 HuntAndRevive(game.renderer, players);
                 
-                //
+                // Timer render
                 SDL_RenderCopy(game.renderer, timerTexture, NULL, &timerRect);
 
                 // Present the rendered frame
                 SDL_RenderPresent(game.renderer);
 
                 if (selectedOption == 0) {
-                    manageServerDuties(&information, &record, players, &toSend);
+                    manageServerDuties(&information, record, players, &toSend);
                 }
                 // Calculate elapsed time in seconds
                 int elapsedSeconds = (int)elapsed_time;
 
                 // Create timer string
+                int remainingMinutes = (int)elapsed_time / 60;
+                int remainingSeconds = (int)elapsed_time % 60;
                 char timerText[10];
-                snprintf(timerText, sizeof(timerText), "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60);
+                snprintf(timerText, sizeof(timerText), "%02d:%02d", remainingMinutes, remainingSeconds);
 
                 // Render timer text to a surface
                 timerSurface = TTF_RenderText_Solid(font, timerText, textColor);
@@ -165,7 +168,10 @@ int main(int argc, char **argv) {
 
                 // Free the timer surface since it's not needed anymore
                 SDL_FreeSurface(timerSurface);
-
+                if (remainingMinutes == 0 &&  remainingSeconds == 0){
+                    printf("Game over!");
+                    break; 
+                }
                 
                 if (number == 1) {
                     sendData(&information, &toSend, &players[0]);
@@ -187,7 +193,7 @@ int main(int argc, char **argv) {
                 printf(
                     "START\n"
                 );
-                selectedOption = manageMenu(&game, &menu, &information, &state, &record);
+                selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 if (selectedOption == 0) {
                     number = 0;
                 }

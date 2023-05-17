@@ -32,6 +32,9 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber
 
     playerX.frame = 6;
     playerX.speed = 2;
+    //playerX.speedBoostStartTime = 0;
+    //playerX.baseSpeed = 2;
+    //playerX.boostedSpeed = 4;
 
     playerX.player = playerNumber;
     playerX.captured = false;
@@ -44,8 +47,8 @@ void handlePlayerMovement(Player *playerX) {
         if (playerX->up) {
             if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y)) {
                 playWalkingSound();
-                printf("Player: Up\n");
-                printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
+                //printf("Player: Up\n");
+                //printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
                 playerX->position.y -= playerX->speed;
                 if (playerX->frame == 9 || playerX->frame == 10)
                     playerX->frame++;
@@ -56,8 +59,8 @@ void handlePlayerMovement(Player *playerX) {
         else if (playerX->down) {
             if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y + PLAYER_FRAME_HEIGHT)) {
                 playWalkingSound();
-                printf("Player: Down\n");
-                printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
+                //printf("Player: Down\n");
+                //printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
                 playerX->position.y += playerX->speed;
                 if (playerX->frame == 0 || playerX->frame == 1)
                     playerX->frame++;
@@ -68,8 +71,8 @@ void handlePlayerMovement(Player *playerX) {
         if (playerX->left) {
             if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
                 playWalkingSound();
-                printf("Player: Left\n");
-                printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
+                //printf("Player: Left\n");
+                //printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
                 playerX->position.x -= playerX->speed;
                 if (playerX->frame == 3 || playerX->frame == 4)
                     playerX->frame++;
@@ -80,8 +83,8 @@ void handlePlayerMovement(Player *playerX) {
         else if (playerX->right) {
             if (!encountersForbiddenTile(playerX->position.x + PLAYER_FRAME_WIDTH, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
                 playWalkingSound();
-                printf("Player: Right\n");
-                printf("X: %d, Y: %d", playerX->position.x, playerX->position.y);
+                //printf("Player: Right\n");
+                //printf("X: %d, Y: %d", playerX->position.x, playerX->position.y);
                 playerX->position.x += playerX->speed;
                 if (playerX->frame == 6 || playerX->frame == 7)
                     playerX->frame++;

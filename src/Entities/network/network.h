@@ -4,6 +4,7 @@
 #define MAX_CLIENTS 3
 
 #include <stdbool.h>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 
@@ -14,8 +15,8 @@ typedef struct {
 	int positionX;
 	int positionY;
 	int alive;
-	bool isConnected;
 	int frame;
+	bool connectedStatus;
 } PlayerData;
 
 typedef enum {
@@ -48,33 +49,24 @@ typedef struct {
 typedef struct {
     Uint32 ip;
     Uint16 port;
+	bool connectedStatus;
 } ClientID;
-
-typedef struct {
-    ClientID id;
-	PlayerData player;
-    // add any other relevant information about the client here
-} Client;
-
-typedef struct {
-    Client clients[3];
-} AddressBook;
 
 void setUpClient(Network *information, char IP_address[], int port);
 void sendData(Network *information, PlayerData *toSend, Player *playerX);
 void receiveData(Network *information, Player players[]);
-void setUpServer(Network *information, AddressBook *record, int port);
-void manageServerDuties(Network *information, AddressBook *record, Player players[], PlayerData *toSend);
+void setUpServer(Network *information, ClientID record[], int port);
+void manageServerDuties(Network *information, ClientID record[], Player players[], PlayerData *toSend);
 
 static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
 static void commenceTransfer(Network *information, PlayerData *toSend);
-static void initiateAddressBook(AddressBook *record);
-static void registerSourceInformation(Network *information, PlayerData *receivedData, AddressBook *record);
+static void initiateAddressBook(ClientID record[]);
+static void registerSourceInformation(Network *information, PlayerData *receivedData, ClientID record[]);
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *host);
-static void sendHostPlayerPacket(Network *information, AddressBook *record, PlayerData *toSend, Player *host);
+static void sendHostPlayerPacket(Network *information, ClientID record[], PlayerData *toSend, Player *host);
 static void applyReceivedData(Player *player, PlayerData *toSend);
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, AddressBook *record, Player players[]);
+static void forwardreceivedPacket(Network *information, PlayerData *receivedData, ClientID record[], Player players[]);
 static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
 
 #endif

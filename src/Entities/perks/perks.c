@@ -14,6 +14,7 @@ void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
     }
 }
 
+
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
 {
     if (perk.available)
@@ -56,5 +57,6 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.rect.h = PERK_HEIGHT; 
     speedBoostPerk.available = true;
     speedBoostPerk.duration = PERK_DURATION;
+
     return speedBoostPerk;
 }

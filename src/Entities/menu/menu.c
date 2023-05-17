@@ -1,6 +1,6 @@
 #include "menu.h"
 
-int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, AddressBook *record) {
+int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]) {
     TTF_Init();
     char* options[] = {"Host Game", "Join Game", "Quit"};
     Menu menus = {
