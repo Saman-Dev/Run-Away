@@ -18,6 +18,7 @@ typedef struct {
 
 void initiateMapResources(SDL_Renderer *renderer, Background *resources);
 void renderBackground(SDL_Renderer *renderer, Background resources);
+void renderBackground2(SDL_Renderer *renderer, Background resources);
 
 int getNumberOfRowsInMap();
 int getNumberOfColumnsInMap();
