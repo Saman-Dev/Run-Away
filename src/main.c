@@ -22,11 +22,9 @@
 #define WINDOW_HEIGHT 560 //960
 
 int main(int argc, char **argv) {
+    int timeAtLoopBeginning;
     TCPLocalInformation TCPInformation = {0, 0, NULL, 0};
     TCPClientInformation client[MAX_CLIENTS] = {NULL, 0};
-
-    int timeAtLoopBeginning;
-
     Framework game;
     Background resources;
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -126,7 +124,7 @@ int main(int argc, char **argv) {
 
                 if (selectedOption == 0) {
                     manageServerDuties(&information, record, players, &toSend);
-                    //manageServerTCPActivity(&TCPInformation, client);
+                    manageServerTCPActivity(&TCPInformation, client, record);
                 }
                 // Calculate elapsed time in seconds
                 int elapsedSeconds = (int)elapsed_time;
@@ -192,7 +190,6 @@ int main(int argc, char **argv) {
                 strcpy(menu.img, "resources/start_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
-                /*
                 if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
@@ -200,7 +197,6 @@ int main(int argc, char **argv) {
                 else {
                     InitiateClientTCPCapability(&TCPInformation);
                 }
-                */
                 break;
             case SETTINGS:
                 printf(

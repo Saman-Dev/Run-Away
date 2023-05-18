@@ -53,7 +53,6 @@ typedef struct {
 	UDPpacket *packetToSend;
 	UDPpacket *packetToReceive;
 	bool lobbyActive;
-	int nrOfClients;
     GameState gState; // add this variable to track the game state
 	PlayerData players[MAX_CLIENTS];
 	int playerNr;
@@ -62,7 +61,7 @@ typedef struct {
 typedef struct {
     Uint32 ip;
     Uint16 port;
-	bool connectedStatus;
+	bool active;
 } ClientID;
 
 void setUpClient(Network *information, char IP_address[], int port);
@@ -83,14 +82,15 @@ static void forwardreceivedPacket(Network *information, PlayerData *receivedData
 static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
 
 ///// TCP /////
-void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
-void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
-void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], int clientNumber);
-void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
-void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
-void receiveClientNumber(TCPLocalInformation *TCPInformation);
+static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
+static void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
+static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[], int clientNumber);
+static void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
+static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
+static void receiveClientNumber(TCPLocalInformation *TCPInformation);
+static void removeUDPEntry(ClientID entry[], int clientNumber);
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
 void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation);
-void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
+void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[]);
 
 #endif
