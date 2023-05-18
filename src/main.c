@@ -23,14 +23,7 @@
 
 int main(int argc, char **argv) {
     TCPLocalInformation TCPInformation = {0, 0, NULL, 0};
-    TCPClientInformation client[MAX_CLIENTS];
-    
-    initiateServerTCPCapability(&TCPInformation);
-    /*
-    while (1) {
-        manageServerTCPActivity(&TCPInformation, client);
-    }
-    */
+    TCPClientInformation client[MAX_CLIENTS] = {NULL, 0};
 
     int timeAtLoopBeginning;
     int number;
@@ -206,7 +199,14 @@ int main(int argc, char **argv) {
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 if (selectedOption == 0) {
                     number = 0;
+                    //initiateServerTCPCapability(&TCPInformation);
+                    /*
+                    while (1) {
+                        manageServerTCPActivity(&TCPInformation, client);
+                    }
+                    */
                 }
+
                 break;
             default:
                 break;

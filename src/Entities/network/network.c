@@ -75,11 +75,6 @@ void receiveData(Network *information, Player players[]) {
 }
 
 void setUpServer(Network *information, ClientID record[], int port) {
-	if (SDLNet_Init() < 0) {
-		fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
-		exit(1);
-	}
-
 	if (!(information->sourcePort = SDLNet_UDP_Open(port))) {
 		fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
 		exit(1);
@@ -286,7 +281,7 @@ void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation) {
     }
 
     TCPInformation->socket = SDLNet_TCP_Open(&TCPInformation->ip);
-    if(!TCPInformation->socket) {
+    if(TCPInformation->socket == NULL) {
         printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
         exit(1);
     }
