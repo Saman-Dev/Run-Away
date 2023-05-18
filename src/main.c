@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     time_t start_time = time(NULL); // Set start time 
 
     char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
-    char* settingsOptions[] = {"Mute Game", "Quit"};
+    char* settingsOptions[] = {"Mute Game", "Back to Menu"};
     Menu menu = {
         .optionWidth = 200,
         .optionHeight = 50,
