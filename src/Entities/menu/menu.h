@@ -17,6 +17,7 @@ typedef struct {
     int optionSpacing;
     int menuX;
     int menuY;
+    char img[50];
 } Menu;
 
 int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]);

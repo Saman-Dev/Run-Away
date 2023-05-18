@@ -53,17 +53,6 @@ int main(int argc, char **argv) {
     players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
     players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
 
-    char* options[] = {"Host Game", "Join Game", "Quit"};
-    Menu menu = {
-        .options = options,
-        .numOptions = 3,
-        .optionWidth = 200,
-        .optionHeight = 50,
-        .optionSpacing = 10,
-        .menuX = 480,
-        .menuY = 477,
-    };
-
     int selectedOption;
 
     state = START;
@@ -87,6 +76,15 @@ int main(int argc, char **argv) {
     }
 
     time_t start_time = time(NULL); // Set start time 
+
+    char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
+    char* settingsOptions[] = {"Mute Game", "Quit"};
+    Menu menu = {
+        .optionWidth = 200,
+        .optionHeight = 50,
+        .menuX = 480,
+        .menuY = 477,
+    };
 
     while (!game.quit)
     {   
@@ -128,7 +126,7 @@ int main(int argc, char **argv) {
 
                 if (selectedOption == 0) {
                     manageServerDuties(&information, record, players, &toSend);
-                    manageServerTCPActivity(&TCPInformation, client);
+                    //manageServerTCPActivity(&TCPInformation, client);
                 }
                 // Calculate elapsed time in seconds
                 int elapsedSeconds = (int)elapsed_time;
@@ -179,14 +177,22 @@ int main(int argc, char **argv) {
                 break;
             case GAME_OVER:
                 printf(
-                    "GAME_OVER"
+                    "GAME_OVER\n"
                 );
+                
                 break;
             case START:
                 printf(
                     "START\n"
                 );
+
+                menu.options = menuOptions;
+                menu.numOptions = 4;
+                menu.optionSpacing = 10;
+                strcpy(menu.img, "resources/start_menu.png");
+
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
+                /*
                 if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
@@ -194,6 +200,19 @@ int main(int argc, char **argv) {
                 else {
                     InitiateClientTCPCapability(&TCPInformation);
                 }
+                */
+                break;
+            case SETTINGS:
+                printf(
+                    "SETTINGS\n"
+                );
+
+                menu.options = settingsOptions;
+                menu.numOptions = 2;
+                menu.optionSpacing = 60;
+                strcpy(menu.img, "resources/settings_menu.png");
+                    
+                selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 break;
             default:
                 break;

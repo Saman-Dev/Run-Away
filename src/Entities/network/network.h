@@ -43,7 +43,8 @@ typedef struct {
 typedef enum {
 	START,
 	ONGOING,
-	GAME_OVER
+	GAME_OVER,
+	SETTINGS,
 } GameState;
 
 typedef struct {
