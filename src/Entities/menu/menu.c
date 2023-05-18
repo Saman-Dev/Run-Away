@@ -1,7 +1,6 @@
 #include "menu.h"
 
 int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]) {
-    TTF_Init();
     int selectedOption;
     if (*state == START){
         selectedOption = displayMenu(game->renderer, menu);
@@ -38,14 +37,12 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
                 break;
             case 1:
                 *state = START;
-                TTF_Quit();
                 break;
             default:
                 break;
         }
     }
     return selectedOption;
-    TTF_Quit();
 }
 
 int displayMenu(SDL_Renderer* renderer, Menu* menu) 

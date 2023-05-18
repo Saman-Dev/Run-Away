@@ -6,6 +6,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "../audio/audio.h"
 
@@ -30,8 +31,18 @@ typedef struct {
     SDL_Rect rectangle;
 } Image;
 
+typedef struct {
+    time_t timeWhenStarting;
+    double timeRemaining;
+    int minutesRemaining;
+    int secondsRemaining;
+} Timer;
+
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
-void checkTimeLeft(Framework *game, double elapsedTime);
+void manageTimer(Framework *game, Timer *timerData);
+static void calculateRemainingTime(Timer *timerData);
+static void displayTime(SDL_Renderer *renderer, Timer *timerData);
+static void checkIfTimerHasExpired(Framework *game, Timer *timerData);
 
 #endif
