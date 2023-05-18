@@ -26,17 +26,6 @@ int main(int argc, char **argv) {
     TCPClientInformation client[MAX_CLIENTS] = {NULL, 0};
 
     int timeAtLoopBeginning;
-    int number;
-
-    if (argc == 1) {
-        number = 1;
-    }
-    else if (argc == 2) {
-        number = 2;
-    }
-    else if (argc == 3) {
-        number = 3;
-    }
 
     Framework game;
     Background resources;
@@ -139,6 +128,7 @@ int main(int argc, char **argv) {
 
                 if (selectedOption == 0) {
                     manageServerDuties(&information, record, players, &toSend);
+                    manageServerTCPActivity(&TCPInformation, client);
                 }
                 // Calculate elapsed time in seconds
                 int elapsedSeconds = (int)elapsed_time;
@@ -176,10 +166,10 @@ int main(int argc, char **argv) {
                     break; 
                 }
                 
-                if (number == 1) {
+                if (TCPInformation.playerNumber == 0) {
                     sendData(&information, &toSend, &players[0]);
                     receiveData(&information, players);
-                }else if (number == 2) {
+                }else if (TCPInformation.playerNumber == 1) {
                     sendData(&information, &toSend, &players[1]);
                     receiveData(&information, players);
                 }
@@ -198,15 +188,12 @@ int main(int argc, char **argv) {
                 );
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 if (selectedOption == 0) {
-                    number = 0;
-                    //initiateServerTCPCapability(&TCPInformation);
-                    /*
-                    while (1) {
-                        manageServerTCPActivity(&TCPInformation, client);
-                    }
-                    */
+                    initiateServerTCPCapability(&TCPInformation);
+                    TCPInformation.playerNumber = -1;
                 }
-
+                else {
+                    InitiateClientTCPCapability(&TCPInformation);
+                }
                 break;
             default:
                 break;

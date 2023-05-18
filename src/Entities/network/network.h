@@ -89,6 +89,7 @@ void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
 void removeClient(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
 void receiveClientNumber(TCPLocalInformation *TCPInformation);
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation);
 void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
 
 #endif
