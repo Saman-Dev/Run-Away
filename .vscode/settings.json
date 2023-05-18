@@ -4,6 +4,8 @@
         "math.h": "c",
         "numbers": "c",
         "sdl_mixer.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stdlib.h": "c",
+        "player.h": "c"
     }
 }

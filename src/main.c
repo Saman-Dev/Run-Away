@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         // Handle error
     }
 
-    time_t start_time = time(NULL); // Set start time 
+    time_t start_time = time(NULL); // Set start time
 
     char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
     char* settingsOptions[] = {"Mute Game", "Back to Menu"};
@@ -102,7 +102,6 @@ int main(int argc, char **argv) {
                 // Check for perk collision
                 applySpeedBoostPerk(&players[0], &speedBoostPerk);
                 applySpeedBoostPerk(&players[1], &speedBoostPerk);
-
 
                 // Game renderer
                 SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);

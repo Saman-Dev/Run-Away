@@ -11,9 +11,9 @@
 
 #define PERK_WIDTH 32
 #define PERK_HEIGHT 32
-#define PERK_DURATION 10
+#define PERK_DURATION 5
 #define SPEED_BOOST_AMOUNT 1
-#define SPEED_BOOST_DURATION 4
+#define SPEED_BOOST_DURATION 0
 
 typedef struct {
     SDL_Texture* texture;
