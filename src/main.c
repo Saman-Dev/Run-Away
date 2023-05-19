@@ -117,16 +117,15 @@ int main(int argc, char **argv) {
                 strcpy(menu.img, "resources/start_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
-
                 if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
+                    changeThemeSong();
                 }
-                else {
+                else if (selectedOption == 1){
                     InitiateClientTCPCapability(&TCPInformation);
+                    changeThemeSong();
                 }
-
-                changeThemeSong();
                 timerData.timeWhenStarting = time(NULL);
                 break;
             case SETTINGS:
