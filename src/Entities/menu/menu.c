@@ -6,19 +6,22 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
         selectedOption = displayMenu(game->renderer, menu);
         switch (selectedOption) {
             case 0:
+                playMenuClickSound();
                 setUpServer(information, record, 2000);
                 *state = LOBBY;
                 break;
             case 1:
                 // options
+                playMenuClickSound();
                 setUpClient(information, "127.0.0.1", 2000);
                 *state = LOBBY;
                 break;
             case 2:
                 // options
+                playMenuClickSound();
                 *state = SETTINGS;
                 break;
-            case 3:     
+            case 3:    
                 game->quit = true;
                 break;
             default:
@@ -28,6 +31,7 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
         selectedOption = displayMenu(game->renderer, menu);
         switch (selectedOption) {
             case 0:
+                playMenuClickSound();
                 game->isMuted = !game->isMuted;
                 if (game->isMuted) {
                     Mix_VolumeMusic(0);
@@ -36,6 +40,7 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
                 }
                 break;
             case 1:
+                playMenuClickSound();
                 *state = START;
                 break;
             default:

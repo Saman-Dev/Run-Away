@@ -37,6 +37,13 @@ void initializeAudio(void) {
         exit(1);
     }
     Mix_VolumeChunk(cageUnlockSound, 20);
+
+    menuClickSound = Mix_LoadWAV("resources/MenuClickSound.mp3");
+    if (menuClickSound == NULL) {
+        printf("%s\n", Mix_GetError());
+        exit(1);
+    }
+    Mix_VolumeChunk(menuClickSound, 40);
 }
 
 void playWalkingSound(void) {
@@ -64,4 +71,8 @@ void playCageLockSound(void) {
 
 void playCageUnlockSound(void) {
     Mix_PlayChannel(-1, cageUnlockSound, 0);
+}
+
+void playMenuClickSound(void) {
+    Mix_PlayChannel(-1, menuClickSound, 0);
 }
