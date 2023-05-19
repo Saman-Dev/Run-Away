@@ -50,8 +50,6 @@ int main(int argc, char **argv) {
 
     state = START;
 
-    changeThemeSong();
-
     char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
     char* settingsOptions[] = {"Mute Game", "Back to Menu"};
     Menu menu = {
@@ -119,6 +117,7 @@ int main(int argc, char **argv) {
                 strcpy(menu.img, "resources/start_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
+
                 if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
@@ -126,6 +125,8 @@ int main(int argc, char **argv) {
                 else {
                     InitiateClientTCPCapability(&TCPInformation);
                 }
+
+                changeThemeSong();
                 timerData.timeWhenStarting = time(NULL);
                 break;
             case SETTINGS:
