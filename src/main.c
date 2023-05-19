@@ -18,9 +18,6 @@
 #include "Entities/foundation/foundation.h"
 #include "Entities/mechanics/mechanics.h"
 
-#define WINDOW_WIDTH 900 //1280
-#define WINDOW_HEIGHT 560 //960
-
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     TCPLocalInformation TCPInformation = {0, 0, NULL, 0};

@@ -10,8 +10,8 @@
 
 #include "../audio/audio.h"
 
-#define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 900
+#define SCREEN_WIDTH 960 // 1280
+#define SCREEN_HEIGHT 900 // 960
 
 #define FPS 60
 
