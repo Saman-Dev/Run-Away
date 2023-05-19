@@ -8,13 +8,13 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
             case 0:
                 playMenuClickSound();
                 setUpServer(information, record, 2000);
-                *state = LOBBY;
+                *state = ONGOING;
                 break;
             case 1:
                 // options
                 playMenuClickSound();
                 setUpClient(information, "127.0.0.1", 2000);
-                *state = LOBBY;
+                *state = ONGOING;
                 break;
             case 2:
                 // options

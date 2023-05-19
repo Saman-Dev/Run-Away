@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     TCPLocalInformation TCPInformation = {0, 0, NULL, 0};
     TCPClientInformation client[MAX_CLIENTS] = {NULL, 0};
-    Framework game;
+    Framework game = {NULL, NULL, NULL, 0, false, false};
     Background resources;
     Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     GameState state;
@@ -30,9 +30,6 @@ int main(int argc, char **argv) {
     PlayerData toSend = {0, 0, 0, 0, 0};
     ClientID record[MAX_CLIENTS];
     Timer timerData = {0, 0, 0, 0};
-
-    game.isMuted = false;
-    game.quit = false;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);

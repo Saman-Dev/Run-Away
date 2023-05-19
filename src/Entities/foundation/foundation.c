@@ -50,7 +50,7 @@ void manageTimer(Framework *game, Timer *timerData) {
 
 static void calculateRemainingTime(Timer *timerData) {
     time_t currentTime = time(NULL);
-    timerData->timeRemaining = (5 * 60) - difftime(currentTime, timerData->timeWhenStarting); // Den här funktion är ansvarig för hur många minuter en timer har
+    timerData->timeRemaining = (TIMER_MINUTES * 60) - difftime(currentTime, timerData->timeWhenStarting); // Den här funktion är ansvarig för hur många minuter en timer har
     timerData->minutesRemaining = ((int) timerData->timeRemaining / 60);
     timerData->secondsRemaining = ((int) timerData->timeRemaining % 60);
 }
