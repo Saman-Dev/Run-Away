@@ -64,11 +64,12 @@ typedef struct {
 	bool active;
 } ClientID;
 
+void manageUDPClientConnection(Network *information, PlayerData *toSend, Player players[], int playerNumber);
 void setUpClient(Network *information, char IP_address[], int port);
-void sendData(Network *information, PlayerData *toSend, Player *playerX);
-void receiveData(Network *information, Player players[]);
 void setUpServer(Network *information, ClientID record[], int port);
 void manageServerDuties(Network *information, ClientID record[], Player players[], PlayerData *toSend);
+static void sendData(Network *information, PlayerData *toSend, Player *playerX);
+static void receiveData(Network *information, Player players[]);
 
 static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);

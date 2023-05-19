@@ -25,7 +25,12 @@ void setUpClient(Network *information, char IP_address[], int port) {
     information->packetToSend->address.port = information->destination.port;
 }
 
-void sendData(Network *information, PlayerData *toSend, Player *playerX) {
+void manageUDPClientConnection(Network *information, PlayerData *toSend, Player players[], int playerNumber) {
+    sendData(information, toSend, &players[playerNumber]);
+    receiveData(information, players);
+}
+
+static void sendData(Network *information, PlayerData *toSend, Player *playerX) {
     if (checkDifference(toSend, playerX)) {
         prepareTransfer(toSend, playerX);
         commenceTransfer(information, toSend);
@@ -60,7 +65,7 @@ static void commenceTransfer(Network *information, PlayerData *toSend) {
     SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
 }
 
-void receiveData(Network *information, Player players[]) {
+static void receiveData(Network *information, Player players[]) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         PlayerData temporary;
         memcpy(&temporary, (char *) information->packetToReceive->data, sizeof(PlayerData));
@@ -120,7 +125,6 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientP
     // Serialize the struct into a byte array
     char buf[sizeof(PlayerData)];
     memcpy(&temporary, (char * ) information->packetToReceive->data, sizeof(PlayerData));
-    applyReceivedData(player, &temporary); /// Implement received packet changes locally
     memcpy(buf, &temporary, sizeof(PlayerData));
 
     // Send the byte array as the payload of the UDP packet
@@ -178,7 +182,7 @@ static void forwardreceivedPacket(Network *information, PlayerData *receivedData
         if (record[i].port == information->packetToReceive->address.port) {
             for (int j = 0; j < MAX_CLIENTS; j++) {
                 if (i == j) {
-                    continue;
+                    applyReceivedData(&players[i], receivedData);
                 }
                 else if (record[j].active){
                     sendServerCopy(information, record[j].ip, record[j].port, &players[i]);

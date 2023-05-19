@@ -94,13 +94,8 @@ int main(int argc, char **argv) {
                     manageServerDuties(&information, record, players, &toSend);
                     manageServerTCPActivity(&TCPInformation, client, record);
                 }
-
-                if (TCPInformation.playerNumber == 0) {
-                    sendData(&information, &toSend, &players[0]);
-                    receiveData(&information, players);
-                }else if (TCPInformation.playerNumber == 1) {
-                    sendData(&information, &toSend, &players[1]);
-                    receiveData(&information, players);
+                else {
+                    manageUDPClientConnection(&information, &toSend, players, TCPInformation.playerNumber);
                 }
 
                 manageFrameRate(timeAtLoopBeginning);
