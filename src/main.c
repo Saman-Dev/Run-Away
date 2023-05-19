@@ -76,8 +76,8 @@ int main(int argc, char **argv) {
                 applySpeedBoostPerk(&players[1], &speedBoostPerk);
 
                 // Game renderer
-                SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-                SDL_RenderClear(game.renderer);
+                //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                //SDL_RenderClear(game.renderer);
                 renderBackground(game.renderer, resources);
 
                 // Render players
@@ -146,8 +146,10 @@ int main(int argc, char **argv) {
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
     SDL_DestroyWindow(game.window);
+    TTF_CloseFont(game.font);
     Mix_CloseAudio();
-    SDL_Quit();
     TTF_Quit();
+    SDLNet_Quit();
+    SDL_Quit();
     return 0;
 }
