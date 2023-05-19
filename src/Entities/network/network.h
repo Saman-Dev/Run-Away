@@ -45,6 +45,7 @@ typedef enum {
 	ONGOING,
 	GAME_OVER,
 	SETTINGS,
+	LOBBY,
 } GameState;
 
 typedef struct {

@@ -7,12 +7,12 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
         switch (selectedOption) {
             case 0:
                 setUpServer(information, record, 2000);
-                *state = ONGOING;
+                *state = LOBBY;
                 break;
             case 1:
                 // options
                 setUpClient(information, "127.0.0.1", 2000);
-                *state = ONGOING;
+                *state = LOBBY;
                 break;
             case 2:
                 // options
@@ -41,7 +41,19 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
             default:
                 break;
         }
-    }
+    }else if (*state == LOBBY){
+            selectedOption = displayMenu(game->renderer, menu);
+            switch (selectedOption) {
+                case 4:
+                    *state = ONGOING;
+                    break;
+                case 5:
+                    *state = START;
+                    printf("Host ended server");
+                    SDLNet_UDP_Close(information->sourcePort);
+                    break;
+            }
+        }
     return selectedOption;
 }
 
@@ -74,7 +86,7 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
     int menuX = 400;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
-    int menuY = 400;//(SCREEN_HEIGHT - menuHeight) / 2;
+    int menuY = 320;//(SCREEN_HEIGHT - menuHeight) / 2;
 
     for (int i = 0; i < menu->numOptions; i++) 
     {

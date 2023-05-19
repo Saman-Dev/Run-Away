@@ -51,7 +51,9 @@ int main(int argc, char **argv) {
     state = START;
 
     char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
+    char* lobbyOptions[] = {"Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back"};
     char* settingsOptions[] = {"Mute Game", "Back to Menu"};
+
     Menu menu = {
         .optionWidth = 200,
         .optionHeight = 50,
@@ -113,21 +115,32 @@ int main(int argc, char **argv) {
 
                 menu.options = menuOptions;
                 menu.numOptions = 4;
-                menu.optionSpacing = 10;
+                menu.optionSpacing = 30;
                 strcpy(menu.img, "resources/start_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &state, record);
 
-                if (selectedOption == 0) {
+                /*if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
                 }
                 else {
                     InitiateClientTCPCapability(&TCPInformation);
-                }
+                }*/
 
                 changeThemeSong();
                 timerData.timeWhenStarting = time(NULL);
+                break;
+            case LOBBY:
+                printf("LOBBY\n");
+
+                menu.options = lobbyOptions;
+                menu.numOptions = 6;
+                menu.optionSpacing = 55;
+                menu.menuX = 280;
+                strcpy(menu.img, "resources/lobby_menu.png");
+
+                selectedOption = manageMenu(&game, &menu, &information, &state, record);
                 break;
             case SETTINGS:
                 printf("SETTINGS\n");
