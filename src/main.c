@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
                 handlePlayerMovement(&players[2]);
 
                 // Check for perk collision
-                applySpeedBoostPerk(&players[0], &speedBoostPerk);
-                applySpeedBoostPerk(&players[1], &speedBoostPerk);
+                applySpeedBoostPerk(players, &speedBoostPerk);
+
 
                 // Game renderer
                 //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
                 renderPlayers(game, players);
 
                 // Perk render
-                renderSpeedBoostPerk(game.renderer, speedBoostPerk);
+                renderSpeedBoostPerk(game.renderer, &speedBoostPerk);
                 HuntAndRevive(game.renderer, players);
 
                 manageTimer(&game, &timerData);

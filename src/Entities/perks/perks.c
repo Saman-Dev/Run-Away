@@ -6,49 +6,64 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
+#define MAX_PLAYERS 5
 
-void applySpeedBoostPerk(Player *player, SpeedBoostPerk *perk)
+void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
 {
-    static time_t start_time = 0; // Declare start_time as static to retain its value between function calls
-    static int active = -1;
+    static time_t start_time[MAX_PLAYERS] = {0}; // Declare start_time as static array to retain its value between function calls
+    static int active[MAX_PLAYERS] = {-1};
 
-    if (perk->available && checkCollision(player->position, perk->rect)) 
+    if (perk->available) 
     {
-        player->speed += SPEED_BOOST_AMOUNT;
-        perk->available = false;
-        perk->duration = 10;
-        start_time = time(NULL); // Set start time when the perk is applied
-        active = player->player;
-    }
-    else if(!perk->available && perk->duration > 0 && active == player->player)
-    {
-        time_t current_time = time(NULL); // Get the current time
-        double elapsed_time = difftime(current_time, start_time); // Calculate elapsed time
-
-        if (elapsed_time >= 10)
+        for (int i = 0; i < MAX_PLAYERS; i++)
         {
-            player->speed -= SPEED_BOOST_AMOUNT;
-            perk->duration = 0;
-            printf("speed %d\n", player->speed);
+            Player *player = &players[i];
+            if (checkCollision(player->position, perk->rect))
+            {
+                player->speed += SPEED_BOOST_AMOUNT;
+                perk->available = false;
+                perk->duration = 10;
+                start_time[player->player] = time(NULL); // Set start time when the perk is applied
+                active[player->player] = player->player;
+            }
         }
-        else
+    }
+    else
+    {
+        for (int i = 0; i < MAX_PLAYERS; i++)
         {
-            int remaining_time = (int)(10 - elapsed_time);
-            printf("Time remaining: %d seconds\n", remaining_time);
-            printf("Player: %d \n", player->player);
+            Player *player = &players[i];
+            if (!perk->available && perk->duration > 0 && active[player->player] == player->player)
+            {
+                time_t current_time = time(NULL); // Get the current time
+                double elapsed_time = difftime(current_time, start_time[player->player]); // Calculate elapsed time
 
+                if (elapsed_time >= 10)
+                {
+                    player->speed -= SPEED_BOOST_AMOUNT;
+                    perk->duration = 0;
+                    printf("Player %d speed: %d\n", player->player, player->speed);
+                }
+                else
+                {
+                    int remaining_time = (int)(10 - elapsed_time);
+                    printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
+                }
+            }
         }
     }
 }
 
 
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk perk)
+
+void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk)
 {
-    if (perk.available)
+    if (perk->available)
     {
-        SDL_RenderCopy(renderer, perk.texture, NULL, &perk.rect);
+        SDL_RenderCopy(renderer, perk->texture, NULL, &perk->rect);
     }
 }
+
 
 bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
