@@ -42,12 +42,12 @@ void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
                 {
                     player->speed -= SPEED_BOOST_AMOUNT;
                     perk->duration = 0;
-                    printf("Player %d speed: %d\n", player->player, player->speed);
+                    //printf("Player %d speed: %d\n", player->player, player->speed);
                 }
                 else
                 {
                     int remaining_time = (int)(10 - elapsed_time);
-                    printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
+                    //printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
                 }
             }
         }
