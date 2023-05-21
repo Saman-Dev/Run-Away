@@ -7,13 +7,16 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 #define MAX_PLAYERS 5
+#define perk_duration 10
 
 void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
 {
-    static time_t start_time[MAX_PLAYERS] = {0}; // Declare start_time as static array to retain its value between function calls
+    static time_t start_time[MAX_PLAYERS] = {0};
     static int active[MAX_PLAYERS] = {-1};
+    static bool respawned = true;
+    static time_t respawn_time = 0;
 
-    if (perk->available) 
+    if (perk->available)
     {
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
@@ -22,39 +25,58 @@ void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
             {
                 player->speed += SPEED_BOOST_AMOUNT;
                 perk->available = false;
-                perk->duration = 10;
-                start_time[player->player] = time(NULL); // Set start time when the perk is applied
+                perk->duration = perk_duration;
+                start_time[player->player] = time(NULL);
                 active[player->player] = player->player;
+                respawned = false;
             }
         }
     }
     else
     {
+        bool activePlayer = false;
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             Player *player = &players[i];
             if (!perk->available && perk->duration > 0 && active[player->player] == player->player)
             {
-                time_t current_time = time(NULL); // Get the current time
-                double elapsed_time = difftime(current_time, start_time[player->player]); // Calculate elapsed time
+                activePlayer = true;
+                time_t current_time = time(NULL);
+                double elapsed_time = difftime(current_time, start_time[player->player]);
 
-                if (elapsed_time >= 10)
+                if (elapsed_time >= perk_duration)
                 {
                     player->speed -= SPEED_BOOST_AMOUNT;
                     perk->duration = 0;
-                    //printf("Player %d speed: %d\n", player->player, player->speed);
+                    active[player->player] = -1;
+                    respawned = false;
                 }
                 else
                 {
-                    int remaining_time = (int)(10 - elapsed_time);
-                    //printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
+                    int remaining_time = (int)(perk_duration - elapsed_time);
+                    printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
                 }
             }
         }
+
+        if (!respawned && !activePlayer)
+        {
+            time_t current_time = time(NULL);
+            double elapsed_time = difftime(current_time, start_time[0]); // Use the first player's start time for consistency
+            if (elapsed_time >= 15)
+            {
+                perk->available = true;
+                respawned = true;
+                respawn_time = 0;
+                printf("respwan time %d", elapsed_time);
+            }
+        }
+        else if (respawned && respawn_time == 0)
+        {
+            respawn_time = time(NULL);
+        }
     }
 }
-
-
 
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk)
 {
@@ -64,17 +86,17 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk)
     }
 }
 
-
-bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
+bool checkCollision(SDL_Rect a, SDL_Rect b)
 {
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
 
-SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer) 
+SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
 {
     SpeedBoostPerk speedBoostPerk;
-    SDL_Texture* perkTexture = IMG_LoadTexture(renderer, "resources/newperk.png");
-    if (perkTexture == NULL) {
+    SDL_Texture *perkTexture = IMG_LoadTexture(renderer, "resources/newperk.png");
+    if (perkTexture == NULL)
+    {
         printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
         exit(1);
     }
@@ -84,21 +106,21 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
 
     speedBoostPerk.texture = perkTexture;
 
-    if(randomLocation == 1) 
+    if (randomLocation == 1)
     {
-        speedBoostPerk.rect.x = 435; 
-        speedBoostPerk.rect.y = 350; 
+        speedBoostPerk.rect.x = 435;
+        speedBoostPerk.rect.y = 350;
     }
-    else 
+    else
     {
-        speedBoostPerk.rect.x = 750; 
-        speedBoostPerk.rect.y = 750; 
+        speedBoostPerk.rect.x = 750;
+        speedBoostPerk.rect.y = 750;
     }
 
-    speedBoostPerk.rect.w = PERK_WIDTH;  
-    speedBoostPerk.rect.h = PERK_HEIGHT; 
+    speedBoostPerk.rect.w = PERK_WIDTH;
+    speedBoostPerk.rect.h = PERK_HEIGHT;
     speedBoostPerk.available = true;
-    speedBoostPerk.duration = 0; // Initialize duration to 0
+    speedBoostPerk.duration = 0;
 
     return speedBoostPerk;
 }
