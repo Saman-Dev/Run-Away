@@ -21,11 +21,11 @@ typedef struct {
     int frame;
     int speed;
     bool captured;
+    bool frozen;
     bool up;
     bool down;
     bool left;
     bool right;
-
     //int baseSpeed; 
     //int boostedSpeed;
     //Uint32 speedBoostStartTime;

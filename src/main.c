@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
     initiateMapResources(game.renderer, &resources);
 
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
+    FreezePerk freezPerk = initializeFreezePerk(game.renderer);
 
     players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
     players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
@@ -62,8 +63,10 @@ int main(int argc, char **argv) {
                 handlePlayerMovement(&players[2]);
 
                 // Check for perk collision
+                applyFreezePerk(players, &freezPerk);
                 applySpeedBoostPerk(players, &speedBoostPerk);
                 checkPerkRespawn(&speedBoostPerk);
+                checkFreezPerkRespawn(&freezPerk);
 
                 // Game renderer
                 //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -75,6 +78,7 @@ int main(int argc, char **argv) {
 
                 // Perk render
                 renderSpeedBoostPerk(game.renderer, &speedBoostPerk);
+                renderFreezPerk(game.renderer, &freezPerk);
                 HuntAndRevive(game.renderer, players);
 
                 if(manageTimer(&game, &timerData)){
