@@ -177,7 +177,7 @@ static void checkIfTimerHasExpired(bool *quit, Framework *game, Timer *timerData
         printf("The time has run out!\n");
         loadBlackScreen(game);
         displayWinMessage(game);
-        //*quit = true;
+        *quit = true;
     }
 }
 
