@@ -43,10 +43,10 @@ typedef struct {
 
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
-void manageTimer(Framework *game, Timer *timerData);
+bool manageTimer(Framework *game, Timer *timerData);
 static void calculateRemainingTime(Timer *timerData);
 static void displayTime(Framework *game, Timer *timerData);
-static void checkIfTimerHasExpired(bool *quit, Framework *game, Timer *timerData);
+bool checkIfTimerHasExpired(Timer *timerData);
 static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h);
 
 #endif

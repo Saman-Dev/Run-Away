@@ -47,13 +47,9 @@ int main(int argc, char **argv) {
     char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
     char* lobbyOptions[] = {"Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back"};
     char* settingsOptions[] = {"Mute Game", "Back to Menu"};
+    char* gameOverOptions[] = {"Back to Menu", "Quit"};
 
-    Menu menu = {
-        .optionWidth = 200,
-        .optionHeight = 50,
-        .menuX = 480,
-        .menuY = 477,
-    };
+    Menu menu;
 
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();
@@ -81,7 +77,9 @@ int main(int argc, char **argv) {
                 renderSpeedBoostPerk(game.renderer, &speedBoostPerk);
                 HuntAndRevive(game.renderer, players);
 
-                manageTimer(&game, &timerData);
+                if(manageTimer(&game, &timerData)){
+                    state = GAME_OVER;
+                };
 
                 // Present the rendered frame
                 SDL_RenderPresent(game.renderer);
@@ -98,6 +96,14 @@ int main(int argc, char **argv) {
                 break;
             case GAME_OVER:
                 printf("GAME_OVER\n");
+                menu.options = gameOverOptions;
+                menu.numOptions = 2;
+                menu.optionSpacing = 30;
+                menu.menuX = 381;
+                menu.menuY = 600;
+                strcpy(menu.img, "resources/gameOverHuntersLose.png");
+
+                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
                 break;
             case START:
                 printf("START\n");
@@ -105,9 +111,11 @@ int main(int argc, char **argv) {
                 menu.options = menuOptions;
                 menu.numOptions = 4;
                 menu.optionSpacing = 30;
+                menu.menuX = 400,
+                menu.menuY = 400;
                 strcpy(menu.img, "resources/start_menu.png");
 
-                selectedOption = manageMenu(&game, &menu, &information, &state, record);
+                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
                 if (selectedOption == 0) {
                     initiateServerTCPCapability(&TCPInformation);
                     TCPInformation.playerNumber = -1;
@@ -125,10 +133,11 @@ int main(int argc, char **argv) {
                 menu.options = lobbyOptions;
                 menu.numOptions = 6;
                 menu.optionSpacing = 55;
-                menu.menuX = 280;
+                menu.menuX = 400,
+                menu.menuY = 400;
                 strcpy(menu.img, "resources/lobby_menu.png");
 
-                selectedOption = manageMenu(&game, &menu, &information, &state, record);
+                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
                 break;
             case SETTINGS:
                 printf("SETTINGS\n");
@@ -136,9 +145,11 @@ int main(int argc, char **argv) {
                 menu.options = settingsOptions;
                 menu.numOptions = 2;
                 menu.optionSpacing = 60;
+                menu.menuX = 381;
+                menu.menuY = 400;
                 strcpy(menu.img, "resources/settings_menu.png");
                     
-                selectedOption = manageMenu(&game, &menu, &information, &state, record);
+                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
                 break;
             default:
                 break;

@@ -20,7 +20,7 @@ typedef struct {
     char img[50];
 } Menu;
 
-int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]);
+int manageMenu(Framework *game, Menu* menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]);
 int displayMenu(SDL_Renderer* renderer, Menu* menu);
 
 #endif

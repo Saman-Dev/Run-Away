@@ -1,6 +1,6 @@
 #include "menu.h"
 
-int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]) {
+int manageMenu(Framework *game, Menu* menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]) {
     int selectedOption;
     if (*state == START){
         selectedOption = displayMenu(game->renderer, menu);
@@ -11,13 +11,11 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
                 *state = ONGOING;
                 break;
             case 1:
-                // options
                 playMenuClickSound();
                 setUpClient(information, "127.0.0.1", 2000);
                 *state = ONGOING;
                 break;
             case 2:
-                // options
                 playMenuClickSound();
                 *state = SETTINGS;
                 break;
@@ -47,18 +45,37 @@ int manageMenu(Framework *game, Menu* menu, Network *information, GameState *sta
                 break;
         }
     }else if (*state == LOBBY){
-            selectedOption = displayMenu(game->renderer, menu);
-            switch (selectedOption) {
-                case 4:
-                    *state = ONGOING;
-                    break;
-                case 5:
-                    *state = START;
-                    printf("Host ended server");
-                    SDLNet_UDP_Close(information->sourcePort);
-                    break;
-            }
+        selectedOption = displayMenu(game->renderer, menu);
+        switch (selectedOption) {
+            case 4:
+                playMenuClickSound();
+                *state = ONGOING;
+                break;
+            case 5:
+                playMenuClickSound();
+                *state = START;
+                printf("Disconnected");
+                SDLNet_UDP_Close(information->sourcePort);
+                SDLNet_TCP_Close(TCPInformation->socket);
+                break;
         }
+    }else if (*state == GAME_OVER){
+        selectedOption = displayMenu(game->renderer, menu);
+        switch (selectedOption) {
+            case 0:
+                playMenuClickSound();
+                *state = START;
+                SDLNet_UDP_Close(information->sourcePort);
+                SDLNet_TCP_Close(TCPInformation->socket);
+                break;
+            case 1:
+                playMenuClickSound();
+                game->quit = true;
+                break;
+            default:
+                break;
+        }
+    }
     return selectedOption;
 }
 
@@ -90,8 +107,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
-    int menuX = 400;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
-    int menuY = 320;//(SCREEN_HEIGHT - menuHeight) / 2;
+    int menuX = menu->menuX;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
+    int menuY = menu->menuY;//(SCREEN_HEIGHT - menuHeight) / 2;
 
     for (int i = 0; i < menu->numOptions; i++) 
     {

@@ -88,10 +88,12 @@ void manageFrameRate(int timeAtLoopBeginning) {
     }
 }
 
-void manageTimer(Framework *game, Timer *timerData) {
+bool manageTimer(Framework *game, Timer *timerData) {
     calculateRemainingTime(timerData);
     displayTime(game, timerData);
-    checkIfTimerHasExpired(&game->quit, game, timerData);
+    if(checkIfTimerHasExpired(timerData)){
+        return true;
+    }
 }
 
 static void calculateRemainingTime(Timer *timerData) {
@@ -108,8 +110,6 @@ static void calculateRemainingTime(Timer *timerData) {
     timerData->minutesRemaining = timerData->timeRemaining / 60;
     timerData->secondsRemaining = timerData->timeRemaining % 60;
 }
-
-
 
 static void displayTime(Framework *game, Timer *timerData) {
     static Image toDisplay = {0, NULL, {434, 15, 91, 35}};
@@ -147,56 +147,12 @@ static void displayTime(Framework *game, Timer *timerData) {
     }
 }
 
-void loadBlackScreen(Framework *game) {
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-    SDL_RenderClear(game->renderer);
-    SDL_RenderPresent(game->renderer);
-}
-
-void displayWinMessage(Framework *game) {
-    SDL_Color color = {255, 255, 255};
-    SDL_Surface *surface = TTF_RenderText_Solid(game->font, "Runners won", color);
-    if (surface == NULL) {
-        printf("TTF_RenderText_Solid error: %s\n", TTF_GetError());
-    }
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(game->renderer, surface);
-    if (texture == NULL) {
-        printf("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
-    }
-
-    SDL_Rect textRect;
-    textRect.x = (SCREEN_WIDTH - surface->w) / 2;
-    textRect.y = (SCREEN_HEIGHT - surface->h) / 2;
-    textRect.w = surface->w;
-    textRect.h = surface->h;
-
-    SDL_FreeSurface(surface);
-
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-    SDL_RenderClear(game->renderer);
-    SDL_RenderCopy(game->renderer, texture, NULL, &textRect);
-    SDL_RenderPresent(game->renderer);
-
-    SDL_DestroyTexture(texture);
-}
-
-
-static void checkIfTimerHasExpired(bool *quit, Framework *game, Timer *timerData) {
-    int runners_won = 0;
+bool checkIfTimerHasExpired(Timer *timerData) {
     if (timerData->timeRemaining == 0) {
-        runners_won = 1;
-        /*printf("The time has run out!\n");
-        loadBlackScreen(game);
-        displayWinMessage(game);
-        *quit = true;*/
+        printf("The time has run out!\n");
+        return true;
     }
-    if (runners_won){
-        //printf("game over");
-        loadBlackScreen(game);
-        displayWinMessage(game);
-        //*quit = true;
-    }
+    return false;
 }
 
 
