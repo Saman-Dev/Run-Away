@@ -1,11 +1,57 @@
 #include "foundation.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
+#include <SDL2/SDL_ttf.h>
+
+
+
+
 void initialize(Framework *game) {
     // Initialize SDL, timer and Mixer Library
     SDL_Init(SDL_INIT_VIDEO);
     initializeAudio();
     srand(time(NULL));
-    
+     // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {
+        printf("Failed to initialize SDL: %s\n", SDL_GetError());
+        exit(1);
+    }
+
+    // Initialize SDL_image, SDL_mixer, SDL_net, SDL_ttf libraries
+    if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG) {
+        printf("Failed to initialize SDL_image: %s\n", IMG_GetError());
+        exit(1);
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("Failed to initialize SDL_mixer: %s\n", Mix_GetError());
+        exit(1);
+    }
+
+    if (SDLNet_Init() == -1) {
+        printf("Failed to initialize SDL_net: %s\n", SDLNet_GetError());
+        exit(1);
+    }
+
+    if (TTF_Init() == -1) {
+        printf("Failed to initialize SDL_ttf: %s\n", TTF_GetError());
+        exit(1);
+    }
+
+    game->winFont = TTF_OpenFont("resources/font.ttf", 48);
+    if (game->winFont == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
+    }
+
 	if (SDLNet_Init() == -1) {
 		printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(1);
@@ -45,7 +91,7 @@ void manageFrameRate(int timeAtLoopBeginning) {
 void manageTimer(Framework *game, Timer *timerData) {
     calculateRemainingTime(timerData);
     displayTime(game, timerData);
-    checkIfTimerHasExpired(&game->quit, timerData);
+    checkIfTimerHasExpired(&game->quit, game, timerData);
 }
 
 static void calculateRemainingTime(Timer *timerData) {
@@ -77,6 +123,10 @@ static void displayTime(Framework *game, Timer *timerData) {
             printf("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
         }
 
+        if (timerData->timeRemaining == 0) {
+        SDL_DestroyTexture(toDisplay.texture);
+        }
+
         SDL_FreeSurface(surface);
     }
 
@@ -87,12 +137,50 @@ static void displayTime(Framework *game, Timer *timerData) {
     }
 }
 
-static void checkIfTimerHasExpired(bool *quit, Timer *timerData) {
+void loadBlackScreen(Framework *game) {
+    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(game->renderer);
+    SDL_RenderPresent(game->renderer);
+}
+
+void displayWinMessage(Framework *game) {
+    SDL_Color color = {255, 255, 255};
+    SDL_Surface *surface = TTF_RenderText_Solid(game->font, "Runners won", color);
+    if (surface == NULL) {
+        printf("TTF_RenderText_Solid error: %s\n", TTF_GetError());
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(game->renderer, surface);
+    if (texture == NULL) {
+        printf("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
+    }
+
+    SDL_Rect textRect;
+    textRect.x = (SCREEN_WIDTH - surface->w) / 2;
+    textRect.y = (SCREEN_HEIGHT - surface->h) / 2;
+    textRect.w = surface->w;
+    textRect.h = surface->h;
+
+    SDL_FreeSurface(surface);
+
+    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(game->renderer);
+    SDL_RenderCopy(game->renderer, texture, NULL, &textRect);
+    SDL_RenderPresent(game->renderer);
+
+    SDL_DestroyTexture(texture);
+}
+
+
+static void checkIfTimerHasExpired(bool *quit, Framework *game, Timer *timerData) {
     if (timerData->timeRemaining == 0) {
         printf("The time has run out!\n");
-        *quit = true;
+        loadBlackScreen(game);
+        displayWinMessage(game);
+        //*quit = true;
     }
 }
+
 
 static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h) {
     SDL_Rect rectangle;
