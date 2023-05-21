@@ -6,19 +6,21 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "../audio/audio.h"
 
-#define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 900
+#define SCREEN_WIDTH 960 // 1280
+#define SCREEN_HEIGHT 900 // 960
 
 #define FPS 60
 
-#define TIMER_LENGTH 1000
+#define TIMER_MINUTES 5
 
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
+    TTF_Font *font;
     SDL_Event event;
     bool isMuted;
     bool quit;
@@ -30,8 +32,19 @@ typedef struct {
     SDL_Rect rectangle;
 } Image;
 
+typedef struct {
+    time_t timeWhenStarting;
+    double timeRemaining;
+    int minutesRemaining;
+    int secondsRemaining;
+} Timer;
+
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
-void checkTimeLeft(Framework *game, double elapsedTime);
+void manageTimer(Framework *game, Timer *timerData);
+static void calculateRemainingTime(Timer *timerData);
+static void displayTime(Framework *game, Timer *timerData);
+static void checkIfTimerHasExpired(bool *quit, Timer *timerData);
+static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h);
 
 #endif

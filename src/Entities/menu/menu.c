@@ -1,36 +1,65 @@
 #include "menu.h"
 
 int manageMenu(Framework *game, Menu* menu, Network *information, GameState *state, ClientID record[]) {
-    TTF_Init();
-    char* options[] = {"Host Game", "Join Game", "Quit"};
-    Menu menus = {
-        .options = options,
-        .numOptions = 3,
-        .optionWidth = 200,
-        .optionHeight = 50,
-        .optionSpacing = 10,
-        .menuX = 480,
-        .menuY = 477,
-    };
-    int selectedOption = displayMenu(game->renderer, &menus);
-    switch (selectedOption) {
-        case 0:
-            setUpServer(information, record, 2000);
-            *state = ONGOING;
-            break;
-        case 1:
-            // options
-            setUpClient(information, "127.0.0.1", 2000);
-            *state = ONGOING;
-            break;
-        case 2:     
-            game->quit = true;
-            break;
-        default:
-            break;
-    }
+    int selectedOption;
+    if (*state == START){
+        selectedOption = displayMenu(game->renderer, menu);
+        switch (selectedOption) {
+            case 0:
+                playMenuClickSound();
+                setUpServer(information, record, 2000);
+                *state = ONGOING;
+                break;
+            case 1:
+                // options
+                playMenuClickSound();
+                setUpClient(information, "127.0.0.1", 2000);
+                *state = ONGOING;
+                break;
+            case 2:
+                // options
+                playMenuClickSound();
+                *state = SETTINGS;
+                break;
+            case 3:    
+                game->quit = true;
+                break;
+            default:
+                break;
+        }
+    }else if (*state == SETTINGS){
+        selectedOption = displayMenu(game->renderer, menu);
+        switch (selectedOption) {
+            case 0:
+                playMenuClickSound();
+                game->isMuted = !game->isMuted;
+                if (game->isMuted) {
+                    Mix_VolumeMusic(0);
+                } else {
+                    Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+                }
+                break;
+            case 1:
+                playMenuClickSound();
+                *state = START;
+                break;
+            default:
+                break;
+        }
+    }else if (*state == LOBBY){
+            selectedOption = displayMenu(game->renderer, menu);
+            switch (selectedOption) {
+                case 4:
+                    *state = ONGOING;
+                    break;
+                case 5:
+                    *state = START;
+                    printf("Host ended server");
+                    SDLNet_UDP_Close(information->sourcePort);
+                    break;
+            }
+        }
     return selectedOption;
-    TTF_Quit();
 }
 
 int displayMenu(SDL_Renderer* renderer, Menu* menu) 
@@ -57,12 +86,12 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
         }
     }
 
-    SDL_Texture* imageTexture = IMG_LoadTexture(renderer, "resources/FINAL_menu2.png"); 
+    SDL_Texture* imageTexture = IMG_LoadTexture(renderer, menu->img); 
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
-    int menuX = 405;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
-    int menuY = 600;//(SCREEN_HEIGHT - menuHeight) / 2;
+    int menuX = 400;//(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
+    int menuY = 320;//(SCREEN_HEIGHT - menuHeight) / 2;
 
     for (int i = 0; i < menu->numOptions; i++) 
     {
