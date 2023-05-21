@@ -94,6 +94,9 @@ bool manageTimer(Framework *game, Timer *timerData) {
     if(checkIfTimerHasExpired(timerData)){
         return true;
     }
+    else {
+        return false;
+    }
 }
 
 static void calculateRemainingTime(Timer *timerData) {
