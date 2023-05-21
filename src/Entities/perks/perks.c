@@ -7,6 +7,7 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 #define MAX_PLAYERS 5
+#define perk_duration 5
 
 void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
 {
@@ -22,7 +23,7 @@ void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
             {
                 player->speed += SPEED_BOOST_AMOUNT;
                 perk->available = false;
-                perk->duration = 5;
+                perk->duration = perk_duration;
                 start_time[player->player] = time(NULL); // Set start time when the perk is applied
                 active[player->player] = player->player;
             }
