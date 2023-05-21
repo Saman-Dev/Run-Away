@@ -96,10 +96,20 @@ void manageTimer(Framework *game, Timer *timerData) {
 
 static void calculateRemainingTime(Timer *timerData) {
     time_t currentTime = time(NULL);
-    timerData->timeRemaining = (TIMER_MINUTES * 60) - difftime(currentTime, timerData->timeWhenStarting); // Den här funktion är ansvarig för hur många minuter en timer har
-    timerData->minutesRemaining = ((int) timerData->timeRemaining / 60);
-    timerData->secondsRemaining = ((int) timerData->timeRemaining % 60);
+    int timeElapsed = (int)difftime(currentTime, timerData->timeWhenStarting);
+
+    if (timeElapsed >= (TIMER_MINUTES * 60)) {
+        // Timer has expired, set remaining time to 0
+        timerData->timeRemaining = 0;
+    } else {
+        timerData->timeRemaining = (TIMER_MINUTES * 60) - timeElapsed;
+    }
+
+    timerData->minutesRemaining = timerData->timeRemaining / 60;
+    timerData->secondsRemaining = timerData->timeRemaining % 60;
 }
+
+
 
 static void displayTime(Framework *game, Timer *timerData) {
     static Image toDisplay = {0, NULL, {434, 15, 91, 35}};
@@ -173,11 +183,19 @@ void displayWinMessage(Framework *game) {
 
 
 static void checkIfTimerHasExpired(bool *quit, Framework *game, Timer *timerData) {
+    int runners_won = 0;
     if (timerData->timeRemaining == 0) {
-        printf("The time has run out!\n");
+        runners_won = 1;
+        /*printf("The time has run out!\n");
         loadBlackScreen(game);
         displayWinMessage(game);
-        *quit = true;
+        *quit = true;*/
+    }
+    if (runners_won){
+        //printf("game over");
+        loadBlackScreen(game);
+        displayWinMessage(game);
+        //*quit = true;
     }
 }
 

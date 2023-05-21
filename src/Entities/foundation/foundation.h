@@ -35,10 +35,11 @@ typedef struct {
 
 typedef struct {
     time_t timeWhenStarting;
-    double timeRemaining;
+    int timeRemaining;  // Change the type to int
     int minutesRemaining;
     int secondsRemaining;
 } Timer;
+
 
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);
