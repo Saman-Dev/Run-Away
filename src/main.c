@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
                 // Check for perk collision
                 applySpeedBoostPerk(players, &speedBoostPerk);
-
+                checkPerkRespawn(&speedBoostPerk);
 
                 // Game renderer
                 //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);

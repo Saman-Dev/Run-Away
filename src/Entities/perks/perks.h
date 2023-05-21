@@ -21,12 +21,14 @@ typedef struct {
     bool available;
     int duration;
     int activationTime;
+    int respawnTime;
 } SpeedBoostPerk;
 
 SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer);
 void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk);
 void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
+void checkPerkRespawn(SpeedBoostPerk *perk);
 
 
 #endif

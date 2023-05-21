@@ -7,14 +7,11 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 #define MAX_PLAYERS 5
-#define perk_duration 10
 
 void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
 {
-    static time_t start_time[MAX_PLAYERS] = {0};
+    static time_t start_time[MAX_PLAYERS] = {0}; // Declare start_time as static array to retain its value between function calls
     static int active[MAX_PLAYERS] = {-1};
-    static bool respawned = true;
-    static time_t respawn_time = 0;
 
     if (perk->available)
     {
@@ -25,55 +22,34 @@ void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk)
             {
                 player->speed += SPEED_BOOST_AMOUNT;
                 perk->available = false;
-                perk->duration = perk_duration;
-                start_time[player->player] = time(NULL);
+                perk->duration = 5;
+                start_time[player->player] = time(NULL); // Set start time when the perk is applied
                 active[player->player] = player->player;
-                respawned = false;
             }
         }
     }
     else
     {
-        bool activePlayer = false;
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             Player *player = &players[i];
             if (!perk->available && perk->duration > 0 && active[player->player] == player->player)
             {
-                activePlayer = true;
-                time_t current_time = time(NULL);
-                double elapsed_time = difftime(current_time, start_time[player->player]);
+                time_t current_time = time(NULL); // Get the current time
+                double elapsed_time = difftime(current_time, start_time[player->player]); // Calculate elapsed time
 
-                if (elapsed_time >= perk_duration)
+                if (elapsed_time >= perk->duration)
                 {
                     player->speed -= SPEED_BOOST_AMOUNT;
                     perk->duration = 0;
-                    active[player->player] = -1;
-                    respawned = false;
+                    perk->respawnTime = time(NULL) + 10; // Set the respawn time as 10 seconds from now
                 }
                 else
                 {
-                    int remaining_time = (int)(perk_duration - elapsed_time);
+                    int remaining_time = (int)(perk->duration - elapsed_time);
                     printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
                 }
             }
-        }
-
-        if (!respawned && !activePlayer)
-        {
-            time_t current_time = time(NULL);
-            double elapsed_time = difftime(current_time, start_time[0]); // Use the first player's start time for consistency
-            if (elapsed_time >= 15)
-            {
-                perk->available = true;
-                respawned = true;
-                respawn_time = 0;
-                printf("respwan time %d", elapsed_time);
-            }
-        }
-        else if (respawned && respawn_time == 0)
-        {
-            respawn_time = time(NULL);
         }
     }
 }
@@ -86,7 +62,7 @@ void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk)
     }
 }
 
-bool checkCollision(SDL_Rect a, SDL_Rect b)
+bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
 }
@@ -120,7 +96,19 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
     speedBoostPerk.rect.w = PERK_WIDTH;
     speedBoostPerk.rect.h = PERK_HEIGHT;
     speedBoostPerk.available = true;
-    speedBoostPerk.duration = 0;
+    speedBoostPerk.duration = 0;       // Initialize duration to 0
+    speedBoostPerk.respawnTime = 0;    // Initialize respawn time to 0
 
     return speedBoostPerk;
+}
+
+void checkPerkRespawn(SpeedBoostPerk *perk)
+{
+    time_t current_time = time(NULL); // Get the current time
+    
+    if (!perk->available && perk->respawnTime > 0 && current_time >= perk->respawnTime)
+    {
+        perk->available = true;
+        perk->respawnTime = 0; // Reset the respawn time
+    }
 }
