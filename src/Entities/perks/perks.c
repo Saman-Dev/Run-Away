@@ -19,7 +19,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
 
     if (perk->available)
     {
-        for (int i = 0; i < MAX_PLAYERS; i++)
+        for (int i = 0; i < MAX_PLAYERS; i++) // denna for loop har koll på vilken spelare som tog perk
         {
             Player *player = &players[i];
             if (checkCollision(player->position, perk->rect))
@@ -41,7 +41,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
                     }
                     perk->available = false;
                     perk->duration = perk_duration;
-                    start_time[player->player] = time(NULL);
+                    start_time[player->player] = time(NULL); // Set start time when the perk is applied
                     active[player->player] = player->player;
                 }
             }
@@ -63,8 +63,8 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
                     perk->respawnTime = time(NULL) + 10; // Set the respawn time as 10 seconds from now
                     for (int j = 0; j < MAX_PLAYERS; j++){
                         Player *otherPlayer = &players[j];
-                            otherPlayer->frozen = false;
-                            otherPlayer->speed = DEFAULT_SPEED;  // Give back the default speed to other players
+                        otherPlayer->frozen = false;
+                        otherPlayer->speed = DEFAULT_SPEED;  // Give back the default speed to other players
                     }
                 }
                 else
@@ -77,6 +77,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
             }
         }
     }
+    
 
     for (int i = 0; i < MAX_PLAYERS; i++)
     {
