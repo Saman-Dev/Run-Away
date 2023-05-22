@@ -118,7 +118,7 @@ void checkPerkRespawn(SpeedBoostPerk *perk)
 FreezePerk initializeFreezePerk(SDL_Renderer *renderer)
 {
     FreezePerk freezePerk;
-    SDL_Texture *perkTexture = IMG_LoadTexture(renderer, "resources/newperk.png");
+    SDL_Texture *perkTexture = IMG_LoadTexture(renderer, "resources/newperk2.png");
     if (perkTexture == NULL)
     {
         printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
