@@ -115,7 +115,7 @@ static void calculateRemainingTime(Timer *timerData) {
 }
 
 static void displayTime(Framework *game, Timer *timerData) {
-    static Image toDisplay = {0, NULL, {434, 15, 91, 35}};
+    static Image toDisplay = {0, NULL, {790, 15, 91, 35}};
     static SDL_Color color = {255, 255, 255};
     static int lastSeenTimeRemainingValue = 0;
     char numbersToPrint[8];
@@ -143,7 +143,7 @@ static void displayTime(Framework *game, Timer *timerData) {
         SDL_FreeSurface(surface);
     }
 
-    drawRectangle(game->renderer, 428, 10, 100, 50);
+    drawRectangle(game->renderer, 783, 10, 100, 50);
     SDL_RenderCopy(game->renderer, toDisplay.texture, NULL, &toDisplay.rectangle);
     if (timerData->timeRemaining == 0) {
         SDL_DestroyTexture(toDisplay.texture);
