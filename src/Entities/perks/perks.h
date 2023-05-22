@@ -6,14 +6,20 @@
 #include <time.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "../player/player.h"
 
+#define MAX_PLAYERS 5
+#define perk_duration 5
+#define DEFAULT_SPEED 2
 #define PERK_WIDTH 32
 #define PERK_HEIGHT 32
-#define PERK_DURATION 5
 #define SPEED_BOOST_AMOUNT 1
-#define SPEED_BOOST_DURATION 0
+
 
 typedef struct {
     SDL_Texture* texture;

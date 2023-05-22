@@ -1,14 +1,6 @@
 #include "perks.h"
-#include <time.h>
-#include <stdbool.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
-#include <SDL2/SDL_ttf.h>
-#define MAX_PLAYERS 5
-#define perk_duration 5
-#define DEFAULT_SPEED 2
+
+
 
 void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
 {
