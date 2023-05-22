@@ -8,7 +8,7 @@ void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
 
 static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[]) {
     for (int i = 0; players[i].player != 0; i++) {
-        if (players[i].speed == 0) {
+        if ( players[i].captured) {
             if (!cage->active) {
                 cage->texture = IMG_LoadTexture(renderer,"resources/cage.png");
                 cage->active = true;
@@ -50,9 +50,9 @@ static void checkCapturedStatus(Player players[]) {
             else if (checkCollision(players[0].position, players[2].position)) {
                 if (players[0].captured == true || players[2].captured == true) {
                     playCageUnlockSound();
-                    players[0].speed = 2;
+                    players[0].speed = Default_Speed;
                     players[0].captured = false;
-                    players[2].speed = 2;
+                    players[2].speed = Default_Speed;
                     players[2].captured = false;
                 }
             }

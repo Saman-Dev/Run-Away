@@ -29,7 +29,8 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr);
 void renderPerk(SDL_Renderer *renderer, Perk *perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void checkPerkRespawn(Perk *perk);
-void applyPerk(Player players[], Perk *perk);
+void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer );
+
 
 #endif
 
