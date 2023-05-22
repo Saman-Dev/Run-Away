@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
 
-    SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
-    FreezePerk freezPerk = initializeFreezePerk(game.renderer);
+    Perk speedBoostPerk = initializePerk(game.renderer, 1);
+    Perk freezPerk = initializePerk(game.renderer, 2);
 
     players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 300, 300);
     players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 242, 280);
@@ -63,11 +63,10 @@ int main(int argc, char **argv) {
                 handlePlayerMovement(&players[2]);
 
                 // Check for perk collision
-                applyFreezePerk(players, &freezPerk);
-                applySpeedBoostPerk(players, &speedBoostPerk);
+                applyPerk(players, &freezPerk);
+                applyPerk(players, &speedBoostPerk);
                 checkPerkRespawn(&speedBoostPerk);
-                checkFreezPerkRespawn(&freezPerk);
-
+                checkPerkRespawn(&freezPerk);
                 // Game renderer
                 //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                 //SDL_RenderClear(game.renderer);
@@ -77,8 +76,8 @@ int main(int argc, char **argv) {
                 renderPlayers(game, players);
 
                 // Perk render
-                renderSpeedBoostPerk(game.renderer, &speedBoostPerk);
-                renderFreezPerk(game.renderer, &freezPerk);
+                renderPerk(game.renderer, &speedBoostPerk);
+                renderPerk(game.renderer, &freezPerk);
                 HuntAndRevive(game.renderer, players);
 
                 if(manageTimer(&game, &timerData)){
@@ -162,6 +161,7 @@ int main(int argc, char **argv) {
 
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
+    SDL_DestroyTexture(freezPerk.texture);
     SDL_DestroyWindow(game.window);
     TTF_CloseFont(game.font);
     Mix_CloseAudio();

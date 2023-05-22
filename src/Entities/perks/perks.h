@@ -20,29 +20,16 @@ typedef struct {
     SDL_Rect rect;
     bool available;
     int duration;
-    int activationTime;
-    int respawnTime;
-} SpeedBoostPerk;
-
-typedef struct {
-    SDL_Texture *texture;
-    SDL_Rect rect;
-    bool available;
-    int duration;
     time_t respawnTime;
-} FreezePerk;
+    int perkID;
+} Perk;
 
 
-SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer);
-void applySpeedBoostPerk(Player players[], SpeedBoostPerk *perk);
-void renderSpeedBoostPerk(SDL_Renderer *renderer, SpeedBoostPerk *perk);
+Perk initializePerk(SDL_Renderer *renderer, int perkNr);
+void renderPerk(SDL_Renderer *renderer, Perk *perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
-void checkPerkRespawn(SpeedBoostPerk *perk);
-FreezePerk initializeFreezePerk(SDL_Renderer *renderer);
-void applyFreezePerk(Player players[], FreezePerk *perk);
-void checkFreezPerkRespawn(FreezePerk *perk);
-void renderFreezPerk(SDL_Renderer *renderer, FreezePerk *perk);
-
+void checkPerkRespawn(Perk *perk);
+void applyPerk(Player players[], Perk *perk);
 
 #endif
 
