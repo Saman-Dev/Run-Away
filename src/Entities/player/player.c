@@ -31,13 +31,14 @@ Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber
     playerX.position.h = PLAYER_FRAME_HEIGHT;
 
     playerX.frame = 6;
-    playerX.speed = 2;
+    playerX.speed = Default_Speed;
     //playerX.speedBoostStartTime = 0;
     //playerX.baseSpeed = 2;
     //playerX.boostedSpeed = 4;
 
     playerX.player = playerNumber;
     playerX.captured = false;
+    playerX.frozen = false; 
 
     return playerX;
 }

@@ -10,7 +10,7 @@
 #define perk_duration 5
 #define DEFAULT_SPEED 2
 
-void applyPerk(Player players[], Perk *perk)
+void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer )
 {
     static time_t start_time[MAX_PLAYERS] = {0}; // Declare start_time as static array to retain its value between function calls
     static int active[MAX_PLAYERS] = {-1};
@@ -35,6 +35,14 @@ void applyPerk(Player players[], Perk *perk)
                         {
                             otherPlayer->frozen = true;
                             otherPlayer->speed = 0;
+                            SDL_Texture *frozenTexture = IMG_LoadTexture(renderer, "resources/cristal1.png");
+                            if (frozenTexture == NULL)
+                            {
+                                printf("Failed to load frozen texture: %s\n", IMG_GetError());
+                                exit(1);
+                            }
+                            SDL_RenderCopy(renderer, frozenTexture, NULL, &player->position);
+                            SDL_DestroyTexture(frozenTexture);
                         }
                     }
                     perk->available = false;

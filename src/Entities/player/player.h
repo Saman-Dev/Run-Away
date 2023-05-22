@@ -12,6 +12,7 @@
 
 #define PLAYER_FRAME_WIDTH 32
 #define PLAYER_FRAME_HEIGHT 32
+#define  Default_Speed 2
 
 typedef struct {
     int player;
