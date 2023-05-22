@@ -37,9 +37,9 @@ int main(int argc, char **argv) {
     SpeedBoostPerk speedBoostPerk = initializeSpeedBoostPerk(game.renderer);
     FreezePerk freezPerk = initializeFreezePerk(game.renderer);
 
-    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 200, 200);
-    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 142, 280);
-    players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 200, 400);
+    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 300, 300);
+    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 242, 280);
+    players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 300, 400);
 
     int selectedOption;
 
@@ -102,10 +102,10 @@ int main(int argc, char **argv) {
                 printf("GAME_OVER\n");
                 menu.options = gameOverOptions;
                 menu.numOptions = 2;
-                menu.optionSpacing = 30;
-                menu.menuX = 381;
+                menu.optionSpacing = 67;
+                menu.menuX = 713,
                 menu.menuY = 600;
-                strcpy(menu.img, "resources/gameOverHuntersLose.png");
+                strcpy(menu.img, "resources/game_over_hunters_lose_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
                 break;
@@ -114,9 +114,9 @@ int main(int argc, char **argv) {
 
                 menu.options = menuOptions;
                 menu.numOptions = 4;
-                menu.optionSpacing = 30;
-                menu.menuX = 400,
-                menu.menuY = 400;
+                menu.optionSpacing = 60;
+                menu.menuX = 730,
+                menu.menuY = 425;
                 strcpy(menu.img, "resources/start_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
                 menu.numOptions = 6;
                 menu.optionSpacing = 55;
                 menu.menuX = 400,
-                menu.menuY = 400;
+                menu.menuY = 425;
                 strcpy(menu.img, "resources/lobby_menu.png");
 
                 selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
@@ -148,9 +148,9 @@ int main(int argc, char **argv) {
 
                 menu.options = settingsOptions;
                 menu.numOptions = 2;
-                menu.optionSpacing = 60;
-                menu.menuX = 381;
-                menu.menuY = 400;
+                menu.optionSpacing = 240;
+                menu.menuX = 710,
+                menu.menuY = 425;
                 strcpy(menu.img, "resources/settings_menu.png");
                     
                 selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);

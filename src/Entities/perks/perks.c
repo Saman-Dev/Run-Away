@@ -86,12 +86,12 @@ SpeedBoostPerk initializeSpeedBoostPerk(SDL_Renderer *renderer)
 
     if (randomLocation == 1)
     {
-        speedBoostPerk.rect.x = 435;
-        speedBoostPerk.rect.y = 350;
+        speedBoostPerk.rect.x = 500;
+        speedBoostPerk.rect.y = 740;
     }
     else
     {
-        speedBoostPerk.rect.x = 750;
+        speedBoostPerk.rect.x = 860;
         speedBoostPerk.rect.y = 750;
     }
 

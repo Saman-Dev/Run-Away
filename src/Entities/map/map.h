@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define MAP_ROWS 30
+#define MAP_ROWS 50
 #define MAP_COLUMNS 30
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 32

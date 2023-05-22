@@ -85,8 +85,8 @@ int displayMenu(SDL_Renderer* renderer, Menu* menu)
     SDL_Surface* optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
 
-    SDL_Color textColor = {000, 000, 000};
-    TTF_SetFontStyle(font, TTF_STYLE_BOLD);
+    SDL_Color textColor = {255, 255, 255};
+    TTF_SetFontStyle(font, TTF_STYLE_NORMAL);
     int maxOptionWidth = 0;
     int totalOptionHeight = 0;
     
