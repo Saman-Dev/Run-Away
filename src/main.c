@@ -64,6 +64,9 @@ int main(int argc, char **argv) {
                 //SDL_RenderClear(game.renderer);
                 renderBackground(game.renderer, resources);
 
+                // Render players
+                renderPlayers(game, players);
+
                 // Check for perk collision
                 applyPerk(players, &freezPerk, game.renderer );
                 applyPerk(players, &speedBoostPerk, game.renderer);
@@ -71,10 +74,6 @@ int main(int argc, char **argv) {
                 checkPerkRespawn(&freezPerk);
                 // Game renderer
                 //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-                
-
-                // Render players
-                renderPlayers(game, players);
 
                 // Perk render
                 renderPerk(game.renderer, &speedBoostPerk);
