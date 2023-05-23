@@ -1,24 +1,20 @@
 #include "perks.h"
 
 void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
-    static time_t start_time[MAX_PLAYERS] = { 0 }; // Declare start_time as static array to retain its value between function calls
-    static int active[MAX_PLAYERS] = { -1 };
-
     SDL_Texture *frozenTexture = IMG_LoadTexture(renderer, "resources/cristal1.png");
 
     if (perk->available) {
-        for (int i = 0; i < MAX_PLAYERS; i++) // denna for loop har koll på vilken spelare som tog perk
-        {
+        for (int i = 0; i < MAX_PLAYERS; i++) {
             Player *player = &players[i];
             if (checkCollision(player->position, perk->rect)) {
                 if (perk->perkID == 1) {
                     player->speed += SPEED_BOOST_AMOUNT;
                     perk->available = false;
                     perk->duration = perk_duration;
-                    start_time[player->player] = time(NULL); // Set start time when the perk is applied
-                    active[player->player] = player->player;
+                    player->hasPerk = true;
+                    player->perkStartTime = time(NULL);
                 }
-                else if (perk->perkID = 2) {
+                else if (perk->perkID == 2) {
                     for (int j = 0; j < MAX_PLAYERS; j++) {
                         Player *otherPlayer = &players[j];
                         if (i != j) {
@@ -28,8 +24,8 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                     }
                     perk->available = false;
                     perk->duration = perk_duration;
-                    start_time[player->player] = time(NULL); // Set start time when the perk is applied
-                    active[player->player] = player->player;
+                    player->hasPerk = true;
+                    player->perkStartTime = time(NULL);
                 }
             }
         }
@@ -37,24 +33,26 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
     else {
         for (int i = 0; i < MAX_PLAYERS; i++) {
             Player *player = &players[i];
-            if (!perk->available && perk->duration > 0 && active[player->player] == player->player) {
-                time_t current_time = time(NULL);                                         // Get the current time
-                double elapsed_time = difftime(current_time, start_time[player->player]); // Calculate elapsed time
+            if (!perk->available && perk->duration > 0 && player->hasPerk) {
+                time_t current_time = time(NULL);
+                double elapsed_time = difftime(current_time, player->perkStartTime);
 
                 if (elapsed_time >= perk->duration) {
                     perk->duration = 0;
-                    perk->respawnTime = time(NULL) + 10; // Set the respawn time as 10 seconds from now
+                    perk->respawnTime = time(NULL) + 10;
                     for (int j = 0; j < MAX_PLAYERS; j++) {
                         Player *otherPlayer = &players[j];
                         otherPlayer->frozen = false;
-                        otherPlayer->speed = DEFAULT_SPEED; // Give back the default speed to other players
+                        otherPlayer->speed = DEFAULT_SPEED;
                     }
+                    player->hasPerk = false;
                 }
                 else {
                     int remaining_time = (int)(perk->duration - elapsed_time);
                     printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
                     SDL_DestroyTexture(frozenTexture);
                 }
+
             }
         }
     }
@@ -70,6 +68,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
         }
     }
 }
+
 
 void renderPerk(SDL_Renderer *renderer, Perk *perk) {
     if (perk->available) {

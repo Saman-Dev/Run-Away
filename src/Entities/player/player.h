@@ -27,6 +27,8 @@ typedef struct {
     bool down;
     bool left;
     bool right;
+    bool hasPerk;
+    time_t perkStartTime;
     // int baseSpeed;
     // int boostedSpeed;
     // Uint32 speedBoostStartTime;
