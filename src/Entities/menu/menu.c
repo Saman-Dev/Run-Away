@@ -84,9 +84,10 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
 }
 
 int displayMenu(Framework *game, Menu *menu) {
+    SDL_Texture *imageTexture = IMG_LoadTexture(game->renderer, menu->imageFilePath);
     SDL_Surface *optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
-    
+
     int maxOptionWidth = 0;
     int totalOptionHeight = 0;
 
@@ -101,8 +102,6 @@ int displayMenu(Framework *game, Menu *menu) {
             maxOptionWidth = optionRects[i].w;
         }
     }
-
-    SDL_Texture *imageTexture = IMG_LoadTexture(game->renderer, menu->img);
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
@@ -137,9 +136,6 @@ int displayMenu(Framework *game, Menu *menu) {
             }
         }
 
-        SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-        SDL_RenderClear(game->renderer);
-
         SDL_RenderCopy(game->renderer, imageTexture, NULL, NULL);
 
         for (int i = 0; i < menu->numOptions; i++) {
@@ -154,6 +150,8 @@ int displayMenu(Framework *game, Menu *menu) {
     for (int i = 0; i < menu->numOptions; i++) {
         SDL_FreeSurface(optionSurfaces[i]);
     }
+
+    SDL_DestroyTexture(imageTexture);
 
     return selectedOption;
 }

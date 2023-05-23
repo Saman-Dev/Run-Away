@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
             menu.optionSpacing = 67;
             menu.menuX = 713,
                 menu.menuY = 600;
-            strcpy(menu.img, "resources/game_over_hunters_lose_menu.png");
+            strcpy(menu.imageFilePath, "resources/game_over_hunters_lose_menu.png");
 
             selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
             break;
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
             menu.optionSpacing = 60;
             menu.menuX = 730,
                 menu.menuY = 425;
-            strcpy(menu.img, "resources/start_menu.png");
+            strcpy(menu.imageFilePath, "resources/start_menu.png");
 
             selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
             if (selectedOption == 0) {
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
             menu.optionSpacing = 55;
             menu.menuX = 400,
                 menu.menuY = 425;
-            strcpy(menu.img, "resources/lobby_menu.png");
+            strcpy(menu.imageFilePath, "resources/lobby_menu.png");
 
             selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
             break;
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
             menu.optionSpacing = 240;
             menu.menuX = 710,
                 menu.menuY = 425;
-            strcpy(menu.img, "resources/settings_menu.png");
+            strcpy(menu.imageFilePath, "resources/settings_menu.png");
 
             selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
             break;
