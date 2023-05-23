@@ -6,17 +6,14 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
-            playMenuClickSound();
             setUpServer(information, record, 2000);
             *state = ONGOING;
             break;
         case 1:
-            playMenuClickSound();
             setUpClient(information, "127.0.0.1", 2000);
             *state = ONGOING;
             break;
         case 2:
-            playMenuClickSound();
             *state = SETTINGS;
             break;
         case 3:
@@ -30,7 +27,6 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
-            playMenuClickSound();
             game->isMuted = !game->isMuted;
             if (game->isMuted) {
                 Mix_VolumeMusic(0);
@@ -40,7 +36,6 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
             }
             break;
         case 1:
-            playMenuClickSound();
             *state = START;
             break;
         default:
@@ -51,11 +46,9 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 4:
-            playMenuClickSound();
             *state = ONGOING;
             break;
         case 5:
-            playMenuClickSound();
             *state = START;
             printf("Disconnected");
             SDLNet_UDP_Close(information->sourcePort);
@@ -67,13 +60,11 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
-            playMenuClickSound();
             *state = START;
             SDLNet_UDP_Close(information->sourcePort);
             SDLNet_TCP_Close(TCPInformation->socket);
             break;
         case 1:
-            playMenuClickSound();
             game->quit = true;
             break;
         default:
@@ -126,6 +117,7 @@ int displayOptions(Framework *game, Menu *menu) {
                     SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
                     for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
                         if (SDL_PointInRect(&mousePosition, &textBoxRectangle[i])) {
+                            playMenuClickSound();
                             selectedOption = i;
                         }
                     }
