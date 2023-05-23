@@ -9,9 +9,10 @@
 #include "../foundation/foundation.h"
 #include "../network/network.h"
 
+#define MAX_NUMBER_OF_TEXT_BOXES 6
+
 typedef struct {
     char **options;
-    int numOptions;
     int optionWidth;
     int optionHeight;
     int optionSpacing;
@@ -21,6 +22,6 @@ typedef struct {
 } Menu;
 
 int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]);
-int displayMenu(Framework *game, Menu *menu);
+int displayOptions(Framework *game, Menu *menu);
 
 #endif

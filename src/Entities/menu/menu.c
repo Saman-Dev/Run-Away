@@ -3,7 +3,7 @@
 int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]) {
     int selectedOption;
     if (*state == START) {
-        selectedOption = displayMenu(game, menu);
+        selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -27,7 +27,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == SETTINGS) {
-        selectedOption = displayMenu(game, menu);
+        selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -48,7 +48,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == LOBBY) {
-        selectedOption = displayMenu(game, menu);
+        selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 4:
             playMenuClickSound();
@@ -64,7 +64,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == GAME_OVER) {
-        selectedOption = displayMenu(game, menu);
+        selectedOption = displayOptions(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -83,75 +83,69 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
     return selectedOption;
 }
 
-int displayMenu(Framework *game, Menu *menu) {
-    SDL_Texture *imageTexture = IMG_LoadTexture(game->renderer, menu->imageFilePath);
-    SDL_Surface *optionSurfaces[menu->numOptions];
-    SDL_Rect optionRects[menu->numOptions];
+int displayOptions(Framework *game, Menu *menu) {
+    int largestTextBoxWidth = 0;
+    int totalTextBoxHeight = 0;
+    SDL_Surface *textBoxSurface[MAX_NUMBER_OF_TEXT_BOXES+1];
+    SDL_Rect textBoxRectangle[MAX_NUMBER_OF_TEXT_BOXES+1];
+    SDL_Texture *textBoxTexture[MAX_NUMBER_OF_TEXT_BOXES+1];
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(game->renderer, menu->imageFilePath);
+    SDL_Point mousePosition;
 
-    int maxOptionWidth = 0;
-    int totalOptionHeight = 0;
-
-    for (int i = 0; i < menu->numOptions; i++) {
-        optionSurfaces[i] = TTF_RenderText_Solid(game->font, menu->options[i], game->white);
-        optionRects[i].x = 0;
-        optionRects[i].y = totalOptionHeight;
-        optionRects[i].w = optionSurfaces[i]->w;
-        optionRects[i].h = optionSurfaces[i]->h;
-        totalOptionHeight += optionRects[i].h + menu->optionSpacing;
-        if (optionRects[i].w > maxOptionWidth) {
-            maxOptionWidth = optionRects[i].w;
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxSurface[i] = TTF_RenderText_Solid(game->font, menu->options[i], game->white);
+        textBoxRectangle[i].y = totalTextBoxHeight;
+        textBoxRectangle[i].w = textBoxSurface[i]->w;
+        textBoxRectangle[i].h = textBoxSurface[i]->h;
+        totalTextBoxHeight += textBoxRectangle[i].h + menu->optionSpacing;
+        if (textBoxRectangle[i].w > largestTextBoxWidth) {
+            largestTextBoxWidth = textBoxRectangle[i].w;
         }
     }
-
-    int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
-    int menuHeight = totalOptionHeight - menu->optionSpacing;
-    int menuX = menu->menuX; //(SCREEN_WIDTH - menuWidth) / 2 + 200; // Adjust center position to the side
-    int menuY = menu->menuY; //(SCREEN_HEIGHT - menuHeight) / 2;
-
-    for (int i = 0; i < menu->numOptions; i++) {
-        optionRects[i].x = menuX + (maxOptionWidth - optionRects[i].w) / 2;
-        optionRects[i].y = menuY + optionRects[i].y;
+    
+    int menuX = (SCREEN_WIDTH / 2) - (largestTextBoxWidth / 2);
+    int menuY = (SCREEN_HEIGHT / 2) - 52;
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxRectangle[i].x = menuX + (largestTextBoxWidth - textBoxRectangle[i].w) / 2;
+        textBoxRectangle[i].y = menuY + textBoxRectangle[i].y;
     }
 
-    int mouseX = 0, mouseY = 0;
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxTexture[i] = SDL_CreateTextureFromSurface(game->renderer, textBoxSurface[i]);
+        SDL_FreeSurface(textBoxSurface[i]);
+    }
+
     int selectedOption = -1;
-    SDL_Event event;
-
     while (selectedOption == -1) {
-        while (SDL_PollEvent(&event)) {
-
-            switch (event.type) {
-            case SDL_QUIT:
-                selectedOption = menu->numOptions - 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-
-                SDL_GetMouseState(&mouseX, &mouseY);
-                for (int i = 0; i < menu->numOptions; i++) {
-                    if (SDL_PointInRect(&(SDL_Point) { mouseX, mouseY }, &optionRects[i])) {
-                        selectedOption = i;
+        while (SDL_PollEvent(&game->event)) {
+            switch (game->event.type) {
+                case SDL_QUIT:
+                    selectedOption = 1; // FIX!
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+                    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+                        if (SDL_PointInRect(&mousePosition, &textBoxRectangle[i])) {
+                            selectedOption = i;
+                        }
                     }
-                }
-                break;
+                    break;
+                default:
+                    break;
             }
         }
 
-        SDL_RenderCopy(game->renderer, imageTexture, NULL, NULL);
-
-        for (int i = 0; i < menu->numOptions; i++) {
-            SDL_Texture *optionTexture = SDL_CreateTextureFromSurface(game->renderer, optionSurfaces[i]);
-            SDL_RenderCopy(game->renderer, optionTexture, NULL, &optionRects[i]);
-            SDL_DestroyTexture(optionTexture);
+        SDL_RenderCopy(game->renderer, backgroundTexture, NULL, NULL);
+        for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+            SDL_RenderCopy(game->renderer, textBoxTexture[i], NULL, &textBoxRectangle[i]);
         }
-
         SDL_RenderPresent(game->renderer);
     }
 
-    for (int i = 0; i < menu->numOptions; i++) {
-        SDL_FreeSurface(optionSurfaces[i]);
+    SDL_DestroyTexture(backgroundTexture);
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        SDL_DestroyTexture(textBoxTexture[i]);
     }
-
-    SDL_DestroyTexture(imageTexture);
 
     return selectedOption;
 }

@@ -45,10 +45,10 @@ int main(int argc, char **argv) {
 
     state = START;
 
-    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit" };
-    char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back" };
-    char *settingsOptions[] = { "Mute Game", "Back to Menu" };
-    char *gameOverOptions[] = { "Back to Menu", "Quit" };
+    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
+    char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back", "\0"};
+    char *settingsOptions[] = { "Mute Game", "Back to Menu", "\0"};
+    char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};
 
     Menu menu;
 
@@ -97,7 +97,6 @@ int main(int argc, char **argv) {
         case GAME_OVER:
             printf("GAME_OVER\n");
             menu.options = gameOverOptions;
-            menu.numOptions = 2;
             menu.optionSpacing = 67;
             menu.menuX = 713,
                 menu.menuY = 600;
@@ -109,7 +108,6 @@ int main(int argc, char **argv) {
             printf("START\n");
 
             menu.options = menuOptions;
-            menu.numOptions = 4;
             menu.optionSpacing = 60;
             menu.menuX = 730,
                 menu.menuY = 425;
@@ -131,7 +129,6 @@ int main(int argc, char **argv) {
             printf("LOBBY\n");
 
             menu.options = lobbyOptions;
-            menu.numOptions = 6;
             menu.optionSpacing = 55;
             menu.menuX = 400,
                 menu.menuY = 425;
@@ -143,7 +140,6 @@ int main(int argc, char **argv) {
             printf("SETTINGS\n");
 
             menu.options = settingsOptions;
-            menu.numOptions = 2;
             menu.optionSpacing = 240;
             menu.menuX = 710,
                 menu.menuY = 425;
