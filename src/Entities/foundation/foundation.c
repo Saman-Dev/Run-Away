@@ -39,7 +39,6 @@ void initialize(Framework *game) {
         printf("%s\n", SDL_GetError());
         exit(1);
     }
-    TTF_SetFontStyle(game->font, TTF_STYLE_BOLD);
 
     game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (game->window == NULL) {
@@ -52,6 +51,12 @@ void initialize(Framework *game) {
         printf("%s\n", SDL_GetError());
         exit(1);
     }
+
+    TTF_SetFontStyle(game->font, TTF_STYLE_BOLD);
+    game->white.r = 255;
+    game->white.g = 255;
+    game->white.b = 255;
+    game->white.a = 0;
 }
 
 void manageFrameRate(int timeAtLoopBeginning) {
@@ -91,7 +96,6 @@ static void calculateRemainingTime(Timer *timerData) {
 
 static void displayTime(Framework *game, Timer *timerData) {
     static Image toDisplay = { 0, NULL, {790, 15, 91, 35} };
-    static SDL_Color color = { 255, 255, 255 };
     static int lastSeenTimeRemainingValue = 0;
     char numbersToPrint[8];
     SDL_Surface *surface;
@@ -101,7 +105,7 @@ static void displayTime(Framework *game, Timer *timerData) {
 
         snprintf(numbersToPrint, sizeof(numbersToPrint), "%02d:%02d", timerData->minutesRemaining, timerData->secondsRemaining);
 
-        surface = TTF_RenderText_Solid(game->font, numbersToPrint, color);
+        surface = TTF_RenderText_Solid(game->font, numbersToPrint, game->white);
         if (surface == NULL) {
             printf("TTF_RenderText_Solid error: %s\n", TTF_GetError());
         }

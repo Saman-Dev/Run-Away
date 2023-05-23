@@ -86,13 +86,12 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
 int displayMenu(Framework *game, Menu *menu) {
     SDL_Surface *optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
-
-    SDL_Color textColor = { 255, 255, 255 };
+    
     int maxOptionWidth = 0;
     int totalOptionHeight = 0;
 
     for (int i = 0; i < menu->numOptions; i++) {
-        optionSurfaces[i] = TTF_RenderText_Solid(game->font, menu->options[i], textColor);
+        optionSurfaces[i] = TTF_RenderText_Solid(game->font, menu->options[i], game->white);
         optionRects[i].x = 0;
         optionRects[i].y = totalOptionHeight;
         optionRects[i].w = optionSurfaces[i]->w;

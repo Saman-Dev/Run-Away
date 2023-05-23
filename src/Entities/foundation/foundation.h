@@ -26,6 +26,7 @@ typedef struct {
     SDL_Renderer *renderer;
     TTF_Font *font;
     TTF_Font *winFont;
+    SDL_Color white;
     SDL_Event event;
     bool isMuted;
     bool quit;
