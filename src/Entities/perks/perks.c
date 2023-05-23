@@ -50,7 +50,6 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                 else {
                     int remaining_time = (int)(perk->duration - elapsed_time);
                     printf("Player %d - Time remaining: %d seconds\n", player->player, remaining_time);
-                    SDL_DestroyTexture(frozenTexture);
                 }
 
             }
@@ -67,8 +66,9 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
             SDL_RenderCopy(renderer, frozenTexture, NULL, &player->position);
         }
     }
-}
 
+    SDL_DestroyTexture(frozenTexture);
+}
 
 void renderPerk(SDL_Renderer *renderer, Perk *perk) {
     if (perk->available) {
