@@ -6,6 +6,14 @@
         "sdl_mixer.h": "c",
         "stdbool.h": "c",
         "stdlib.h": "c",
-        "player.h": "c"
+        "player.h": "c",
+        "audio.h": "c",
+        "network.h": "c",
+        "sdl_net.h": "c",
+        "map.h": "c",
+        "sdl_image.h": "c",
+        "menu.h": "c",
+        "foundation.h": "c",
+        "mechanics.h": "c"
     }
 }
