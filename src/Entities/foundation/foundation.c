@@ -1,26 +1,12 @@
 #include "foundation.h"
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
-#include <SDL2/SDL_ttf.h>
-
 void initialize(Framework *game) {
-    // Initialize SDL, timer and Mixer Library
-    SDL_Init(SDL_INIT_VIDEO);
-    initializeAudio();
-    srand(time(NULL));
-    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {
         printf("Failed to initialize SDL: %s\n", SDL_GetError());
         exit(1);
     }
+    initializeAudio();
+    srand(time(NULL));
 
     // Initialize SDL_image, SDL_mixer, SDL_net, SDL_ttf libraries
     if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG) {
@@ -34,22 +20,6 @@ void initialize(Framework *game) {
     }
 
     if (SDLNet_Init() == -1) {
-        printf("Failed to initialize SDL_net: %s\n", SDLNet_GetError());
-        exit(1);
-    }
-
-    if (TTF_Init() == -1) {
-        printf("Failed to initialize SDL_ttf: %s\n", TTF_GetError());
-        exit(1);
-    }
-
-    game->winFont = TTF_OpenFont("resources/font.ttf", 48);
-    if (game->winFont == NULL) {
-        printf("%s\n", SDL_GetError());
-        exit(1);
-    }
-
-    if (SDLNet_Init() == -1) {
         printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(1);
     }
@@ -58,11 +28,18 @@ void initialize(Framework *game) {
         printf("TTF_Init error: %s\n", TTF_GetError());
     }
 
+    game->winFont = TTF_OpenFont("resources/font.ttf", 48);
+    if (game->winFont == NULL) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
+    }
+
     game->font = TTF_OpenFont("resources/font.ttf", 24);
     if (game->font == NULL) {
         printf("%s\n", SDL_GetError());
         exit(1);
     }
+    TTF_SetFontStyle(game->font, TTF_STYLE_BOLD);
 
     game->window = SDL_CreateWindow("RUN AWAY", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (game->window == NULL) {
@@ -132,10 +109,6 @@ static void displayTime(Framework *game, Timer *timerData) {
         toDisplay.texture = SDL_CreateTextureFromSurface(game->renderer, surface);
         if (toDisplay.texture == NULL) {
             printf("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
-        }
-
-        if (timerData->timeRemaining == 0) {
-            SDL_DestroyTexture(toDisplay.texture);
         }
 
         SDL_FreeSurface(surface);

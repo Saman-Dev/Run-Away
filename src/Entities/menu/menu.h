@@ -21,6 +21,6 @@ typedef struct {
 } Menu;
 
 int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]);
-int displayMenu(SDL_Renderer *renderer, Menu *menu);
+int displayMenu(Framework *game, Menu *menu);
 
 #endif

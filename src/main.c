@@ -61,7 +61,6 @@ int main(int argc, char **argv) {
             handlePlayerMovement(&players[0]);
             handlePlayerMovement(&players[1]);
             handlePlayerMovement(&players[2]);
-            // SDL_RenderClear(game.renderer);
             renderBackground(game.renderer, resources);
 
             // Render players
@@ -72,8 +71,6 @@ int main(int argc, char **argv) {
             applyPerk(players, &speedBoostPerk, game.renderer);
             checkPerkRespawn(&speedBoostPerk);
             checkPerkRespawn(&freezPerk);
-            // Game renderer
-            // SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
             // Perk render
             renderPerk(game.renderer, &speedBoostPerk);

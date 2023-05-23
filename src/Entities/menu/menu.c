@@ -3,7 +3,7 @@
 int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]) {
     int selectedOption;
     if (*state == START) {
-        selectedOption = displayMenu(game->renderer, menu);
+        selectedOption = displayMenu(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -27,7 +27,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == SETTINGS) {
-        selectedOption = displayMenu(game->renderer, menu);
+        selectedOption = displayMenu(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -48,7 +48,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == LOBBY) {
-        selectedOption = displayMenu(game->renderer, menu);
+        selectedOption = displayMenu(game, menu);
         switch (selectedOption) {
         case 4:
             playMenuClickSound();
@@ -64,7 +64,7 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == GAME_OVER) {
-        selectedOption = displayMenu(game->renderer, menu);
+        selectedOption = displayMenu(game, menu);
         switch (selectedOption) {
         case 0:
             playMenuClickSound();
@@ -83,18 +83,16 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
     return selectedOption;
 }
 
-int displayMenu(SDL_Renderer *renderer, Menu *menu) {
-    TTF_Font *font = TTF_OpenFont("resources/font.ttf", 24);
+int displayMenu(Framework *game, Menu *menu) {
     SDL_Surface *optionSurfaces[menu->numOptions];
     SDL_Rect optionRects[menu->numOptions];
 
     SDL_Color textColor = { 255, 255, 255 };
-    TTF_SetFontStyle(font, TTF_STYLE_NORMAL);
     int maxOptionWidth = 0;
     int totalOptionHeight = 0;
 
     for (int i = 0; i < menu->numOptions; i++) {
-        optionSurfaces[i] = TTF_RenderText_Solid(font, menu->options[i], textColor);
+        optionSurfaces[i] = TTF_RenderText_Solid(game->font, menu->options[i], textColor);
         optionRects[i].x = 0;
         optionRects[i].y = totalOptionHeight;
         optionRects[i].w = optionSurfaces[i]->w;
@@ -105,7 +103,7 @@ int displayMenu(SDL_Renderer *renderer, Menu *menu) {
         }
     }
 
-    SDL_Texture *imageTexture = IMG_LoadTexture(renderer, menu->img);
+    SDL_Texture *imageTexture = IMG_LoadTexture(game->renderer, menu->img);
 
     int menuWidth = maxOptionWidth + menu->optionSpacing * 2;
     int menuHeight = totalOptionHeight - menu->optionSpacing;
@@ -140,25 +138,23 @@ int displayMenu(SDL_Renderer *renderer, Menu *menu) {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
+        SDL_RenderClear(game->renderer);
 
-        SDL_RenderCopy(renderer, imageTexture, NULL, NULL);
+        SDL_RenderCopy(game->renderer, imageTexture, NULL, NULL);
 
         for (int i = 0; i < menu->numOptions; i++) {
-            SDL_Texture *optionTexture = SDL_CreateTextureFromSurface(renderer, optionSurfaces[i]);
-            SDL_RenderCopy(renderer, optionTexture, NULL, &optionRects[i]);
+            SDL_Texture *optionTexture = SDL_CreateTextureFromSurface(game->renderer, optionSurfaces[i]);
+            SDL_RenderCopy(game->renderer, optionTexture, NULL, &optionRects[i]);
             SDL_DestroyTexture(optionTexture);
         }
 
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(game->renderer);
     }
 
     for (int i = 0; i < menu->numOptions; i++) {
         SDL_FreeSurface(optionSurfaces[i]);
     }
-
-    TTF_CloseFont(font);
 
     return selectedOption;
 }
