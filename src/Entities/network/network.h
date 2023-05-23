@@ -23,20 +23,20 @@ typedef enum {
 	READY,
 } ClientCommand;
 
-typedef struct{
-    ClientCommand command;
-    int playerNumber;
+typedef struct {
+	ClientCommand command;
+	int playerNumber;
 } TCPPacket;
 
 typedef struct {
-    TCPsocket socket;
-    bool active;
+	TCPsocket socket;
+	bool active;
 } TCPClientInformation;
 
 typedef struct {
-    IPaddress ip;
-    TCPsocket socket;
-    SDLNet_SocketSet set;
+	IPaddress ip;
+	TCPsocket socket;
+	SDLNet_SocketSet set;
 	int playerNumber;
 } TCPLocalInformation;
 
@@ -49,19 +49,19 @@ typedef enum {
 } GameState;
 
 typedef struct {
-    UDPsocket sourcePort;
+	UDPsocket sourcePort;
 	IPaddress destination;
 	UDPpacket *packetToSend;
 	UDPpacket *packetToReceive;
 	bool lobbyActive;
-    GameState gState; // add this variable to track the game state
+	GameState gState; // add this variable to track the game state
 	PlayerData players[MAX_CLIENTS];
 	int playerNr;
 } Network;
 
 typedef struct {
-    Uint32 ip;
-    Uint16 port;
+	Uint32 ip;
+	Uint16 port;
 	bool active;
 } ClientID;
 

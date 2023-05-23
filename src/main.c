@@ -1,7 +1,7 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -9,27 +9,27 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "Entities/perks/perks.h"
 #include "Entities/audio/audio.h"
-#include "Entities/map/map.h"
-#include "Entities/player/player.h"
-#include "Entities/network/network.h"
-#include "Entities/menu/menu.h"
 #include "Entities/foundation/foundation.h"
+#include "Entities/map/map.h"
 #include "Entities/mechanics/mechanics.h"
+#include "Entities/menu/menu.h"
+#include "Entities/network/network.h"
+#include "Entities/perks/perks.h"
+#include "Entities/player/player.h"
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    TCPLocalInformation TCPInformation = {0, 0, NULL, 0};
-    TCPClientInformation client[MAX_CLIENTS] = {NULL, 0};
-    Framework game = {NULL, NULL, NULL, 0, false, false};
+    TCPLocalInformation TCPInformation = { 0, 0, NULL, 0 };
+    TCPClientInformation client[MAX_CLIENTS] = { NULL, 0 };
+    Framework game = { NULL, NULL, NULL, 0, false, false };
     Background resources;
-    Player players[5] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     GameState state;
     Network information;
-    PlayerData toSend = {0, 0, 0, 0, 0};
+    PlayerData toSend = { 0, 0, 0, 0, 0 };
     ClientID record[MAX_CLIENTS];
-    Timer timerData = {0, 0, 0, 0};
+    Timer timerData = { 0, 0, 0, 0 };
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -45,118 +45,117 @@ int main(int argc, char **argv) {
 
     state = START;
 
-    char* menuOptions[] = {"Host Game", "Join Game", "Settings", "Quit"};
-    char* lobbyOptions[] = {"Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back"};
-    char* settingsOptions[] = {"Mute Game", "Back to Menu"};
-    char* gameOverOptions[] = {"Back to Menu", "Quit"};
+    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit" };
+    char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back" };
+    char *settingsOptions[] = { "Mute Game", "Back to Menu" };
+    char *gameOverOptions[] = { "Back to Menu", "Quit" };
 
     Menu menu;
 
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();
         switch (state) {
-            case ONGOING:
-                // Handle events
-                handleInput(&game, &players[0], &players[1], &players[2]);
-                handlePlayerMovement(&players[0]);
-                handlePlayerMovement(&players[1]);
-                handlePlayerMovement(&players[2]);
-                //SDL_RenderClear(game.renderer);
-                renderBackground(game.renderer, resources);
+        case ONGOING:
+            // Handle events
+            handleInput(&game, &players[0], &players[1], &players[2]);
+            handlePlayerMovement(&players[0]);
+            handlePlayerMovement(&players[1]);
+            handlePlayerMovement(&players[2]);
+            // SDL_RenderClear(game.renderer);
+            renderBackground(game.renderer, resources);
 
-                // Render players
-                renderPlayers(game, players);
+            // Render players
+            renderPlayers(game, players);
 
-                // Check for perk collision
-                applyPerk(players, &freezPerk, game.renderer );
-                applyPerk(players, &speedBoostPerk, game.renderer);
-                checkPerkRespawn(&speedBoostPerk);
-                checkPerkRespawn(&freezPerk);
-                // Game renderer
-                //SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            // Check for perk collision
+            applyPerk(players, &freezPerk, game.renderer);
+            applyPerk(players, &speedBoostPerk, game.renderer);
+            checkPerkRespawn(&speedBoostPerk);
+            checkPerkRespawn(&freezPerk);
+            // Game renderer
+            // SDL_SetRenderDrawColor(game.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-                // Perk render
-                renderPerk(game.renderer, &speedBoostPerk);
-                renderPerk(game.renderer, &freezPerk);
-                HuntAndRevive(game.renderer, players);
-                
+            // Perk render
+            renderPerk(game.renderer, &speedBoostPerk);
+            renderPerk(game.renderer, &freezPerk);
+            HuntAndRevive(game.renderer, players);
 
-                if(manageTimer(&game, &timerData)){
-                    state = GAME_OVER;
-                };
+            if (manageTimer(&game, &timerData)) {
+                state = GAME_OVER;
+            };
 
-                // Present the rendered frame
-                SDL_RenderPresent(game.renderer);
+            // Present the rendered frame
+            SDL_RenderPresent(game.renderer);
 
-                if (selectedOption == 0) {
-                    manageServerDuties(&information, record, players, &toSend);
-                    manageServerTCPActivity(&TCPInformation, client, record);
-                }
-                else {
-                    manageUDPClientConnection(&information, &toSend, players, TCPInformation.playerNumber);
-                }
+            if (selectedOption == 0) {
+                manageServerDuties(&information, record, players, &toSend);
+                manageServerTCPActivity(&TCPInformation, client, record);
+            }
+            else {
+                manageUDPClientConnection(&information, &toSend, players, TCPInformation.playerNumber);
+            }
 
-                manageFrameRate(timeAtLoopBeginning);
-                break;
-            case GAME_OVER:
-                printf("GAME_OVER\n");
-                menu.options = gameOverOptions;
-                menu.numOptions = 2;
-                menu.optionSpacing = 67;
-                menu.menuX = 713,
+            manageFrameRate(timeAtLoopBeginning);
+            break;
+        case GAME_OVER:
+            printf("GAME_OVER\n");
+            menu.options = gameOverOptions;
+            menu.numOptions = 2;
+            menu.optionSpacing = 67;
+            menu.menuX = 713,
                 menu.menuY = 600;
-                strcpy(menu.img, "resources/game_over_hunters_lose_menu.png");
+            strcpy(menu.img, "resources/game_over_hunters_lose_menu.png");
 
-                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-                break;
-            case START:
-                printf("START\n");
+            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
+            break;
+        case START:
+            printf("START\n");
 
-                menu.options = menuOptions;
-                menu.numOptions = 4;
-                menu.optionSpacing = 60;
-                menu.menuX = 730,
+            menu.options = menuOptions;
+            menu.numOptions = 4;
+            menu.optionSpacing = 60;
+            menu.menuX = 730,
                 menu.menuY = 425;
-                strcpy(menu.img, "resources/start_menu.png");
+            strcpy(menu.img, "resources/start_menu.png");
 
-                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-                if (selectedOption == 0) {
-                    initiateServerTCPCapability(&TCPInformation);
-                    TCPInformation.playerNumber = -1;
-                    changeThemeSong();
-                }
-                else if (selectedOption == 1){
-                    InitiateClientTCPCapability(&TCPInformation);
-                    changeThemeSong();
-                }
-                timerData.timeWhenStarting = time(NULL);
-                break;
-            case LOBBY:
-                printf("LOBBY\n");
+            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
+            if (selectedOption == 0) {
+                initiateServerTCPCapability(&TCPInformation);
+                TCPInformation.playerNumber = -1;
+                changeThemeSong();
+            }
+            else if (selectedOption == 1) {
+                InitiateClientTCPCapability(&TCPInformation);
+                changeThemeSong();
+            }
+            timerData.timeWhenStarting = time(NULL);
+            break;
+        case LOBBY:
+            printf("LOBBY\n");
 
-                menu.options = lobbyOptions;
-                menu.numOptions = 6;
-                menu.optionSpacing = 55;
-                menu.menuX = 400,
+            menu.options = lobbyOptions;
+            menu.numOptions = 6;
+            menu.optionSpacing = 55;
+            menu.menuX = 400,
                 menu.menuY = 425;
-                strcpy(menu.img, "resources/lobby_menu.png");
+            strcpy(menu.img, "resources/lobby_menu.png");
 
-                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-                break;
-            case SETTINGS:
-                printf("SETTINGS\n");
+            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
+            break;
+        case SETTINGS:
+            printf("SETTINGS\n");
 
-                menu.options = settingsOptions;
-                menu.numOptions = 2;
-                menu.optionSpacing = 240;
-                menu.menuX = 710,
+            menu.options = settingsOptions;
+            menu.numOptions = 2;
+            menu.optionSpacing = 240;
+            menu.menuX = 710,
                 menu.menuY = 425;
-                strcpy(menu.img, "resources/settings_menu.png");
-                    
-                selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-                break;
-            default:
-                break;
+            strcpy(menu.img, "resources/settings_menu.png");
+
+            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
+            break;
+        default:
+            break;
         }
     }
 

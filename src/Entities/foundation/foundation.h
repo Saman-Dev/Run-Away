@@ -2,16 +2,15 @@
 #define FOUNDATION_H
 
 #include <stdbool.h>
-#include <time.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
-
 
 #include "../audio/audio.h"
 
@@ -34,17 +33,16 @@ typedef struct {
 
 typedef struct {
     bool active;
-    SDL_Texture* texture;
+    SDL_Texture *texture;
     SDL_Rect rectangle;
 } Image;
 
 typedef struct {
     time_t timeWhenStarting;
-    int timeRemaining;  // Change the type to int
+    int timeRemaining; // Change the type to int
     int minutesRemaining;
     int secondsRemaining;
 } Timer;
-
 
 void initialize(Framework *game);
 void manageFrameRate(int timeAtLoopBeginning);

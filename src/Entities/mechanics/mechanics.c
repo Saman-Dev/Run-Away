@@ -1,26 +1,26 @@
 #include "mechanics.h"
 
 void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
-    static Image cage = {0, NULL, {0, 0, 40, 40}};
+    static Image cage = { 0, NULL, {0, 0, 40, 40} };
     checkCapturedStatus(players);
     handleCage(renderer, &cage, players);
 }
 
 static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[]) {
     for (int i = 0; players[i].player != 0; i++) {
-        if ( players[i].captured) {
+        if (players[i].captured) {
             if (!cage->active) {
-                cage->texture = IMG_LoadTexture(renderer,"resources/cage.png");
+                cage->texture = IMG_LoadTexture(renderer, "resources/cage.png");
                 cage->active = true;
             }
             if (players[i].captured) {
-                cage->rectangle.x = (players[i].position.x-7); // -7 så att spelaren blir exakt i mitten av "cage"
-                cage->rectangle.y = (players[i].position.y-2);
+                cage->rectangle.x = (players[i].position.x - 7); // -7 så att spelaren blir exakt i mitten av "cage"
+                cage->rectangle.y = (players[i].position.y - 2);
                 SDL_RenderCopy(renderer, cage->texture, NULL, &cage->rectangle);
             }
         }
     }
-    
+
     if (cage->active) {
         int numberOfCapturedPlayers;
         for (int i = 0; players[i].player != 0; i++) {

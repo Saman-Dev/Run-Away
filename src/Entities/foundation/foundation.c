@@ -1,9 +1,9 @@
 #include "foundation.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -11,15 +11,12 @@
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 
-
-
-
 void initialize(Framework *game) {
     // Initialize SDL, timer and Mixer Library
     SDL_Init(SDL_INIT_VIDEO);
     initializeAudio();
     srand(time(NULL));
-     // Initialize SDL
+    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {
         printf("Failed to initialize SDL: %s\n", SDL_GetError());
         exit(1);
@@ -52,10 +49,10 @@ void initialize(Framework *game) {
         exit(1);
     }
 
-	if (SDLNet_Init() == -1) {
-		printf("SDLNet_Init: %s\n", SDLNet_GetError());
+    if (SDLNet_Init() == -1) {
+        printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(1);
-	}
+    }
 
     if (TTF_Init() == -1) {
         printf("TTF_Init error: %s\n", TTF_GetError());
@@ -91,7 +88,7 @@ void manageFrameRate(int timeAtLoopBeginning) {
 bool manageTimer(Framework *game, Timer *timerData) {
     calculateRemainingTime(timerData);
     displayTime(game, timerData);
-    if(checkIfTimerHasExpired(timerData)){
+    if (checkIfTimerHasExpired(timerData)) {
         return true;
     }
     else {
@@ -106,7 +103,8 @@ static void calculateRemainingTime(Timer *timerData) {
     if (timeElapsed >= (TIMER_MINUTES * 60)) {
         // Timer has expired, set remaining time to 0
         timerData->timeRemaining = 0;
-    } else {
+    }
+    else {
         timerData->timeRemaining = (TIMER_MINUTES * 60) - timeElapsed;
     }
 
@@ -115,8 +113,8 @@ static void calculateRemainingTime(Timer *timerData) {
 }
 
 static void displayTime(Framework *game, Timer *timerData) {
-    static Image toDisplay = {0, NULL, {790, 15, 91, 35}};
-    static SDL_Color color = {255, 255, 255};
+    static Image toDisplay = { 0, NULL, {790, 15, 91, 35} };
+    static SDL_Color color = { 255, 255, 255 };
     static int lastSeenTimeRemainingValue = 0;
     char numbersToPrint[8];
     SDL_Surface *surface;
@@ -137,7 +135,7 @@ static void displayTime(Framework *game, Timer *timerData) {
         }
 
         if (timerData->timeRemaining == 0) {
-        SDL_DestroyTexture(toDisplay.texture);
+            SDL_DestroyTexture(toDisplay.texture);
         }
 
         SDL_FreeSurface(surface);
@@ -157,7 +155,6 @@ bool checkIfTimerHasExpired(Timer *timerData) {
     }
     return false;
 }
-
 
 static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h) {
     SDL_Rect rectangle;

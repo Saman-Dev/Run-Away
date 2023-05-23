@@ -6,13 +6,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#include "../map/map.h"
 #include "../audio/audio.h"
 #include "../foundation/foundation.h"
+#include "../map/map.h"
 
 #define PLAYER_FRAME_WIDTH 32
 #define PLAYER_FRAME_HEIGHT 32
-#define  Default_Speed 2
+#define Default_Speed 2
 
 typedef struct {
     int player;
@@ -27,9 +27,9 @@ typedef struct {
     bool down;
     bool left;
     bool right;
-    //int baseSpeed; 
-    //int boostedSpeed;
-    //Uint32 speedBoostStartTime;
+    // int baseSpeed;
+    // int boostedSpeed;
+    // Uint32 speedBoostStartTime;
 } Player;
 
 Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);

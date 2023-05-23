@@ -3,9 +3,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "../player/player.h"
 #include "../perks/perks.h"
-#define  Default_Speed 2
+#include "../player/player.h"
+#define Default_Speed 2
 
 void HuntAndRevive(SDL_Renderer *renderer, Player players[]);
 static void checkCapturedStatus(Player players[]);

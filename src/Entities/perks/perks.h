@@ -20,9 +20,8 @@
 #define PERK_HEIGHT 32
 #define SPEED_BOOST_AMOUNT 1
 
-
 typedef struct {
-    SDL_Texture* texture;
+    SDL_Texture *texture;
     SDL_Rect rect;
     bool available;
     int duration;
@@ -30,13 +29,10 @@ typedef struct {
     int perkID;
 } Perk;
 
-
 Perk initializePerk(SDL_Renderer *renderer, int perkNr);
 void renderPerk(SDL_Renderer *renderer, Perk *perk);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void checkPerkRespawn(Perk *perk);
-void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer );
-
+void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer);
 
 #endif
-

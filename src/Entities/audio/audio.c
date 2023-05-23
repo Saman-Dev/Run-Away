@@ -2,15 +2,13 @@
 
 void initializeAudio(void) {
     // Open audio device
-    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-    {
+    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to initialize SDL2 Mixer: %s", Mix_GetError());
         exit(1);
     }
 
     music = Mix_LoadMUS("resources/ThemeSong.mp3");
-    if (!music)
-    {
+    if (!music) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
         exit(1);
     }
@@ -30,7 +28,7 @@ void initializeAudio(void) {
         exit(1);
     }
     Mix_VolumeChunk(cageLockSound, 20);
-    
+
     cageUnlockSound = Mix_LoadWAV("resources/CageUnlockSound.mp3");
     if (cageUnlockSound == NULL) {
         printf("%s\n", Mix_GetError());
