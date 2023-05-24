@@ -21,7 +21,12 @@ typedef struct {
     char imageFilePath[50];
 } Menu;
 
-int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]);
-int displayOptions(Framework *game, Menu *menu);
+void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);
+static int displayOptions(Framework *game, Menu *menu);
+
+static void handleMenuEntry(int *scene, Framework *game);
+static void handleHostGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);
+static void handleJoinGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation);
+static void handleSettingsOption(int *scene, Framework *game);
 
 #endif

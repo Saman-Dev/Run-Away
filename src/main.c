@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     TCPLocalInformation TCPInformation = { 0, 0, NULL, 0 };
     TCPClientInformation client[MAX_CLIENTS] = { NULL, 0 };
-    Framework game = { NULL, NULL, NULL, 0, false, false };
+    Framework game = { NULL, NULL, NULL, 0, false, false, false};
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     GameState state;
@@ -41,21 +41,13 @@ int main(int argc, char **argv) {
     players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 242, 280);
     players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 300, 400);
 
-    int selectedOption;
-
-    state = START;
-
-    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
-    char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back", "\0"};
-    char *settingsOptions[] = { "Mute Game", "Back to Menu", "\0"};
-    char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};
-
-    Menu menu;
-
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();
-        switch (state) {
-        case ONGOING:
+        if (game.menuState) {
+            manageMenu(&game, &information, &TCPInformation, record);
+            timerData.timeWhenStarting = time(NULL);
+        }
+        else {
             // Handle events
             handleInput(&game, &players[0], &players[1], &players[2]);
             handlePlayerMovement(&players[0]);
@@ -77,14 +69,12 @@ int main(int argc, char **argv) {
             renderPerk(game.renderer, &freezPerk);
             HuntAndRevive(game.renderer, players);
 
-            if (manageTimer(&game, &timerData)) {
-                state = GAME_OVER;
-            };
+            manageTimer(&game, &timerData);
 
             // Present the rendered frame
             SDL_RenderPresent(game.renderer);
 
-            if (selectedOption == 0) {
+            if (TCPInformation.playerNumber == -1) {
                 manageServerDuties(&information, record, players, &toSend);
                 manageServerTCPActivity(&TCPInformation, client, record);
             }
@@ -93,7 +83,27 @@ int main(int argc, char **argv) {
             }
 
             manageFrameRate(timeAtLoopBeginning);
-            break;
+        }
+    }
+
+    // Free resources and close SDL
+    SDL_DestroyTexture(speedBoostPerk.texture);
+    SDL_DestroyTexture(freezPerk.texture);
+    SDL_DestroyWindow(game.window);
+    TTF_CloseFont(game.font);
+    Mix_CloseAudio();
+    TTF_Quit();
+    SDLNet_Quit();
+    SDL_Quit();
+    return 0;
+}
+
+    //char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
+    //char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back", "\0"};
+    //char *settingsOptions[] = { "Mute Game", "Back to Menu", "\0"};
+    //char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};
+
+/*            break;
         case GAME_OVER:
             printf("GAME_OVER\n");
             menu.options = gameOverOptions;
@@ -149,17 +159,4 @@ int main(int argc, char **argv) {
             break;
         default:
             break;
-        }
-    }
-
-    // Free resources and close SDL
-    SDL_DestroyTexture(speedBoostPerk.texture);
-    SDL_DestroyTexture(freezPerk.texture);
-    SDL_DestroyWindow(game.window);
-    TTF_CloseFont(game.font);
-    Mix_CloseAudio();
-    TTF_Quit();
-    SDLNet_Quit();
-    SDL_Quit();
-    return 0;
-}
+        }*/

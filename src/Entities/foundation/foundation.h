@@ -28,8 +28,9 @@ typedef struct {
     TTF_Font *winFont;
     SDL_Color white;
     SDL_Event event;
-    bool isMuted;
+    bool menuState;
     bool quit;
+    bool isMuted;
 } Framework;
 
 typedef struct {

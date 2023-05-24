@@ -1,31 +1,26 @@
 #include "menu.h"
 
-int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInformation *TCPInformation, GameState *state, ClientID record[]) {
-    int selectedOption;
-    if (*state == START) {
-        selectedOption = displayOptions(game, menu);
-        switch (selectedOption) {
-        case 0:
-            setUpServer(information, record, 2000);
-            *state = ONGOING;
-            break;
-        case 1:
-            setUpClient(information, "127.0.0.1", 2000);
-            *state = ONGOING;
-            break;
-        case 2:
-            *state = SETTINGS;
-            break;
-        case 3:
-            game->quit = true;
-            break;
-        default:
-            break;
+void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]) {
+    int scene = 0;
+    while (game->menuState) {
+        if (scene == 0) {
+            handleMenuEntry(&scene, game);
+        }
+        else if (scene == 1) {
+            handleHostGameOption(game, information, TCPInformation, record);
+        }
+        else if (scene == 2) {
+            handleJoinGameOption(game, information, TCPInformation);
+        }
+        else if (scene == 3) {
+            handleSettingsOption(&scene, game);
         }
     }
-    else if (*state == SETTINGS) {
-        selectedOption = displayOptions(game, menu);
-        switch (selectedOption) {
+
+/*
+    if (*state == SETTINGS) {
+        selectedBox = displayOptions(game, menu);
+        switch (selectedBox) {
         case 0:
             game->isMuted = !game->isMuted;
             if (game->isMuted) {
@@ -43,8 +38,8 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == LOBBY) {
-        selectedOption = displayOptions(game, menu);
-        switch (selectedOption) {
+        selectedBox = displayOptions(game, menu);
+        switch (selectedBox) {
         case 4:
             *state = ONGOING;
             break;
@@ -57,8 +52,8 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
         }
     }
     else if (*state == GAME_OVER) {
-        selectedOption = displayOptions(game, menu);
-        switch (selectedOption) {
+        selectedBox = displayOptions(game, menu);
+        switch (selectedBox) {
         case 0:
             *state = START;
             SDLNet_UDP_Close(information->sourcePort);
@@ -71,10 +66,11 @@ int manageMenu(Framework *game, Menu *menu, Network *information, TCPLocalInform
             break;
         }
     }
-    return selectedOption;
+    return selectedBox;
+    */
 }
 
-int displayOptions(Framework *game, Menu *menu) {
+static int displayOptions(Framework *game, Menu *menu) {
     int largestTextBoxWidth = 0;
     int totalTextBoxHeight = 0;
     SDL_Surface *textBoxSurface[MAX_NUMBER_OF_TEXT_BOXES+1];
@@ -140,4 +136,77 @@ int displayOptions(Framework *game, Menu *menu) {
     }
 
     return selectedOption;
+}
+
+static void handleMenuEntry(int *scene, Framework *game) {
+    Menu menu;
+    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
+    menu.options = menuOptions;
+    menu.optionSpacing = 60;
+    menu.menuX = 730,
+    menu.menuY = 425;
+    strcpy(menu.imageFilePath, "resources/start_menu.png");
+
+    int selectedBox = displayOptions(game, &menu);
+    switch (selectedBox) {
+        case 0:
+            *scene = 1;
+            break;
+        case 1:
+            *scene = 2;
+            break;
+        case 2:
+            *scene = 3;
+            break;
+        case 3:
+            game->menuState = false;
+            game->quit = true;
+            break;
+        default:
+            break;
+    }
+}
+
+static void handleHostGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]) {
+    initiateServerTCPCapability(TCPInformation);
+    TCPInformation->playerNumber = -1;
+    setUpServer(information, record, 2000);
+    changeThemeSong();
+    game->menuState = false;
+}
+
+static void handleJoinGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation) {
+    InitiateClientTCPCapability(TCPInformation);
+    setUpClient(information, "127.0.0.1", 2000);
+    changeThemeSong();
+    game->menuState = false;
+}
+
+static void handleSettingsOption(int *scene, Framework *game) {
+    Menu menu;
+    char *settingsOptions[] = { "Mute Song", "Back to Menu", "\0"};
+    menu.options = settingsOptions;
+    menu.optionSpacing = 240;
+    menu.menuX = 710,
+    menu.menuY = 425;
+    strcpy(menu.imageFilePath, "resources/settings_menu.png");
+    
+    int selectedBox = displayOptions(game, &menu);
+    switch (selectedBox) {
+        case 0:
+            if (!game->isMuted) {
+                Mix_VolumeMusic(0);
+                game->isMuted = true;
+            }
+            else {
+                Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+                game->isMuted = false;
+            }
+            break;
+        case 1:
+            *scene = 0;
+            break;
+        default:
+            break;
+    }
 }

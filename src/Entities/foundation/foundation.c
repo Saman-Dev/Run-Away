@@ -5,6 +5,7 @@ void initialize(Framework *game) {
         printf("Failed to initialize SDL: %s\n", SDL_GetError());
         exit(1);
     }
+    game->menuState = true;
     initializeAudio();
     srand(time(NULL));
 
@@ -80,7 +81,7 @@ bool manageTimer(Framework *game, Timer *timerData) {
 
 static void calculateRemainingTime(Timer *timerData) {
     time_t currentTime = time(NULL);
-    int timeElapsed = (int)difftime(currentTime, timerData->timeWhenStarting);
+    int timeElapsed = (int) difftime(currentTime, timerData->timeWhenStarting);
 
     if (timeElapsed >= (TIMER_MINUTES * 60)) {
         // Timer has expired, set remaining time to 0
@@ -108,6 +109,10 @@ static void displayTime(Framework *game, Timer *timerData) {
         surface = TTF_RenderText_Solid(game->font, numbersToPrint, game->white);
         if (surface == NULL) {
             printf("TTF_RenderText_Solid error: %s\n", TTF_GetError());
+        }
+
+        if (toDisplay.texture != NULL) {
+            SDL_DestroyTexture(toDisplay.texture);
         }
 
         toDisplay.texture = SDL_CreateTextureFromSurface(game->renderer, surface);
