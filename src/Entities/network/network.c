@@ -19,8 +19,6 @@ void setUpClient(Network *information, char IP_address[], int port) {
 
     printf("Client connected to server at %s on port %d.\n", IP_address, port);
 
-    information->gState = START;
-
     information->packetToSend->address.host = information->destination.host;
     information->packetToSend->address.port = information->destination.port;
 }
@@ -91,7 +89,6 @@ void setUpServer(Network *information, ClientID record[], int port) {
     }
 
     initiateAddressBook(record);
-    information->gState = START;
     printf("Server opened on port %d.\n", port);
 }
 
@@ -226,7 +223,7 @@ static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInforma
         removeUDPEntry(record, clientNumber);
     }
     else {
-        printf("Received the following data: \"%u\"\n", toSend.command);
+        printf("Received the following data in variable inMenu: \"%d\"\n", toSend.inMenu);
         sendTCPData(client, toSend);
     }
 }

@@ -16,39 +16,6 @@ void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPI
             handleSettingsOption(&scene, game);
         }
     }
-
-/*
-    else if (*state == LOBBY) {
-        selectedBox = displayOptions(game, menu);
-        switch (selectedBox) {
-        case 4:
-            *state = ONGOING;
-            break;
-        case 5:
-            *state = START;
-            printf("Disconnected");
-            SDLNet_UDP_Close(information->sourcePort);
-            SDLNet_TCP_Close(TCPInformation->socket);
-            break;
-        }
-    }
-    else if (*state == GAME_OVER) {
-        selectedBox = displayOptions(game, menu);
-        switch (selectedBox) {
-        case 0:
-            *state = START;
-            SDLNet_UDP_Close(information->sourcePort);
-            SDLNet_TCP_Close(TCPInformation->socket);
-            break;
-        case 1:
-            game->quit = true;
-            break;
-        default:
-            break;
-        }
-    }
-    return selectedBox;
-    */
 }
 
 static int displayOptions(Framework *game, Menu *menu) {
@@ -207,3 +174,35 @@ static void handleSettingsOption(int *scene, Framework *game) {
             break;
     }
 }
+/*
+    else if (*state == LOBBY) {
+        selectedBox = displayOptions(game, menu);
+        switch (selectedBox) {
+        case 4:
+            *state = ONGOING;
+            break;
+        case 5:
+            *state = START;
+            printf("Disconnected");
+            SDLNet_UDP_Close(information->sourcePort);
+            SDLNet_TCP_Close(TCPInformation->socket);
+            break;
+        }
+    }
+    else if (*state == GAME_OVER) {
+        selectedBox = displayOptions(game, menu);
+        switch (selectedBox) {
+        case 0:
+            *state = START;
+            SDLNet_UDP_Close(information->sourcePort);
+            SDLNet_TCP_Close(TCPInformation->socket);
+            break;
+        case 1:
+            game->quit = true;
+            break;
+        default:
+            break;
+        }
+    }
+    return selectedBox;
+    */

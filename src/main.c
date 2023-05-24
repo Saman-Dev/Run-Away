@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
     Framework game = { NULL, NULL, NULL, 0, false, false, false};
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    GameState state;
     Network information;
     PlayerData toSend = { 0, 0, 0, 0, 0 };
     ClientID record[MAX_CLIENTS];
@@ -72,7 +71,7 @@ int main(int argc, char **argv) {
             SDL_RenderPresent(game.renderer);
 
             if (TCPInformation.playerNumber == -1) {
-                manageServerDuties(&information, record, players, &toSend);
+                manageServerDuties(&information, record, players, &toSend); //players, client
                 manageServerTCPActivity(&TCPInformation, client, record);
             }
             else {

@@ -19,12 +19,8 @@ typedef struct {
 	bool connectedStatus;
 } PlayerData;
 
-typedef enum {
-	READY,
-} ClientCommand;
-
 typedef struct {
-	ClientCommand command;
+	bool inMenu;
 	int playerNumber;
 } TCPPacket;
 
@@ -40,23 +36,12 @@ typedef struct {
 	int playerNumber;
 } TCPLocalInformation;
 
-typedef enum {
-	START,
-	ONGOING,
-	GAME_OVER,
-	SETTINGS,
-	LOBBY,
-} GameState;
-
 typedef struct {
 	UDPsocket sourcePort;
 	IPaddress destination;
 	UDPpacket *packetToSend;
 	UDPpacket *packetToReceive;
-	bool lobbyActive;
-	GameState gState; // add this variable to track the game state
 	PlayerData players[MAX_CLIENTS];
-	int playerNr;
 } Network;
 
 typedef struct {

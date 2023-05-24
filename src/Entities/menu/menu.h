@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include <stdbool.h>
+#include <string.h>
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -14,6 +15,7 @@
 typedef struct {
     char **options;
     int optionSpacing;
+    char role[10];
     char imageFilePath[50];
 } Menu;
 
