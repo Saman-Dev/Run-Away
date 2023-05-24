@@ -19,6 +19,7 @@ typedef struct {
 
 void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);
 static int displayOptions(Framework *game, Menu *menu);
+static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[]);
 
 static void handleMenuEntry(int *scene, Framework *game);
 static void handleHostGameOption(int *scene, Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);

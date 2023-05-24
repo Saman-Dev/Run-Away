@@ -52,36 +52,12 @@ void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPI
 }
 
 static int displayOptions(Framework *game, Menu *menu) {
-    int largestTextBoxWidth = 0;
-    int totalTextBoxHeight = 0; // option width, X, Y, option height, 
-    SDL_Surface *textBoxSurface[MAX_NUMBER_OF_TEXT_BOXES+1];
     SDL_Rect textBoxRectangle[MAX_NUMBER_OF_TEXT_BOXES+1];
     SDL_Texture *textBoxTexture[MAX_NUMBER_OF_TEXT_BOXES+1];
     SDL_Texture *backgroundTexture = IMG_LoadTexture(game->renderer, menu->imageFilePath);
     SDL_Point mousePosition;
 
-    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-        textBoxSurface[i] = TTF_RenderText_Solid(game->font, menu->options[i], game->white);
-        textBoxRectangle[i].y = totalTextBoxHeight;
-        textBoxRectangle[i].w = textBoxSurface[i]->w;
-        textBoxRectangle[i].h = textBoxSurface[i]->h;
-        totalTextBoxHeight += textBoxRectangle[i].h + menu->optionSpacing;
-        if (textBoxRectangle[i].w > largestTextBoxWidth) {
-            largestTextBoxWidth = textBoxRectangle[i].w;
-        }
-    }
-    
-    int menuX = (SCREEN_WIDTH / 2) - (largestTextBoxWidth / 2);
-    int menuY = (SCREEN_HEIGHT / 2) - 52;
-    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-        textBoxRectangle[i].x = menuX + (largestTextBoxWidth - textBoxRectangle[i].w) / 2;
-        textBoxRectangle[i].y = menuY + textBoxRectangle[i].y;
-    }
-
-    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-        textBoxTexture[i] = SDL_CreateTextureFromSurface(game->renderer, textBoxSurface[i]);
-        SDL_FreeSurface(textBoxSurface[i]);
-    }
+    prepareTextBoxesToBeShown(game, menu, textBoxRectangle, textBoxTexture);
 
     int selectedOption = -1;
     while (selectedOption == -1) {
@@ -117,6 +93,35 @@ static int displayOptions(Framework *game, Menu *menu) {
     }
 
     return selectedOption;
+}
+
+static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[]) {
+    SDL_Surface *textBoxSurface[MAX_NUMBER_OF_TEXT_BOXES+1];
+    int largestTextBoxWidth = 0;
+    int accumulatedTextBoxHeight = 0;
+
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxSurface[i] = TTF_RenderText_Solid(game->font, menu->options[i], game->white);
+        textBoxRectangle[i].y = accumulatedTextBoxHeight;
+        textBoxRectangle[i].w = textBoxSurface[i]->w;
+        textBoxRectangle[i].h = textBoxSurface[i]->h;
+        accumulatedTextBoxHeight += textBoxRectangle[i].h + menu->optionSpacing;
+        if (textBoxRectangle[i].w > largestTextBoxWidth) {
+            largestTextBoxWidth = textBoxRectangle[i].w;
+        }
+    }
+    
+    int menuX = (SCREEN_WIDTH / 2) - (largestTextBoxWidth / 2);
+    int menuY = (SCREEN_HEIGHT / 2) - 52;
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxRectangle[i].x = menuX + (largestTextBoxWidth - textBoxRectangle[i].w) / 2;
+        textBoxRectangle[i].y = menuY + textBoxRectangle[i].y;
+    }
+
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+        textBoxTexture[i] = SDL_CreateTextureFromSurface(game->renderer, textBoxSurface[i]);
+        SDL_FreeSurface(textBoxSurface[i]);
+    }
 }
 
 static void handleMenuEntry(int *scene, Framework *game) {
