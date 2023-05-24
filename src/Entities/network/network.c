@@ -101,7 +101,7 @@ void manageServerDuties(Network *information, ClientID record[], Player players[
         PlayerData *receivedData = (PlayerData *)information->packetToReceive->data;
         memcpy(receivedData, information->packetToReceive->data, sizeof(PlayerData));
 
-        registerSourceInformation(information, receivedData, record);
+        registerSourceInformation(information, record);
         forwardreceivedPacket(information, receivedData, record, players);
     }
     if (checkDifference(toSend, &players[2])) {
@@ -153,7 +153,7 @@ static void applyReceivedData(Player *playerX, PlayerData *toSend) {
     playerX->frame = toSend->frame;
 }
 
-static void registerSourceInformation(Network *information, PlayerData *receivedData, ClientID record[]) {
+static void registerSourceInformation(Network *information, ClientID record[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (record[i].ip == information->packetToReceive->address.host && record[i].port == information->packetToReceive->address.port) {
             return;

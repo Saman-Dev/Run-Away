@@ -13,11 +13,7 @@
 
 typedef struct {
     char **options;
-    int optionWidth;
-    int optionHeight;
     int optionSpacing;
-    int menuX;
-    int menuY;
     char imageFilePath[50];
 } Menu;
 
@@ -25,7 +21,7 @@ void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPI
 static int displayOptions(Framework *game, Menu *menu);
 
 static void handleMenuEntry(int *scene, Framework *game);
-static void handleHostGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);
+static void handleHostGameOption(int *scene, Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]);
 static void handleJoinGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation);
 static void handleSettingsOption(int *scene, Framework *game);
 

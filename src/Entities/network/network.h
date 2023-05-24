@@ -76,7 +76,7 @@ static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
 static void commenceTransfer(Network *information, PlayerData *toSend);
 static void initiateAddressBook(ClientID record[]);
-static void registerSourceInformation(Network *information, PlayerData *receivedData, ClientID record[]);
+static void registerSourceInformation(Network *information, ClientID record[]);
 static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *host);
 static void sendHostPlayerPacket(Network *information, ClientID record[], PlayerData *toSend, Player *host);
 static void applyReceivedData(Player *player, PlayerData *toSend);
