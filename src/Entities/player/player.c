@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY) {
+static Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY) {
     Player playerX;
 
     playerX.spriteSheetTexture = IMG_LoadTexture(renderer, playerModel);
@@ -212,4 +212,10 @@ void handleInput(Framework *game, Player *playerX, Player *playerY, Player *play
             handleKeyReleases(game, playerX, playerY, playerZ);
         }
     }
+}
+
+void loadPlayers(SDL_Renderer *renderer, Player players[]) {
+    players[0] = createPlayer(renderer, "resources/Runner_1.png", 1, 300, 300);
+    players[1] = createPlayer(renderer, "resources/Hunter.png", 2, 242, 280);
+    players[2] = createPlayer(renderer, "resources/Runner_3.png", 3, 300, 400);
 }

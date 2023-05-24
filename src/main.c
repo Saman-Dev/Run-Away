@@ -33,13 +33,10 @@ int main(int argc, char **argv) {
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
+    loadPlayers(game.renderer, players);
 
     Perk speedBoostPerk = initializePerk(game.renderer, 1);
     Perk freezPerk = initializePerk(game.renderer, 2);
-
-    players[0] = createPlayer(game.renderer, "resources/Runner_1.png", 1, 300, 300);
-    players[1] = createPlayer(game.renderer, "resources/Hunter.png", 2, 242, 280);
-    players[2] = createPlayer(game.renderer, "resources/Runner_3.png", 3, 300, 400);
 
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();

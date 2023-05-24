@@ -34,10 +34,11 @@ typedef struct {
     // Uint32 speedBoostStartTime;
 } Player;
 
-Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);
+static Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);
 void handlePlayerMovement(Player *playerX);
 void renderPlayers(Framework game, Player players[]);
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
+void loadPlayers(SDL_Renderer *renderer, Player players[]);
 #endif
