@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
-    NetworkBundle networkData;
+    NetworkBundle networkData = {{NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0}};
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
