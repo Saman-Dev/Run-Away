@@ -20,15 +20,11 @@
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    TCPLocalInformation TCPInformation = { 0, 0, NULL, 0 };
-    TCPClientInformation client[MAX_CLIENTS] = { NULL, 0 };
     Framework game = { NULL, NULL, NULL, 0, false, false, false};
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Network information;
-    PlayerData toSend = { 0, 0, 0, 0, 0 };
-    ClientID record[MAX_CLIENTS];
     Timer timerData = { 0, 0, 0, 0 };
+    NetworkBundle networkData;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -40,7 +36,7 @@ int main(int argc, char **argv) {
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
-            manageMenu(&game, &information, &TCPInformation, record);
+            manageMenu(&game, &networkData.UDPInformation, &networkData.TCPInformation, networkData.UDPRecord);
             timerData.timeWhenStarting = time(NULL);
         }
         else {
@@ -70,13 +66,7 @@ int main(int argc, char **argv) {
             // Present the rendered frame
             SDL_RenderPresent(game.renderer);
 
-            if (TCPInformation.playerNumber == -1) {
-                manageServerDuties(&information, record, players, &toSend); //players, client
-                manageServerTCPActivity(&TCPInformation, client, record);
-            }
-            else {
-                manageUDPClientConnection(&information, &toSend, players, TCPInformation.playerNumber);
-            }
+            manageNetwork(&networkData, players);
 
             manageFrameRate(timeAtLoopBeginning);
         }

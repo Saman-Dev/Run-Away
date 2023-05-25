@@ -1,5 +1,5 @@
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef UDPLocalInformation_H
+#define UDPLocalInformation_H
 
 #define MAX_CLIENTS 3
 
@@ -11,23 +11,24 @@
 #include "../player/player.h"
 
 typedef struct {
+	UDPsocket sourcePort;
+	IPaddress destination;
+	UDPpacket *packetToSend;
+	UDPpacket *packetToReceive;
+} UDPLocalInformation;
+
+typedef struct {
+	Uint32 ip;
+	Uint16 port;
+	bool active;
+} UDPClientInformation;
+
+typedef struct {
 	int player;
 	int positionX;
 	int positionY;
-	int alive;
 	int frame;
-	bool connectedStatus;
-} PlayerData;
-
-typedef struct {
-	bool inMenu;
-	int playerNumber;
-} TCPPacket;
-
-typedef struct {
-	TCPsocket socket;
-	bool active;
-} TCPClientInformation;
+} PlayerData; // UDPPacket
 
 typedef struct {
 	IPaddress ip;
@@ -37,47 +38,52 @@ typedef struct {
 } TCPLocalInformation;
 
 typedef struct {
-	UDPsocket sourcePort;
-	IPaddress destination;
-	UDPpacket *packetToSend;
-	UDPpacket *packetToReceive;
-	PlayerData players[MAX_CLIENTS];
-} Network;
+	TCPsocket socket;
+	bool active;
+} TCPClientInformation;
 
 typedef struct {
-	Uint32 ip;
-	Uint16 port;
-	bool active;
-} ClientID;
+	bool inMenu;
+	int playerNumber;
+} TCPPacket;
 
-void manageUDPClientConnection(Network *information, PlayerData *toSend, Player players[], int playerNumber);
-void setUpClient(Network *information, char IP_address[], int port);
-void setUpServer(Network *information, ClientID record[], int port);
-void manageServerDuties(Network *information, ClientID record[], Player players[], PlayerData *toSend);
-static void sendData(Network *information, PlayerData *toSend, Player *playerX);
-static void receiveData(Network *information, Player players[]);
+typedef struct {
+	UDPLocalInformation UDPInformation;
+	UDPClientInformation UDPRecord[MAX_CLIENTS];
+	PlayerData toSend;
+	TCPLocalInformation TCPInformation;
+	TCPClientInformation TCPRecord[MAX_CLIENTS];
+} NetworkBundle;
+
+void manageNetwork(NetworkBundle *networkData, Player players[]);
+static void manageUDPClientConnection(UDPLocalInformation *information, PlayerData *toSend, Player players[], int playerNumber);
+void setUpClient(UDPLocalInformation *information, char IP_address[], int port);
+void setUpServer(UDPLocalInformation *information, UDPClientInformation UDPRecord[], int port);
+static void manageServerDuties(UDPLocalInformation *information, UDPClientInformation UDPRecord[], Player players[], PlayerData *toSend);
+static void sendData(UDPLocalInformation *information, PlayerData *toSend, Player *playerX);
+static void receiveData(UDPLocalInformation *information, Player players[]);
 
 static int checkDifference(PlayerData *toSend, Player *playerX);
 static void prepareTransfer(PlayerData *toSend, Player *playerX);
-static void commenceTransfer(Network *information, PlayerData *toSend);
-static void initiateAddressBook(ClientID record[]);
-static void registerSourceInformation(Network *information, ClientID record[]);
-static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *host);
-static void sendHostPlayerPacket(Network *information, ClientID record[], PlayerData *toSend, Player *host);
+static void commenceTransfer(UDPLocalInformation *information, PlayerData *toSend);
+static void initiateUDPAddressBook(UDPClientInformation UDPRecord[]);
+static void registerSourceInformation(UDPLocalInformation *information, UDPClientInformation UDPRecord[]);
+static void sendServerCopy(UDPLocalInformation *information, Uint32 clientIP, Uint16 clientPort, Player *host);
+static void sendHostPlayerPacket(UDPLocalInformation *information, UDPClientInformation UDPRecord[], PlayerData *toSend, Player *host);
 static void applyReceivedData(Player *player, PlayerData *toSend);
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, ClientID record[], Player players[]);
-static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort);
+static void forwardreceivedPacket(UDPLocalInformation *information, PlayerData *receivedData, UDPClientInformation UDPRecord[], Player players[]);
+static void changeDestination(UDPLocalInformation *information, Uint32 clientIP, Uint16 clientPort);
 
 ///// TCP /////
-static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]);
+static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
 static void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
-static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[], int clientNumber);
-static void sendTCPData(TCPClientInformation client[], TCPPacket toSend);
-static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber);
+static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[], int clientNumber);
+static void sendTCPData(TCPClientInformation TCPRecord[], TCPPacket toSend);
+static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *TCPRecord, int clientNumber);
 static void receiveClientNumber(TCPLocalInformation *TCPInformation);
-static void removeUDPEntry(ClientID entry[], int clientNumber);
+static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber);
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
 void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation);
-void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[]);
+static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]);
 
 #endif

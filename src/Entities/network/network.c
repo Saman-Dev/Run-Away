@@ -1,6 +1,6 @@
 #include "network.h"
 
-void setUpClient(Network *information, char IP_address[], int port) {
+void setUpClient(UDPLocalInformation *information, char IP_address[], int port) {
     // Open a socket on random port
     if (!(information->sourcePort = SDLNet_UDP_Open(0))) {
         fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
@@ -23,12 +23,12 @@ void setUpClient(Network *information, char IP_address[], int port) {
     information->packetToSend->address.port = information->destination.port;
 }
 
-void manageUDPClientConnection(Network *information, PlayerData *toSend, Player players[], int playerNumber) {
+static void manageUDPClientConnection(UDPLocalInformation *information, PlayerData *toSend, Player players[], int playerNumber) {
     sendData(information, toSend, &players[playerNumber]);
     receiveData(information, players);
 }
 
-static void sendData(Network *information, PlayerData *toSend, Player *playerX) {
+static void sendData(UDPLocalInformation *information, PlayerData *toSend, Player *playerX) {
     if (checkDifference(toSend, playerX)) {
         prepareTransfer(toSend, playerX);
         commenceTransfer(information, toSend);
@@ -51,7 +51,7 @@ static void prepareTransfer(PlayerData *toSend, Player *playerX) {
     toSend->frame = playerX->frame;
 }
 
-static void commenceTransfer(Network *information, PlayerData *toSend) {
+static void commenceTransfer(UDPLocalInformation *information, PlayerData *toSend) {
     // Serialize the struct into a byte array
     char buf[sizeof(PlayerData)];
     memcpy(buf, toSend, sizeof(PlayerData));
@@ -63,7 +63,7 @@ static void commenceTransfer(Network *information, PlayerData *toSend) {
     SDLNet_UDP_Send(information->sourcePort, -1, information->packetToSend);
 }
 
-static void receiveData(Network *information, Player players[]) {
+static void receiveData(UDPLocalInformation *information, Player players[]) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         PlayerData temporary;
         memcpy(&temporary, (char *)information->packetToReceive->data, sizeof(PlayerData));
@@ -77,7 +77,7 @@ static void receiveData(Network *information, Player players[]) {
     }
 }
 
-void setUpServer(Network *information, ClientID record[], int port) {
+void setUpServer(UDPLocalInformation *information, UDPClientInformation UDPRecord[], int port) {
     if (!(information->sourcePort = SDLNet_UDP_Open(port))) {
         fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
         exit(1);
@@ -88,33 +88,33 @@ void setUpServer(Network *information, ClientID record[], int port) {
         exit(1);
     }
 
-    initiateAddressBook(record);
+    initiateUDPAddressBook(UDPRecord);
     printf("Server opened on port %d.\n", port);
 }
 
-void manageServerDuties(Network *information, ClientID record[], Player players[], PlayerData *toSend) {
+static void manageServerDuties(UDPLocalInformation *information, UDPClientInformation UDPRecord[], Player players[], PlayerData *toSend) {
     if (SDLNet_UDP_Recv(information->sourcePort, information->packetToReceive)) {
         // Assuming `buf` is the received byte array
         PlayerData *receivedData = (PlayerData *)information->packetToReceive->data;
         memcpy(receivedData, information->packetToReceive->data, sizeof(PlayerData));
 
-        registerSourceInformation(information, record);
-        forwardreceivedPacket(information, receivedData, record, players);
+        registerSourceInformation(information, UDPRecord);
+        forwardreceivedPacket(information, receivedData, UDPRecord, players);
     }
     if (checkDifference(toSend, &players[2])) {
-        sendHostPlayerPacket(information, record, toSend, &players[2]);
+        sendHostPlayerPacket(information, UDPRecord, toSend, &players[2]);
     }
 }
 
-static void initiateAddressBook(ClientID record[]) {
+static void initiateUDPAddressBook(UDPClientInformation UDPRecord[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        record[i].ip = 0;
-        record[i].port = 0;
-        record[i].active = false;
+        UDPRecord[i].ip = 0;
+        UDPRecord[i].port = 0;
+        UDPRecord[i].active = false;
     }
 }
 
-static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientPort, Player *player) {
+static void sendServerCopy(UDPLocalInformation *information, Uint32 clientIP, Uint16 clientPort, Player *player) {
     PlayerData temporary;
 
     // Serialize the struct into a byte array
@@ -134,11 +134,11 @@ static void sendServerCopy(Network *information, Uint32 clientIP, Uint16 clientP
     }
 }
 
-static void sendHostPlayerPacket(Network *information, ClientID record[], PlayerData *toSend, Player *host) {
+static void sendHostPlayerPacket(UDPLocalInformation *information, UDPClientInformation UDPRecord[], PlayerData *toSend, Player *host) {
     prepareTransfer(toSend, host);
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (record[i].active) {
-            changeDestination(information, record[i].ip, record[i].port);
+        if (UDPRecord[i].active) {
+            changeDestination(information, UDPRecord[i].ip, UDPRecord[i].port);
             commenceTransfer(information, toSend);
         }
     }
@@ -150,36 +150,36 @@ static void applyReceivedData(Player *playerX, PlayerData *toSend) {
     playerX->frame = toSend->frame;
 }
 
-static void registerSourceInformation(Network *information, ClientID record[]) {
+static void registerSourceInformation(UDPLocalInformation *information, UDPClientInformation UDPRecord[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (record[i].ip == information->packetToReceive->address.host && record[i].port == information->packetToReceive->address.port) {
+        if (UDPRecord[i].ip == information->packetToReceive->address.host && UDPRecord[i].port == information->packetToReceive->address.port) {
             return;
         }
     }
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!record[i].active) {
-            record[i].ip = information->packetToReceive->address.host;
-            record[i].port = information->packetToReceive->address.port;
-            record[i].active = true;
+        if (!UDPRecord[i].active) {
+            UDPRecord[i].ip = information->packetToReceive->address.host;
+            UDPRecord[i].port = information->packetToReceive->address.port;
+            UDPRecord[i].active = true;
 
             printf("Client %d joined\n---------------\n", i);
             for (int j = 0; j < MAX_CLIENTS; j++) {
-                printf("Client %d: %d %d\n", j, record[j].ip, record[j].port);
+                printf("Client %d: %d %d\n", j, UDPRecord[j].ip, UDPRecord[j].port);
             }
             return;
         }
     }
 }
 
-static void forwardreceivedPacket(Network *information, PlayerData *receivedData, ClientID record[], Player players[]) {
+static void forwardreceivedPacket(UDPLocalInformation *information, PlayerData *receivedData, UDPClientInformation UDPRecord[], Player players[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (record[i].port == information->packetToReceive->address.port) {
+        if (UDPRecord[i].port == information->packetToReceive->address.port) {
             for (int j = 0; j < MAX_CLIENTS; j++) {
                 if (i == j) {
                     applyReceivedData(&players[i], receivedData);
                 }
-                else if (record[j].active) {
-                    sendServerCopy(information, record[j].ip, record[j].port, &players[i]);
+                else if (UDPRecord[j].active) {
+                    sendServerCopy(information, UDPRecord[j].ip, UDPRecord[j].port, &players[i]);
                 }
             }
             break;
@@ -187,24 +187,24 @@ static void forwardreceivedPacket(Network *information, PlayerData *receivedData
     }
 }
 
-static void changeDestination(Network *information, Uint32 clientIP, Uint16 clientPort) {
+static void changeDestination(UDPLocalInformation *information, Uint32 clientIP, Uint16 clientPort) {
     information->destination.host = clientIP;
     information->destination.port = clientPort;
 }
 
 ///// TCP /////
 
-static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation client[]) {
+static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!client[i].active) {
-            client[i].socket = SDLNet_TCP_Accept(TCPInformation->socket);
-            if (client[i].socket == NULL) {
+        if (!TCPRecord[i].active) {
+            TCPRecord[i].socket = SDLNet_TCP_Accept(TCPInformation->socket);
+            if (TCPRecord[i].socket == NULL) {
                 return;
             }
-            client[i].active = true;
+            TCPRecord[i].active = true;
             printf("Established a connection with client: %d\n", i);
-            SDLNet_TCP_AddSocket(TCPInformation->set, client[i].socket);
-            sendClientNumber(client[i].socket, i);
+            SDLNet_TCP_AddSocket(TCPInformation->set, TCPRecord[i].socket);
+            sendClientNumber(TCPRecord[i].socket, i);
             break;
         }
     }
@@ -216,37 +216,37 @@ static void sendClientNumber(TCPsocket clientSocket, int numberToAssign) {
     SDLNet_TCP_Send(clientSocket, &toSend, sizeof(TCPPacket));
 }
 
-static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[], int clientNumber) {
+static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[], int clientNumber) {
     TCPPacket toSend = { 0, 0 };
-    if (SDLNet_TCP_Recv(client[clientNumber].socket, &toSend, sizeof(TCPPacket)) <= 0) {
-        removeTCPEntry(TCPInformation, &client[clientNumber], clientNumber);
-        removeUDPEntry(record, clientNumber);
+    if (SDLNet_TCP_Recv(TCPRecord[clientNumber].socket, &toSend, sizeof(TCPPacket)) <= 0) {
+        removeTCPEntry(TCPInformation, &TCPRecord[clientNumber], clientNumber);
+        removeUDPEntry(UDPRecord, clientNumber);
     }
     else {
         printf("Received the following data in variable inMenu: \"%d\"\n", toSend.inMenu);
-        sendTCPData(client, toSend);
+        sendTCPData(TCPRecord, toSend);
     }
 }
 
-static void sendTCPData(TCPClientInformation client[], TCPPacket toSend) {
+static void sendTCPData(TCPClientInformation TCPRecord[], TCPPacket toSend) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (client[i].active) {
+        if (TCPRecord[i].active) {
             if (i == toSend.playerNumber) {
                 continue;
             }
             else {
-                SDLNet_TCP_Send(client[i].socket, &toSend, sizeof(TCPPacket));
+                SDLNet_TCP_Send(TCPRecord[i].socket, &toSend, sizeof(TCPPacket));
             }
         }
     }
 }
 
-static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *client, int clientNumber) {
+static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *TCPRecord, int clientNumber) {
     printf("Lost connection with client: %d\n", clientNumber);
-    SDLNet_TCP_DelSocket(TCPInformation->set, client->socket);
-    SDLNet_TCP_Close(client->socket);
-    client->socket = NULL;
-    client->active = false;
+    SDLNet_TCP_DelSocket(TCPInformation->set, TCPRecord->socket);
+    SDLNet_TCP_Close(TCPRecord->socket);
+    TCPRecord->socket = NULL;
+    TCPRecord->active = false;
 }
 
 static void receiveClientNumber(TCPLocalInformation *TCPInformation) {
@@ -256,10 +256,10 @@ static void receiveClientNumber(TCPLocalInformation *TCPInformation) {
     TCPInformation->playerNumber = toReceive.playerNumber;
 }
 
-static void removeUDPEntry(ClientID record[], int clientNumber) {
-    record[clientNumber].ip = 0;
-    record[clientNumber].port = 0;
-    record[clientNumber].active = false;
+static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber) {
+    UDPRecord[clientNumber].ip = 0;
+    UDPRecord[clientNumber].port = 0;
+    UDPRecord[clientNumber].active = false;
     printf("UDP entry for client %d was removed\n", clientNumber);
 }
 
@@ -299,20 +299,30 @@ void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation) {
     receiveClientNumber(TCPInformation);
 }
 
-void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation client[], ClientID record[]) {
+static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]) {
     TCPPacket toSend = { 0, 0 };
 
     SDLNet_CheckSockets(TCPInformation->set, 0);
 
     if (SDLNet_SocketReady(TCPInformation->socket)) {
-        addClient(TCPInformation, client);
+        addClient(TCPInformation, TCPRecord);
     }
 
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (client[i].active) {
-            if (SDLNet_SocketReady(client[i].socket) > 0) {
-                receiveTCPData(TCPInformation, client, record, i);
+        if (TCPRecord[i].active) {
+            if (SDLNet_SocketReady(TCPRecord[i].socket) > 0) {
+                receiveTCPData(TCPInformation, TCPRecord, UDPRecord, i);
             }
         }
+    }
+}
+
+void manageNetwork(NetworkBundle *networkData, Player players[]) {
+    if (networkData->TCPInformation.playerNumber == -1) {
+        manageServerDuties(&networkData->UDPInformation, networkData->UDPRecord, players, &networkData->toSend); //players, client
+        manageServerTCPActivity(&networkData->TCPInformation, networkData->TCPRecord, networkData->UDPRecord);
+    }
+    else {
+        manageUDPClientConnection(&networkData->UDPInformation, &networkData->toSend, players, networkData->TCPInformation.playerNumber);
     }
 }

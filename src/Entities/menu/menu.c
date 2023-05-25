@@ -1,6 +1,6 @@
 #include "menu.h"
 
-void manageMenu(Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]) {
+void manageMenu(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]) {
     int scene = 0;
     while (game->menuState) {
         if (scene == 0) {
@@ -117,7 +117,7 @@ static void handleMenuEntry(int *scene, Framework *game) {
     }
 }
 
-static void handleHostGameOption(int *scene, Framework *game, Network *information, TCPLocalInformation *TCPInformation, ClientID record[]) {
+static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]) {
     initiateServerTCPCapability(TCPInformation);
     TCPInformation->playerNumber = -1;
     setUpServer(information, record, 2000);
@@ -139,7 +139,7 @@ static void handleHostGameOption(int *scene, Framework *game, Network *informati
         changeThemeSong();
 }
 
-static void handleJoinGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation) {
+static void handleJoinGameOption(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation) {
     InitiateClientTCPCapability(TCPInformation);
     setUpClient(information, "127.0.0.1", 2000);
     changeThemeSong();
