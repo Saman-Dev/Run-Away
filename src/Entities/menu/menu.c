@@ -122,12 +122,12 @@ static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformatio
     TCPInformation->playerNumber = -1;
     setUpServer(information, record, 2000);
 
+    /*
     Menu menu;
     char *lobbyOptions[] = { "Host Connected", "Not connected", "Not Connected", "Not connected", "Not connected", "Play", "Back", "\0"};
     menu.options = lobbyOptions;
     strcpy(menu.imageFilePath, "resources/lobby_menu.png");
 
-    /*
     int selectedBox = displayOptions(game, &menu);
     if (selectedBox == 6) {
         *scene = 0;
@@ -135,8 +135,8 @@ static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformatio
     else {
     }
     */
-        game->menuState = false;
-        changeThemeSong();
+    game->menuState = false;
+    changeThemeSong();
 }
 
 static void handleJoinGameOption(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation) {
