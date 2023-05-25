@@ -20,13 +20,13 @@ typedef struct {
     char imageFilePath[50];
 } Menu;
 
-void manageMenu(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]);
+void manageMenu(Framework *game, NetworkBundle *networkData);
 static int displayOptions(Framework *game, Menu *menu);
 static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[]);
 
 static void handleMenuEntry(int *scene, Framework *game);
-static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]);
-static void handleJoinGameOption(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation);
+static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData);
+static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData);
 static void handleSettingsOption(int *scene, Framework *game);
 
 #endif

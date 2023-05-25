@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     while (!game.quit) {
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
-            manageMenu(&game, &networkData.UDPInformation, &networkData.TCPInformation, networkData.UDPRecord);
+            manageMenu(&game, &networkData);
             timerData.timeWhenStarting = time(NULL);
         }
         else {

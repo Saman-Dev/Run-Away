@@ -1,16 +1,16 @@
 #include "menu.h"
 
-void manageMenu(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]) {
+void manageMenu(Framework *game, NetworkBundle *networkData) {
     int scene = 0;
     while (game->menuState) {
         if (scene == 0) {
             handleMenuEntry(&scene, game);
         }
         else if (scene == 1) {
-            handleHostGameOption(&scene, game, information, TCPInformation, record);
+            handleHostGameOption(&scene, game, networkData);
         }
         else if (scene == 2) {
-            handleJoinGameOption(game, information, TCPInformation);
+            handleJoinGameOption(&scene, game, networkData);
         }
         else if (scene == 3) {
             handleSettingsOption(&scene, game);
@@ -117,10 +117,10 @@ static void handleMenuEntry(int *scene, Framework *game) {
     }
 }
 
-static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation, UDPClientInformation record[]) {
-    initiateServerTCPCapability(TCPInformation);
-    TCPInformation->playerNumber = -1;
-    setUpServer(information, record, 2000);
+static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData) {
+    initiateServerTCPCapability(&networkData->TCPInformation);
+    networkData->TCPInformation.playerNumber = -1;
+    setUpServer(&networkData->UDPInformation, networkData->UDPRecord, 2000);
 
     /*
     Menu menu;
@@ -139,9 +139,9 @@ static void handleHostGameOption(int *scene, Framework *game, UDPLocalInformatio
     changeThemeSong();
 }
 
-static void handleJoinGameOption(Framework *game, UDPLocalInformation *information, TCPLocalInformation *TCPInformation) {
-    InitiateClientTCPCapability(TCPInformation);
-    setUpClient(information, "127.0.0.1", 2000);
+static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData) {
+    InitiateClientTCPCapability(&networkData->TCPInformation);
+    setUpClient(&networkData->UDPInformation, "127.0.0.1", 2000);
     changeThemeSong();
     game->menuState = false;
 }
