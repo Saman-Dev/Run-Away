@@ -92,11 +92,7 @@ static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect text
 }
 
 static void handleMenuEntry(int *scene, Framework *game) {
-    Menu menu;
-    char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
-    menu.options = menuOptions;
-    strcpy(menu.imageFilePath, "resources/start_menu.png");
-
+    Menu menu = {{"Host Game", "Join Game", "Settings", "Quit", "\0"}, {"resources/start_menu.png"}, false};
     int selectedBox = displayOptions(game, &menu);
     switch (selectedBox) {
         case 0:
@@ -123,11 +119,7 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
     setUpServer(&networkData->UDPInformation, networkData->UDPRecord, 2000);
 
     /*
-    Menu menu;
-    char *lobbyOptions[] = { "Host Connected", "Not connected", "Not Connected", "Not connected", "Not connected", "Play", "Back", "\0"};
-    menu.options = lobbyOptions;
-    strcpy(menu.imageFilePath, "resources/lobby_menu.png");
-
+    Menu menu = {{"Host Connected", "Not connected", "Not Connected", "Not connected", "Not connected", "Play", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
     int selectedBox = displayOptions(game, &menu);
     if (selectedBox == 6) {
         *scene = 0;
@@ -147,11 +139,7 @@ static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *net
 }
 
 static void handleSettingsOption(int *scene, Framework *game) {
-    Menu menu;
-    char *settingsOptions[] = { "Mute Song", " ", " ", "Back to Menu", "\0"};
-    menu.options = settingsOptions;
-    strcpy(menu.imageFilePath, "resources/settings_menu.png");
-    
+    Menu menu = {{"Mute Song", " ", " ", "Back to Menu", "\0"}, {"resources/settings_menu.png"}, false};
     int selectedBox = displayOptions(game, &menu);
     switch (selectedBox) {
         case 0:
