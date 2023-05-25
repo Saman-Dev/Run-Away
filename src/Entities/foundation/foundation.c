@@ -29,12 +29,6 @@ void initialize(Framework *game) {
         printf("TTF_Init error: %s\n", TTF_GetError());
     }
 
-    game->winFont = TTF_OpenFont("resources/font.ttf", 48);
-    if (game->winFont == NULL) {
-        printf("%s\n", SDL_GetError());
-        exit(1);
-    }
-
     game->font = TTF_OpenFont("resources/font.ttf", 24);
     if (game->font == NULL) {
         printf("%s\n", SDL_GetError());

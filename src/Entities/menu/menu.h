@@ -10,11 +10,12 @@
 #include "../foundation/foundation.h"
 #include "../network/network.h"
 
-#define MAX_NUMBER_OF_TEXT_BOXES 6
+#define MAX_NUMBER_OF_TEXT_BOXES 7
+#define SPACING_BETWEEN_TEXT_BOXES 36
+#define LOCATION_ADJUSTMENT 120
 
 typedef struct {
     char **options;
-    int optionSpacing;
     char role[10];
     char imageFilePath[50];
 } Menu;

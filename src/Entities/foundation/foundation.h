@@ -14,8 +14,8 @@
 
 #include "../audio/audio.h"
 
-#define SCREEN_WIDTH 1600 // 1280
-#define SCREEN_HEIGHT 960 // 720
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 #define FPS 60
 
@@ -25,7 +25,6 @@ typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
     TTF_Font *font;
-    TTF_Font *winFont;
     SDL_Color white;
     SDL_Event event;
     bool menuState;

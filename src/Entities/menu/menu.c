@@ -72,14 +72,14 @@ static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect text
         textBoxRectangle[i].y = accumulatedTextBoxHeight;
         textBoxRectangle[i].w = textBoxSurface[i]->w;
         textBoxRectangle[i].h = textBoxSurface[i]->h;
-        accumulatedTextBoxHeight += textBoxRectangle[i].h + menu->optionSpacing;
+        accumulatedTextBoxHeight += textBoxRectangle[i].h + SPACING_BETWEEN_TEXT_BOXES;
         if (textBoxRectangle[i].w > largestTextBoxWidth) {
             largestTextBoxWidth = textBoxRectangle[i].w;
         }
     }
     
     int menuX = (SCREEN_WIDTH / 2) - (largestTextBoxWidth / 2);
-    int menuY = (SCREEN_HEIGHT / 2) - 52;
+    int menuY = (SCREEN_HEIGHT / 2) - LOCATION_ADJUSTMENT;
     for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
         textBoxRectangle[i].x = menuX + (largestTextBoxWidth - textBoxRectangle[i].w) / 2;
         textBoxRectangle[i].y = menuY + textBoxRectangle[i].y;
@@ -95,7 +95,6 @@ static void handleMenuEntry(int *scene, Framework *game) {
     Menu menu;
     char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
     menu.options = menuOptions;
-    menu.optionSpacing = 60;
     strcpy(menu.imageFilePath, "resources/start_menu.png");
 
     int selectedBox = displayOptions(game, &menu);
@@ -123,22 +122,21 @@ static void handleHostGameOption(int *scene, Framework *game, Network *informati
     TCPInformation->playerNumber = -1;
     setUpServer(information, record, 2000);
 
-    /*
     Menu menu;
-    char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back", "\0"};
+    char *lobbyOptions[] = { "Host Connected", "Not connected", "Not Connected", "Not connected", "Not connected", "Play", "Back", "\0"};
     menu.options = lobbyOptions;
-    menu.optionSpacing = 20;
     strcpy(menu.imageFilePath, "resources/lobby_menu.png");
 
+    /*
     int selectedBox = displayOptions(game, &menu);
-    if (selectedBox == 5) {
+    if (selectedBox == 6) {
         *scene = 0;
     }
     else {
     }
     */
-    game->menuState = false;
-    changeThemeSong();
+        game->menuState = false;
+        changeThemeSong();
 }
 
 static void handleJoinGameOption(Framework *game, Network *information, TCPLocalInformation *TCPInformation) {
@@ -150,9 +148,8 @@ static void handleJoinGameOption(Framework *game, Network *information, TCPLocal
 
 static void handleSettingsOption(int *scene, Framework *game) {
     Menu menu;
-    char *settingsOptions[] = { "Mute Song", "Back to Menu", "\0"};
+    char *settingsOptions[] = { "Mute Song", " ", " ", "Back to Menu", "\0"};
     menu.options = settingsOptions;
-    menu.optionSpacing = 240;
     strcpy(menu.imageFilePath, "resources/settings_menu.png");
     
     int selectedBox = displayOptions(game, &menu);
@@ -167,7 +164,7 @@ static void handleSettingsOption(int *scene, Framework *game) {
                 game->isMuted = false;
             }
             break;
-        case 1:
+        case 3:
             *scene = 0;
             break;
         default:
