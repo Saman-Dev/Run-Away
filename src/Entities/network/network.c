@@ -192,8 +192,17 @@ static void changeDestination(UDPLocalInformation *information, Uint32 clientIP,
     information->destination.port = clientPort;
 }
 
-///// TCP /////
+void resetClientNetwork(NetworkBundle *networkData) {
+    SDLNet_TCP_Close(networkData->TCPInformation.socket);
+    SDLNet_UDP_Close(networkData->UDPInformation.sourcePort);
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        networkData->TCPRecord[i].active = false;
+    }
+    networkData->toSend.positionX = 0;
+    networkData->toSend.positionY = 0;
+}
 
+///// TCP /////
 static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (!TCPRecord[i].active) {
@@ -305,10 +314,7 @@ void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientI
 }
 
 static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]) {
-    TCPPacket toSend = {false, 0, {NULL, false}};
-
-    manageLobbyStatus(TCPInformation, TCPRecord);
-
+    manageLobby(TCPInformation, TCPRecord);
     SDLNet_CheckSockets(TCPInformation->set, 0);
 
     if (SDLNet_SocketReady(TCPInformation->socket)) {
@@ -335,31 +341,31 @@ void manageNetwork(NetworkBundle *networkData, Player players[]) {
     }
 }
 
-static void manageLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
-    static bool reference[MAX_CLIENTS] = {0};
+static void manageLobby(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
     if (TCPInformation->inLobby) {
-        for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (TCPRecord[i].active != reference[i]) {
-                for (int j = 0; j < MAX_CLIENTS; j++) {
-                    if (TCPRecord[j].active) {
-                        sendNumberOfPlayersConnected(TCPRecord, j);
-                    }
-                }
-                reference[i] = TCPRecord[i].active;
-            }
-        }
+        sendNumberOfPlayersConnected(TCPRecord);
     }
     else {
-        tellTheClientsTheGameHasStarted(TCPRecord);
+        sendNewInLobbyValue(TCPRecord);
     }
 }
 
-static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[], int entryToSendUpdateTo) {
+static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[]) {
     TCPPacket toSend = {true, 0, {NULL, false}};
+    static bool reference[MAX_CLIENTS] = {0};
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        toSend.TCPRecord[i].active = TCPRecord[i].active;
+        if (TCPRecord[i].active != reference[i]) {
+            for (int j = 0; j < MAX_CLIENTS; j++) {
+                if (TCPRecord[j].active) {
+                    for (int k = 0; k < MAX_CLIENTS; k++) {
+                        toSend.TCPRecord[k].active = TCPRecord[k].active;
+                    }
+                    SDLNet_TCP_Send(TCPRecord[j].socket, &toSend, sizeof(TCPPacket));
+                }
+            }
+            reference[i] = TCPRecord[i].active;
+        }
     }
-    SDLNet_TCP_Send(TCPRecord[entryToSendUpdateTo].socket, &toSend, sizeof(TCPPacket));
 }
 
 static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
@@ -370,7 +376,7 @@ static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInfor
         if (toReceive.inLobby) {
             for (int i = 0; i < MAX_CLIENTS; i++) {
                 TCPRecord[i].active = toReceive.TCPRecord[i].active;
-                printf("Value the following value from server regarding connected players: %d\n", toReceive.TCPRecord[i].active);
+                printf("Received the following value from the server regarding connected players: %d\n", toReceive.TCPRecord[i].active);
             }
             printf("\n");
         }
@@ -380,7 +386,7 @@ static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInfor
     }
 }
 
-static void tellTheClientsTheGameHasStarted(TCPClientInformation TCPRecord[]) {
+static void sendNewInLobbyValue(TCPClientInformation TCPRecord[]) {
     TCPPacket toSend = {false, 0, {NULL, false}};
     static bool reference[MAX_CLIENTS] = {0};
     for (int i = 0; i < MAX_CLIENTS; i++) {

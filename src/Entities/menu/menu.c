@@ -104,24 +104,19 @@ static void destroyBoxTextures(Menu *menu, SDL_Texture *textBoxTexture[]) {
     }
 }
 
-static void updateBoxContent(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[], NetworkBundle *network) {
-    static int connectedPlayersLastTime = 0;
-    int connectedPlayersNow = 0;
+static void updateBoxContent(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[], NetworkBundle *networkData) {
+    int boxesChanged = 0;
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (network->TCPRecord[i].active) {
-            connectedPlayersNow++;
+        if (networkData->TCPRecord[i].active == true && strcmp(menu->options[i+1], "Spot Available") == 0) {
+            menu->options[i+1] = "Player connected";
+            boxesChanged++;
+        }
+        else if (networkData->TCPRecord[i].active == false && strcmp(menu->options[i+1], "Player connected") == 0)  {
+            menu->options[i+1] = "Spot Available";
+            boxesChanged++;
         }
     }
-    if (connectedPlayersLastTime != connectedPlayersNow) {
-        for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (network->TCPRecord[i].active) {
-                menu->options[i+1] = "Player connected";
-            }
-            else {
-                menu->options[i+1] = "Spot Available";
-            }
-        }
-        connectedPlayersLastTime = connectedPlayersNow;
+    if (boxesChanged > 0) {
         destroyBoxTextures(menu, textBoxTexture);
         prepareTextBoxesToBeShown(game, menu, textBoxRectangle, textBoxTexture);
     }
@@ -185,6 +180,7 @@ static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *net
         }
         if (selectedBox == 6) {
             playMenuClickSound();
+            resetClientNetwork(networkData);
             *scene = 0;
         }
         else {
