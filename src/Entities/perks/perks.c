@@ -27,6 +27,22 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                     player->hasPerk = true;
                     player->perkStartTime = time(NULL);
                 }
+                else if (perk->perkID == 3) {
+                    int numReversed = 0;
+                    while (numReversed < 2) {
+                        int randomPlayerIndex = (rand() % MAX_PLAYERS);
+                        
+                        Player *randomPlayer = &players[randomPlayerIndex];
+                        if (!randomPlayer->hasPerk) {
+                            randomPlayer->movementKeysReversed = true;
+                            randomPlayer->hasPerk = true;
+                            randomPlayer->perkStartTime = time(NULL);
+                            numReversed++;
+                        }
+                    }
+                    perk->available = false;
+                    perk->duration = perk_duration;
+                }
             }
         }
     }
@@ -42,6 +58,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                     perk->respawnTime = time(NULL) + 10;
                     for (int j = 0; j < MAX_PLAYERS; j++) {
                         Player *otherPlayer = &players[j];
+                        otherPlayer->movementKeysReversed = false;
                         otherPlayer->frozen = false;
                         otherPlayer->speed = DEFAULT_SPEED;
                     }
@@ -76,6 +93,7 @@ void renderPerk(SDL_Renderer *renderer, Perk *perk) {
     }
 }
 
+
 bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
     return (a.x + a.w > b.x && a.x < b.x + b.w) && (a.y + a.h > b.y && a.y < b.y + b.h);
@@ -84,9 +102,11 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     Perk speedBoostPerk;
     Perk freezePerk;
+    Perk reverseKeysPerk;
     SDL_Texture *perkTextureSpeed = IMG_LoadTexture(renderer, "resources/newperk.png");
     SDL_Texture *perkTextureFreeze = IMG_LoadTexture(renderer, "resources/newperk2.png");
-    if (perkTextureSpeed == NULL || perkTextureFreeze == NULL) {
+    SDL_Texture *perkTextureReverse = IMG_LoadTexture(renderer, "resources/newperk.png");
+    if (perkTextureSpeed == NULL || perkTextureFreeze == NULL || perkTextureReverse == NULL) {
         printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
         exit(1);
     }
@@ -96,11 +116,14 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
 
     speedBoostPerk.texture = perkTextureSpeed;
     freezePerk.texture = perkTextureFreeze;
+    reverseKeysPerk.texture = perkTextureReverse;
 
     speedBoostPerk.rect.x = 860;
     speedBoostPerk.rect.y = 750;
     freezePerk.rect.x = 400;
     freezePerk.rect.y = 200;
+    reverseKeysPerk.rect.x = 450;
+    reverseKeysPerk.rect.y = 200;
 
     /*if (randomLocation == 1)
     {
@@ -117,21 +140,31 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
         freezePerk.rect.y = 200;
     }*/
 
-    speedBoostPerk.rect.w = freezePerk.rect.w = PERK_WIDTH;
-    speedBoostPerk.rect.h = freezePerk.rect.h = PERK_HEIGHT;
-    speedBoostPerk.available = freezePerk.available = true;
-    speedBoostPerk.duration = freezePerk.duration = 0;    // Initialize duration to 0
-    speedBoostPerk.respawnTime = freezePerk.duration = 0; // Initialize respawn time to 0
+    speedBoostPerk.rect.w = freezePerk.rect.w = reverseKeysPerk.rect.w = PERK_WIDTH;
+    speedBoostPerk.rect.h = freezePerk.rect.h = reverseKeysPerk.rect.h = PERK_HEIGHT;
+    speedBoostPerk.available = freezePerk.available = reverseKeysPerk.available = true;
+    speedBoostPerk.duration = freezePerk.duration = reverseKeysPerk.duration = 0;    // Initialize duration to 0
+    speedBoostPerk.respawnTime = freezePerk.duration = reverseKeysPerk.duration = 0; // Initialize respawn time to 0
 
     if (perkNr == 1) {
         speedBoostPerk.perkID = perkNr;
         return speedBoostPerk;
     }
-    else {
+    else if (perkNr == 2) {
         freezePerk.perkID = perkNr;
         return freezePerk;
     }
+    else if (perkNr == 3) {
+        reverseKeysPerk.perkID = perkNr;
+        return reverseKeysPerk;
+    }
+    else {
+        // Return a default perk if perkNr is invalid
+        speedBoostPerk.perkID = perkNr;
+        return speedBoostPerk;
+    }
 }
+
 
 void checkPerkRespawn(Perk *perk) {
     time_t current_time = time(NULL); // Get the current time

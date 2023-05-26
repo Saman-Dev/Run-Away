@@ -23,6 +23,7 @@ typedef struct {
     int speed;
     bool captured;
     bool frozen;
+    bool movementKeysReversed;
     bool up;
     bool down;
     bool left;

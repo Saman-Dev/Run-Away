@@ -32,8 +32,11 @@ int main(int argc, char **argv) {
 
     Perk speedBoostPerk = initializePerk(game.renderer, 1);
     Perk freezPerk = initializePerk(game.renderer, 2);
-
+    Perk reverseKeysPerk = initializePerk(game.renderer, 3);
+    
     while (!game.quit) {
+        //int randomPlayerIndex = (rand() % MAX_PLAYERS);
+        //printf("Plyer :%d \n", randomPlayerIndex);
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
             manageMenu(&game, &networkData);
@@ -53,12 +56,15 @@ int main(int argc, char **argv) {
             // Check for perk collision
             applyPerk(players, &freezPerk, game.renderer);
             applyPerk(players, &speedBoostPerk, game.renderer);
+            applyPerk(players, &reverseKeysPerk, game.renderer);
             checkPerkRespawn(&speedBoostPerk);
             checkPerkRespawn(&freezPerk);
+            checkPerkRespawn(&reverseKeysPerk);
 
             // Perk render
             renderPerk(game.renderer, &speedBoostPerk);
             renderPerk(game.renderer, &freezPerk);
+            renderPerk(game.renderer, &reverseKeysPerk);
             HuntAndRevive(game.renderer, players);
 
             manageTimer(&game, &timerData);
@@ -74,7 +80,8 @@ int main(int argc, char **argv) {
 
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
-    SDL_DestroyTexture(freezPerk.texture);
+    SDL_DestroyTexture(freezPerk.texture); 
+    SDL_DestroyTexture(reverseKeysPerk.texture); 
     SDL_DestroyWindow(game.window);
     TTF_CloseFont(game.font);
     Mix_CloseAudio();

@@ -7,6 +7,7 @@ void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
 }
 
 static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[]) {
+    int numberOfCapturedPlayers = 0;
     for (int i = 0; players[i].player != 0; i++) {
         if (players[i].captured) {
             if (!cage->active) {
