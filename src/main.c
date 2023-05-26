@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         //printf("Plyer :%d \n", randomPlayerIndex);
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
-            manageMenu(&game, &networkData);
+            manageMenu(&game, &networkData, players);
             timerData.timeWhenStarting = time(NULL);
         }
         else {
@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
         }
     }
 
+    printf("END\n");
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
     SDL_DestroyTexture(freezPerk.texture); 

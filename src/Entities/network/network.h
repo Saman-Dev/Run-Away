@@ -35,6 +35,7 @@ typedef struct {
 	TCPsocket socket;
 	SDLNet_SocketSet set;
 	int playerNumber;
+	bool inLobby;
 } TCPLocalInformation;
 
 typedef struct {
@@ -43,8 +44,9 @@ typedef struct {
 } TCPClientInformation;
 
 typedef struct {
-	bool inMenu;
+	bool inLobby;
 	int playerNumber;
+	TCPClientInformation TCPRecord[MAX_CLIENTS];
 } TCPPacket;
 
 typedef struct {
@@ -83,7 +85,11 @@ static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInforma
 static void receiveClientNumber(TCPLocalInformation *TCPInformation);
 static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber);
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
-void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation);
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
 static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]);
+static void manageLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
+static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[], int entryToSendUpdateTo);
+static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
+static void tellTheClientsTheGameHasStarted(TCPClientInformation TCPRecord[]);
 
 #endif

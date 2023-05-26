@@ -1,16 +1,16 @@
 #include "menu.h"
 
-void manageMenu(Framework *game, NetworkBundle *networkData) {
+void manageMenu(Framework *game, NetworkBundle *networkData, Player players[]) {
     int scene = 0;
     while (game->menuState) {
         if (scene == 0) {
             handleMenuEntry(&scene, game);
         }
         else if (scene == 1) {
-            handleHostGameOption(&scene, game, networkData);
+            handleHostGameOption(&scene, game, networkData, players);
         }
         else if (scene == 2) {
-            handleJoinGameOption(&scene, game, networkData);
+            handleJoinGameOption(&scene, game, networkData, players);
         }
         else if (scene == 3) {
             handleSettingsOption(&scene, game);
@@ -18,7 +18,7 @@ void manageMenu(Framework *game, NetworkBundle *networkData) {
     }
 }
 
-static int displayOptions(Framework *game, Menu *menu) {
+static int displayOptions(Framework *game, Menu *menu, NetworkBundle *networkData, Player players[]) {
     SDL_Rect textBoxRectangle[MAX_NUMBER_OF_TEXT_BOXES+1];
     SDL_Texture *textBoxTexture[MAX_NUMBER_OF_TEXT_BOXES+1];
     SDL_Texture *backgroundTexture = IMG_LoadTexture(game->renderer, menu->imageFilePath);
@@ -31,13 +31,14 @@ static int displayOptions(Framework *game, Menu *menu) {
         while (SDL_PollEvent(&game->event)) {
             switch (game->event.type) {
                 case SDL_QUIT:
-                    selectedOption = 1; // FIX!
+                    game->menuState = false;
+                    game->quit = true;
+                    selectedOption = -2;
                     break;
-                case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEBUTTONDOWN:
                     SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
                     for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
                         if (SDL_PointInRect(&mousePosition, &textBoxRectangle[i])) {
-                            playMenuClickSound();
                             selectedOption = i;
                         }
                     }
@@ -52,12 +53,18 @@ static int displayOptions(Framework *game, Menu *menu) {
             SDL_RenderCopy(game->renderer, textBoxTexture[i], NULL, &textBoxRectangle[i]);
         }
         SDL_RenderPresent(game->renderer);
+
+        if (menu->networkFunctionality) {
+            manageNetwork(networkData, players);
+            updateBoxContent(game, menu, textBoxRectangle, textBoxTexture, networkData);
+            if (!networkData->TCPInformation.inLobby) {
+                return -2;
+            }
+        }
     }
 
     SDL_DestroyTexture(backgroundTexture);
-    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-        SDL_DestroyTexture(textBoxTexture[i]);
-    }
+    destroyBoxTextures(menu, textBoxTexture);
 
     return selectedOption;
 }
@@ -91,17 +98,49 @@ static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect text
     }
 }
 
+static void destroyBoxTextures(Menu *menu, SDL_Texture *textBoxTexture[]) {
+    for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
+    SDL_DestroyTexture(textBoxTexture[i]);
+    }
+}
+
+static void updateBoxContent(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[], NetworkBundle *network) {
+    static int connectedPlayersLastTime = 0;
+    int connectedPlayersNow = 0;
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (network->TCPRecord[i].active) {
+            connectedPlayersNow++;
+        }
+    }
+    if (connectedPlayersLastTime != connectedPlayersNow) {
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            if (network->TCPRecord[i].active) {
+                menu->options[i+1] = "Player connected";
+            }
+            else {
+                menu->options[i+1] = "Spot Available";
+            }
+        }
+        connectedPlayersLastTime = connectedPlayersNow;
+        destroyBoxTextures(menu, textBoxTexture);
+        prepareTextBoxesToBeShown(game, menu, textBoxRectangle, textBoxTexture);
+    }
+}
+
 static void handleMenuEntry(int *scene, Framework *game) {
     Menu menu = {{"Host Game", "Join Game", "Settings", "Quit", "\0"}, {"resources/start_menu.png"}, false};
-    int selectedBox = displayOptions(game, &menu);
+    int selectedBox = displayOptions(game, &menu, NULL, NULL);
     switch (selectedBox) {
         case 0:
+            playMenuClickSound();
             *scene = 1;
             break;
         case 1:
+            playMenuClickSound();
             *scene = 2;
             break;
         case 2:
+            playMenuClickSound();
             *scene = 3;
             break;
         case 3:
@@ -113,36 +152,58 @@ static void handleMenuEntry(int *scene, Framework *game) {
     }
 }
 
-static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData) {
+static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]) {
     initiateServerTCPCapability(&networkData->TCPInformation);
-    networkData->TCPInformation.playerNumber = -1;
     setUpServer(&networkData->UDPInformation, networkData->UDPRecord, 2000);
 
-    /*
-    Menu menu = {{"Host Connected", "Not connected", "Not Connected", "Not connected", "Not connected", "Play", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
-    int selectedBox = displayOptions(game, &menu);
-    if (selectedBox == 6) {
-        *scene = 0;
+    Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", "Play", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
+    int selectedBox = 0;
+    while (selectedBox != 5 && selectedBox != 6) {
+        selectedBox = displayOptions(game, &menu, networkData, players);
+    }
+    if (selectedBox == 5) {
+        playMenuClickSound();
+        changeThemeSong();
+        networkData->TCPInformation.inLobby = false;
+        game->menuState = false;
     }
     else {
+        playMenuClickSound();
+        *scene = 0;
     }
-    */
-    game->menuState = false;
-    changeThemeSong();
 }
 
-static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData) {
-    InitiateClientTCPCapability(&networkData->TCPInformation);
+static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]) {
+    InitiateClientTCPCapability(&networkData->TCPInformation, networkData->TCPRecord);
     setUpClient(&networkData->UDPInformation, "127.0.0.1", 2000);
-    changeThemeSong();
-    game->menuState = false;
+
+    if (networkData->TCPInformation.inLobby) {
+        Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", " ", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
+        int selectedBox = 0;
+        while (selectedBox != 6 && networkData->TCPInformation.inLobby) {
+            selectedBox = displayOptions(game, &menu, networkData, players);
+        }
+        if (selectedBox == 6) {
+            playMenuClickSound();
+            *scene = 0;
+        }
+        else {
+            changeThemeSong();
+            game->menuState = false;
+        }
+    }
+    else {
+        changeThemeSong();
+        game->menuState = false;
+    }
 }
 
 static void handleSettingsOption(int *scene, Framework *game) {
     Menu menu = {{"Mute Song", " ", " ", "Back to Menu", "\0"}, {"resources/settings_menu.png"}, false};
-    int selectedBox = displayOptions(game, &menu);
+    int selectedBox = displayOptions(game, &menu, NULL, NULL);
     switch (selectedBox) {
         case 0:
+            playMenuClickSound();
             if (!game->isMuted) {
                 Mix_VolumeMusic(0);
                 game->isMuted = true;
@@ -153,27 +214,17 @@ static void handleSettingsOption(int *scene, Framework *game) {
             }
             break;
         case 3:
+            playMenuClickSound();
             *scene = 0;
             break;
         default:
             break;
     }
 }
+
 /*
-    else if (*state == LOBBY) {
-        selectedBox = displayOptions(game, menu);
-        switch (selectedBox) {
-        case 4:
-            *state = ONGOING;
-            break;
-        case 5:
-            *state = START;
-            printf("Disconnected");
-            SDLNet_UDP_Close(information->sourcePort);
-            SDLNet_TCP_Close(TCPInformation->socket);
-            break;
-        }
-    }
+    SDLNet_UDP_Close(information->sourcePort);
+    SDLNet_TCP_Close(TCPInformation->socket);
     else if (*state == GAME_OVER) {
         selectedBox = displayOptions(game, menu);
         switch (selectedBox) {

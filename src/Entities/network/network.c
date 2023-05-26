@@ -211,19 +211,19 @@ static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation 
 }
 
 static void sendClientNumber(TCPsocket clientSocket, int numberToAssign) {
-    TCPPacket toSend = { 0, 0 };
+    TCPPacket toSend = {false, 0, {NULL, false}};
     toSend.playerNumber = numberToAssign;
     SDLNet_TCP_Send(clientSocket, &toSend, sizeof(TCPPacket));
 }
 
 static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[], int clientNumber) {
-    TCPPacket toSend = { 0, 0 };
+    TCPPacket toSend = {false, 0, {NULL, false}};
     if (SDLNet_TCP_Recv(TCPRecord[clientNumber].socket, &toSend, sizeof(TCPPacket)) <= 0) {
         removeTCPEntry(TCPInformation, &TCPRecord[clientNumber], clientNumber);
         removeUDPEntry(UDPRecord, clientNumber);
     }
     else {
-        printf("Received the following data in variable inMenu: \"%d\"\n", toSend.inMenu);
+        printf("Received the following data in variable inMenu: \"%d\"\n", toSend.inLobby);
         sendTCPData(TCPRecord, toSend);
     }
 }
@@ -250,7 +250,7 @@ static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInforma
 }
 
 static void receiveClientNumber(TCPLocalInformation *TCPInformation) {
-    TCPPacket toReceive = { 0, 0 };
+    TCPPacket toReceive = {false, 0, {NULL, false}};
     SDLNet_TCP_Recv(TCPInformation->socket, &toReceive, sizeof(TCPPacket));
     printf("Received the following number from server: %d\n", toReceive.playerNumber);
     TCPInformation->playerNumber = toReceive.playerNumber;
@@ -264,6 +264,8 @@ static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber) {
 }
 
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation) {
+    TCPInformation->playerNumber = -1;
+    TCPInformation->inLobby = true;
     TCPInformation->set = SDLNet_AllocSocketSet(MAX_CLIENTS + 1);
 
     if (SDLNet_ResolveHost(&TCPInformation->ip, NULL, 9999) == -1) {
@@ -280,7 +282,8 @@ void initiateServerTCPCapability(TCPLocalInformation *TCPInformation) {
     SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);
 }
 
-void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation) {
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
+    TCPInformation->inLobby = true;
     TCPInformation->set = SDLNet_AllocSocketSet(2);
 
     if (SDLNet_ResolveHost(&TCPInformation->ip, "127.0.0.1", 9999) == -1) {
@@ -297,10 +300,14 @@ void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation) {
     SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);
 
     receiveClientNumber(TCPInformation);
+    SDL_Delay(20); // Delay to give the server time to get to the right function for the beneeth function to work as intendeed if the game is already running
+    checkLobbyStatus(TCPInformation, TCPRecord);
 }
 
 static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]) {
-    TCPPacket toSend = { 0, 0 };
+    TCPPacket toSend = {false, 0, {NULL, false}};
+
+    manageLobbyStatus(TCPInformation, TCPRecord);
 
     SDLNet_CheckSockets(TCPInformation->set, 0);
 
@@ -324,5 +331,64 @@ void manageNetwork(NetworkBundle *networkData, Player players[]) {
     }
     else {
         manageUDPClientConnection(&networkData->UDPInformation, &networkData->toSend, players, networkData->TCPInformation.playerNumber);
+        checkLobbyStatus(&networkData->TCPInformation, networkData->TCPRecord);
     }
+}
+
+static void manageLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
+    static bool reference[MAX_CLIENTS] = {0};
+    if (TCPInformation->inLobby) {
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            if (TCPRecord[i].active != reference[i]) {
+                for (int j = 0; j < MAX_CLIENTS; j++) {
+                    if (TCPRecord[j].active) {
+                        sendNumberOfPlayersConnected(TCPRecord, j);
+                    }
+                }
+                reference[i] = TCPRecord[i].active;
+            }
+        }
+    }
+    else {
+        tellTheClientsTheGameHasStarted(TCPRecord);
+    }
+}
+
+static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[], int entryToSendUpdateTo) {
+    TCPPacket toSend = {true, 0, {NULL, false}};
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        toSend.TCPRecord[i].active = TCPRecord[i].active;
+    }
+    SDLNet_TCP_Send(TCPRecord[entryToSendUpdateTo].socket, &toSend, sizeof(TCPPacket));
+}
+
+static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
+    TCPPacket toReceive = {false, 0, {NULL, false}};
+    SDLNet_CheckSockets(TCPInformation->set, 0);
+    if (SDLNet_SocketReady(TCPInformation->socket)) {
+        SDLNet_TCP_Recv(TCPInformation->socket, &toReceive, sizeof(TCPPacket));
+        if (toReceive.inLobby) {
+            for (int i = 0; i < MAX_CLIENTS; i++) {
+                TCPRecord[i].active = toReceive.TCPRecord[i].active;
+                printf("Value the following value from server regarding connected players: %d\n", toReceive.TCPRecord[i].active);
+            }
+            printf("\n");
+        }
+        else {
+            TCPInformation->inLobby = false;
+        }
+    }
+}
+
+static void tellTheClientsTheGameHasStarted(TCPClientInformation TCPRecord[]) {
+    TCPPacket toSend = {false, 0, {NULL, false}};
+    static bool reference[MAX_CLIENTS] = {0};
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (TCPRecord[i].active != reference[i]) {
+        if (TCPRecord[i].active) {
+            SDLNet_TCP_Send(TCPRecord[i].socket, &toSend, sizeof(TCPPacket));
+        }
+        reference[i] = TCPRecord[i].active;
+        }
+    } 
 }

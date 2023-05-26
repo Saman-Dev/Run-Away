@@ -20,13 +20,15 @@ typedef struct {
     bool networkFunctionality;
 } Menu;
 
-void manageMenu(Framework *game, NetworkBundle *networkData);
-static int displayOptions(Framework *game, Menu *menu);
+void manageMenu(Framework *game, NetworkBundle *networkData, Player players[]);
+static int displayOptions(Framework *game, Menu *menu, NetworkBundle *networkData, Player players[]);
 static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[]);
+static void destroyBoxTextures(Menu *menu, SDL_Texture *textBoxTexture[]);
+static void updateBoxContent(Framework *game, Menu *menu, SDL_Rect textBoxRectangle[], SDL_Texture *textBoxTexture[], NetworkBundle *network);
 
 static void handleMenuEntry(int *scene, Framework *game);
-static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData);
-static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData);
+static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]);
+static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]);
 static void handleSettingsOption(int *scene, Framework *game);
 
 #endif
