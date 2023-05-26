@@ -78,7 +78,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("END\n");
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
     SDL_DestroyTexture(freezPerk.texture); 
@@ -91,66 +90,3 @@ int main(int argc, char **argv) {
     SDL_Quit();
     return 0;
 }
-
-    //char *menuOptions[] = { "Host Game", "Join Game", "Settings", "Quit", "\0"};
-    //char *lobbyOptions[] = { "Not connected", "Not connected", "Not connected", "Not connected", "Play", "Back", "\0"};
-    //char *settingsOptions[] = { "Mute Game", "Back to Menu", "\0"};
-    //char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};
-
-/*            break;
-        case GAME_OVER:
-            printf("GAME_OVER\n");
-            menu.options = gameOverOptions;
-            menu.optionSpacing = 67;
-            menu.menuX = 713,
-                menu.menuY = 600;
-            strcpy(menu.imageFilePath, "resources/game_over_hunters_lose_menu.png");
-
-            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-            break;
-        case START:
-            printf("START\n");
-
-            menu.options = menuOptions;
-            menu.optionSpacing = 60;
-            menu.menuX = 730,
-                menu.menuY = 425;
-            strcpy(menu.imageFilePath, "resources/start_menu.png");
-
-            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-            if (selectedOption == 0) {
-                initiateServerTCPCapability(&TCPInformation);
-                TCPInformation.playerNumber = -1;
-                changeThemeSong();
-            }
-            else if (selectedOption == 1) {
-                InitiateClientTCPCapability(&TCPInformation);
-                changeThemeSong();
-            }
-            timerData.timeWhenStarting = time(NULL);
-            break;
-        case LOBBY:
-            printf("LOBBY\n");
-
-            menu.options = lobbyOptions;
-            menu.optionSpacing = 55;
-            menu.menuX = 400,
-                menu.menuY = 425;
-            strcpy(menu.imageFilePath, "resources/lobby_menu.png");
-
-            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-            break;
-        case SETTINGS:
-            printf("SETTINGS\n");
-
-            menu.options = settingsOptions;
-            menu.optionSpacing = 240;
-            menu.menuX = 710,
-                menu.menuY = 425;
-            strcpy(menu.imageFilePath, "resources/settings_menu.png");
-
-            selectedOption = manageMenu(&game, &menu, &information, &TCPInformation, &state, record);
-            break;
-        default:
-            break;
-        }*/

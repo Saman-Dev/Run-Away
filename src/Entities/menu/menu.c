@@ -219,8 +219,7 @@ static void handleSettingsOption(int *scene, Framework *game) {
 }
 
 /*
-    SDLNet_UDP_Close(information->sourcePort);
-    SDLNet_TCP_Close(TCPInformation->socket);
+char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};                
     else if (*state == GAME_OVER) {
         selectedBox = displayOptions(game, menu);
         switch (selectedBox) {
