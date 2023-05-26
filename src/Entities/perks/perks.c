@@ -1,6 +1,6 @@
 #include "perks.h"
 
-void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
+void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *camera) {
     SDL_Texture *frozenTexture = IMG_LoadTexture(renderer, "resources/cristal1.png");
 
     if (perk->available) {
@@ -31,7 +31,6 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                     int numReversed = 0;
                     while (numReversed < 2) {
                         int randomPlayerIndex = (rand() % MAX_PLAYERS);
-                        
                         Player *randomPlayer = &players[randomPlayerIndex];
                         if (!randomPlayer->hasPerk) {
                             randomPlayer->movementKeysReversed = true;
@@ -80,19 +79,30 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer) {
                 printf("Failed to load frozen texture: %s\n", IMG_GetError());
                 exit(1);
             }
-            SDL_RenderCopy(renderer, frozenTexture, NULL, &player->position);
+            SDL_Rect destRect = {
+                player->position.x - camera->x,
+                player->position.y - camera->y,
+                player->position.w,
+                player->position.h
+            };
+            SDL_RenderCopy(renderer, frozenTexture, NULL, &destRect);
         }
     }
 
     SDL_DestroyTexture(frozenTexture);
 }
 
-void renderPerk(SDL_Renderer *renderer, Perk *perk) {
+void renderPerk(SDL_Renderer *renderer, Perk *perk, Camera *camera) {
     if (perk->available) {
-        SDL_RenderCopy(renderer, perk->texture, NULL, &perk->rect);
+        SDL_Rect destRect = {
+            perk->rect.x - camera->x,
+            perk->rect.y - camera->y,
+            perk->rect.w,
+            perk->rect.h
+        };
+        SDL_RenderCopy(renderer, perk->texture, NULL, &destRect);
     }
 }
-
 
 bool checkCollision(SDL_Rect a, SDL_Rect b) // check perk/player collision
 {
@@ -117,13 +127,12 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     speedBoostPerk.texture = perkTextureSpeed;
     freezePerk.texture = perkTextureFreeze;
     reverseKeysPerk.texture = perkTextureReverse;
-
-    speedBoostPerk.rect.x = 860;
-    speedBoostPerk.rect.y = 750;
-    freezePerk.rect.x = 400;
-    freezePerk.rect.y = 200;
-    reverseKeysPerk.rect.x = 450;
-    reverseKeysPerk.rect.y = 200;
+    speedBoostPerk.rect.x = 880;
+    speedBoostPerk.rect.y = 400;
+    freezePerk.rect.x = 920;
+    freezePerk.rect.y = 400;
+    reverseKeysPerk.rect.x = 960;
+    reverseKeysPerk.rect.y = 400;
 
     /*if (randomLocation == 1)
     {

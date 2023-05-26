@@ -14,8 +14,8 @@
 
 #include "../audio/audio.h"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH  1280 // 1600
+#define SCREEN_HEIGHT 720 //  960
 
 #define FPS 60
 
@@ -31,6 +31,13 @@ typedef struct {
     bool quit;
     bool isMuted;
 } Framework;
+
+typedef struct {
+    int x;
+    int y;
+    int width;
+    int height;
+} Camera;
 
 typedef struct {
     bool active;

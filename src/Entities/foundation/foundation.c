@@ -75,7 +75,7 @@ bool manageTimer(Framework *game, Timer *timerData) {
 
 static void calculateRemainingTime(Timer *timerData) {
     time_t currentTime = time(NULL);
-    int timeElapsed = (int) difftime(currentTime, timerData->timeWhenStarting);
+    int timeElapsed = (int)difftime(currentTime, timerData->timeWhenStarting);
 
     if (timeElapsed >= (TIMER_MINUTES * 60)) {
         // Timer has expired, set remaining time to 0
@@ -90,7 +90,9 @@ static void calculateRemainingTime(Timer *timerData) {
 }
 
 static void displayTime(Framework *game, Timer *timerData) {
-    static Image toDisplay = { 0, NULL, {790, 15, 91, 35} };
+    static Image toDisplay = { 0, NULL, {0, 0, 91, 35} };
+    toDisplay.rectangle.x = (SCREEN_WIDTH - toDisplay.rectangle.w) / 2;
+    toDisplay.rectangle.y = 15;
     static int lastSeenTimeRemainingValue = 0;
     char numbersToPrint[8];
     SDL_Surface *surface;
@@ -117,7 +119,7 @@ static void displayTime(Framework *game, Timer *timerData) {
         SDL_FreeSurface(surface);
     }
 
-    drawRectangle(game->renderer, 783, 10, 100, 50);
+    drawRectangle(game->renderer, 590, 10, 100, 50);
     SDL_RenderCopy(game->renderer, toDisplay.texture, NULL, &toDisplay.rectangle);
     if (timerData->timeRemaining == 0) {
         SDL_DestroyTexture(toDisplay.texture);

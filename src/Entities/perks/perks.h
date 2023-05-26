@@ -30,9 +30,9 @@ typedef struct {
 } Perk;
 
 Perk initializePerk(SDL_Renderer *renderer, int perkNr);
-void renderPerk(SDL_Renderer *renderer, Perk *perk);
+void renderPerk(SDL_Renderer *renderer, Perk *perk, Camera *camera);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 void checkPerkRespawn(Perk *perk);
-void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer);
+void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *camera);
 
 #endif

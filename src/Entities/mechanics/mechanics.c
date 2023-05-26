@@ -1,12 +1,12 @@
 #include "mechanics.h"
 
-void HuntAndRevive(SDL_Renderer *renderer, Player players[]) {
+void HuntAndRevive(SDL_Renderer *renderer, Player players[], Camera *camera) {
     static Image cage = { 0, NULL, {0, 0, 40, 40} };
     checkCapturedStatus(players);
-    handleCage(renderer, &cage, players);
+    handleCage(renderer, &cage, players, camera);
 }
 
-static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[]) {
+static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[], Camera *camera) {
     int numberOfCapturedPlayers = 0;
     for (int i = 0; players[i].player != 0; i++) {
         if (players[i].captured) {
@@ -15,8 +15,8 @@ static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[]) {
                 cage->active = true;
             }
             if (players[i].captured) {
-                cage->rectangle.x = (players[i].position.x - 7); // -7 så att spelaren blir exakt i mitten av "cage"
-                cage->rectangle.y = (players[i].position.y - 2);
+                cage->rectangle.x = (players[i].position.x - 7) - camera->x; // Adjusted for camera position
+                cage->rectangle.y = (players[i].position.y - 2) - camera->y; // Adjusted for camera position
                 SDL_RenderCopy(renderer, cage->texture, NULL, &cage->rectangle);
             }
         }

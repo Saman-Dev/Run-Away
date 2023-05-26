@@ -43,10 +43,10 @@ static Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playe
     return playerX;
 }
 
-void handlePlayerMovement(Player *playerX) {
+void handlePlayerMovement(Player *playerX, Camera *camera) {
     if (!playerX->captured) {
         if (playerX->up) {
-            if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y)) {
+            if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y, camera)) {
                 playWalkingSound();
                 // printf("Player: Up\n");
                 // printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
@@ -58,7 +58,7 @@ void handlePlayerMovement(Player *playerX) {
             }
         }
         else if (playerX->down) {
-            if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y + PLAYER_FRAME_HEIGHT)) {
+            if (!encountersForbiddenTile(playerX->position.x + (PLAYER_FRAME_WIDTH / 2), playerX->position.y + PLAYER_FRAME_HEIGHT, camera)) {
                 playWalkingSound();
                 // printf("Player: Down\n");
                 // printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
@@ -70,7 +70,7 @@ void handlePlayerMovement(Player *playerX) {
             }
         }
         if (playerX->left) {
-            if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
+            if (!encountersForbiddenTile(playerX->position.x, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2), camera)) {
                 playWalkingSound();
                 // printf("Player: Left\n");
                 // printf("X: %d, Y: %d\n", playerX->position.x, playerX->position.y);
@@ -82,7 +82,7 @@ void handlePlayerMovement(Player *playerX) {
             }
         }
         else if (playerX->right) {
-            if (!encountersForbiddenTile(playerX->position.x + PLAYER_FRAME_WIDTH, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2))) {
+            if (!encountersForbiddenTile(playerX->position.x + PLAYER_FRAME_WIDTH, playerX->position.y + (PLAYER_FRAME_HEIGHT / 2), camera)) {
                 playWalkingSound();
                 // printf("Player: Right\n");
                 // printf("X: %d, Y: %d", playerX->position.x, playerX->position.y);
@@ -96,105 +96,117 @@ void handlePlayerMovement(Player *playerX) {
     }
 }
 
-void renderPlayers(Framework game, Player players[]) {
+void renderPlayers(Framework game, Player players[], Camera camera) {
     for (int i = 0; players[i].player != 0; i++) {
-        SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &players[i].position, 0, NULL, SDL_FLIP_NONE);
+        SDL_Rect playerPosition = players[i].position;
+        playerPosition.x -= camera.x;
+        playerPosition.y -= camera.y;
+        SDL_RenderCopyEx(game.renderer, players[i].spriteSheetTexture, &players[i].spriteClip[players[i].frame], &playerPosition, 0, NULL, SDL_FLIP_NONE);
     }
 }
 
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
     SDL_Keycode key = game->event.key.keysym.sym;
-    
+
     if (playerX->movementKeysReversed) {
         // Reverse movement keys for playerX
         if (key == SDLK_UP) {
             key = SDLK_DOWN;
-        } else if (key == SDLK_DOWN) {
+        }
+        else if (key == SDLK_DOWN) {
             key = SDLK_UP;
-        } else if (key == SDLK_LEFT) {
+        }
+        else if (key == SDLK_LEFT) {
             key = SDLK_RIGHT;
-        } else if (key == SDLK_RIGHT) {
+        }
+        else if (key == SDLK_RIGHT) {
             key = SDLK_LEFT;
         }
     }
-    
+
     if (playerY->movementKeysReversed) {
         // Reverse movement keys for playerY
         if (key == SDLK_w) {
             key = SDLK_s;
-        } else if (key == SDLK_s) {
+        }
+        else if (key == SDLK_s) {
             key = SDLK_w;
-        } else if (key == SDLK_a) {
+        }
+        else if (key == SDLK_a) {
             key = SDLK_d;
-        } else if (key == SDLK_d) {
+        }
+        else if (key == SDLK_d) {
             key = SDLK_a;
         }
     }
-    
+
     if (playerZ->movementKeysReversed) {
         // Reverse movement keys for playerZ
         if (key == SDLK_u) {
             key = SDLK_j;
-        } else if (key == SDLK_j) {
+        }
+        else if (key == SDLK_j) {
             key = SDLK_u;
-        } else if (key == SDLK_h) {
+        }
+        else if (key == SDLK_h) {
             key = SDLK_k;
-        } else if (key == SDLK_k) {
+        }
+        else if (key == SDLK_k) {
             key = SDLK_h;
         }
     }
 
     switch (key) {
-        case SDLK_UP:
-            playerX->up = true;
-            break;
-        case SDLK_DOWN:
-            playerX->down = true;
-            break;
-        case SDLK_LEFT:
-            playerX->left = true;
-            break;
-        case SDLK_RIGHT:
-            playerX->right = true;
-            break;
-        case SDLK_w:
-            playerY->up = true;
-            break;
-        case SDLK_s:
-            playerY->down = true;
-            break;
-        case SDLK_a:
-            playerY->left = true;
-            break;
-        case SDLK_d:
-            playerY->right = true;
-            break;
-        case SDLK_u:
-            playerZ->up = true;
-            break;
-        case SDLK_j:
-            playerZ->down = true;
-            break;
-        case SDLK_h:
-            playerZ->left = true;
-            break;
-        case SDLK_k:
-            playerZ->right = true;
-            break;
-        case SDLK_m:
-            game->isMuted = !game->isMuted;
-            if (game->isMuted) {
-                Mix_VolumeMusic(0);
-            }
-            else {
-                Mix_VolumeMusic(MIX_MAX_VOLUME);
-            }
-            break;
-        case SDLK_ESCAPE:
-            game->quit = true;
-            break;
-        default:
-            break;
+    case SDLK_UP:
+        playerX->up = true;
+        break;
+    case SDLK_DOWN:
+        playerX->down = true;
+        break;
+    case SDLK_LEFT:
+        playerX->left = true;
+        break;
+    case SDLK_RIGHT:
+        playerX->right = true;
+        break;
+    case SDLK_w:
+        playerY->up = true;
+        break;
+    case SDLK_s:
+        playerY->down = true;
+        break;
+    case SDLK_a:
+        playerY->left = true;
+        break;
+    case SDLK_d:
+        playerY->right = true;
+        break;
+    case SDLK_u:
+        playerZ->up = true;
+        break;
+    case SDLK_j:
+        playerZ->down = true;
+        break;
+    case SDLK_h:
+        playerZ->left = true;
+        break;
+    case SDLK_k:
+        playerZ->right = true;
+        break;
+    case SDLK_m:
+        game->isMuted = !game->isMuted;
+        if (game->isMuted) {
+            Mix_VolumeMusic(0);
+        }
+        else {
+            Mix_VolumeMusic(MIX_MAX_VOLUME);
+        }
+        break;
+    case SDLK_ESCAPE:
+        game->quit = true;
+        break;
+    default:
+        break;
     }
 }
 
@@ -205,80 +217,89 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
         // Reverse movement keys for playerX
         if (key == SDLK_UP) {
             key = SDLK_DOWN;
-        } else if (key == SDLK_DOWN) {
+        }
+        else if (key == SDLK_DOWN) {
             key = SDLK_UP;
-        } else if (key == SDLK_LEFT) {
+        }
+        else if (key == SDLK_LEFT) {
             key = SDLK_RIGHT;
-        } else if (key == SDLK_RIGHT) {
+        }
+        else if (key == SDLK_RIGHT) {
             key = SDLK_LEFT;
         }
     }
-    
+
     if (playerY->movementKeysReversed) {
         // Reverse movement keys for playerY
         if (key == SDLK_w) {
             key = SDLK_s;
-        } else if (key == SDLK_s) {
+        }
+        else if (key == SDLK_s) {
             key = SDLK_w;
-        } else if (key == SDLK_a) {
+        }
+        else if (key == SDLK_a) {
             key = SDLK_d;
-        } else if (key == SDLK_d) {
+        }
+        else if (key == SDLK_d) {
             key = SDLK_a;
         }
     }
-    
+
     if (playerZ->movementKeysReversed) {
         // Reverse movement keys for playerZ
         if (key == SDLK_u) {
             key = SDLK_j;
-        } else if (key == SDLK_j) {
+        }
+        else if (key == SDLK_j) {
             key = SDLK_u;
-        } else if (key == SDLK_h) {
+        }
+        else if (key == SDLK_h) {
             key = SDLK_k;
-        } else if (key == SDLK_k) {
+        }
+        else if (key == SDLK_k) {
             key = SDLK_h;
         }
     }
 
     switch (key) {
-        case SDLK_UP:
-            playerX->up = false;
-            break;
-        case SDLK_DOWN:
-            playerX->down = false;
-            break;
-        case SDLK_LEFT:
-            playerX->left = false;
-            break;
-        case SDLK_RIGHT:
-            playerX->right = false;
-            break;
-        case SDLK_w:
-            playerY->up = false;
-            break;
-        case SDLK_s:
-            playerY->down = false;
-            break;
-        case SDLK_a:
-            playerY->left = false;
-            break;
-        case SDLK_d:
-            playerY->right = false;
-            break;
-        case SDLK_u:
-            playerZ->up = false;
-            break;
-        case SDLK_j:
-            playerZ->down = false;
-            break;
-        case SDLK_h:
-            playerZ->left = false;
-            break;
-        case SDLK_k:
-            playerZ->right = false;
-            break;
-        default:
-            break;
+    case SDLK_UP:
+        playerX->up = false;
+        break;
+    case SDLK_DOWN:
+        playerX->down = false;
+        break;
+    case SDLK_LEFT:
+        playerX->left = false;
+        break;
+    case SDLK_RIGHT:
+        playerX->right = false;
+        break;
+    case SDLK_w:
+        playerY->up = false;
+        break;
+    case SDLK_s:
+        playerY->down = false;
+        break;
+    case SDLK_a:
+        playerY->left = false;
+        break;
+    case SDLK_d:
+        playerY->right = false;
+        break;
+    case SDLK_u:
+        playerZ->up = false;
+        break;
+    case SDLK_j:
+        playerZ->down = false;
+        break;
+    case SDLK_h:
+        playerZ->left = false;
+        break;
+    case SDLK_k:
+        playerZ->right = false;
+        break;
+    default:
+        break;
     }
 }
 
@@ -299,8 +320,8 @@ void handleInput(Framework *game, Player *playerX, Player *playerY, Player *play
 }
 
 void loadPlayers(SDL_Renderer *renderer, Player players[]) {
-    players[0] = createPlayer(renderer, "resources/Runner_1.png", 1, 300, 300);
-    players[1] = createPlayer(renderer, "resources/Hunter.png", 2, 242, 280);
-    players[2] = createPlayer(renderer, "resources/Hunter_2.png", 3, 300, 400);
-
+    players[0] = createPlayer(renderer, "resources/Hunter.png", 1, 820, 460);
+    players[1] = createPlayer(renderer, "resources/Hunter_2.png", 2, 1300, 780);
+    players[2] = createPlayer(renderer, "resources/Runner_2.png", 3, 900, 1070);
+    //players[3] = createPlayer(renderer, "resources/Runner_3.png", 3, 2050, 1070);
 }

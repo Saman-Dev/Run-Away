@@ -20,11 +20,11 @@
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    Framework game = { NULL, NULL, NULL, 0, false, false, false};
+    Framework game = { NULL, NULL, NULL, 0, false, false, false };
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
-    NetworkBundle networkData = {{NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0}};
+    NetworkBundle networkData = { {NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0} };
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -33,7 +33,8 @@ int main(int argc, char **argv) {
     Perk speedBoostPerk = initializePerk(game.renderer, 1);
     Perk freezPerk = initializePerk(game.renderer, 2);
     Perk reverseKeysPerk = initializePerk(game.renderer, 3);
-    
+    Camera camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+
     while (!game.quit) {
         //int randomPlayerIndex = (rand() % MAX_PLAYERS);
         //printf("Plyer :%d \n", randomPlayerIndex);
@@ -45,27 +46,40 @@ int main(int argc, char **argv) {
         else {
             // Handle events
             handleInput(&game, &players[0], &players[1], &players[2]);
-            handlePlayerMovement(&players[0]);
-            handlePlayerMovement(&players[1]);
-            handlePlayerMovement(&players[2]);
-            renderBackground(game.renderer, resources);
+            handlePlayerMovement(&players[0], &camera);
+            handlePlayerMovement(&players[1], &camera);
+            handlePlayerMovement(&players[2], &camera);
+            if (networkData.TCPInformation.playerNumber == 0) {
+                camera.x = players[0].position.x - SCREEN_WIDTH / 2;
+                camera.y = players[0].position.y - SCREEN_HEIGHT / 2;
+            }
+            else if (networkData.TCPInformation.playerNumber == 1) {
+                camera.x = players[1].position.x - SCREEN_WIDTH / 2;
+                camera.y = players[1].position.y - SCREEN_HEIGHT / 2;
+            }
+            else {
+                camera.x = players[2].position.x - SCREEN_WIDTH / 2;
+                camera.y = players[2].position.y - SCREEN_HEIGHT / 2;
+            }
+
+            renderBackground(&game, resources, &camera);
 
             // Render players
-            renderPlayers(game, players);
+            renderPlayers(game, players, camera);
 
             // Check for perk collision
-            applyPerk(players, &freezPerk, game.renderer);
-            applyPerk(players, &speedBoostPerk, game.renderer);
-            applyPerk(players, &reverseKeysPerk, game.renderer);
+            applyPerk(players, &freezPerk, game.renderer, &camera);
+            applyPerk(players, &speedBoostPerk, game.renderer, &camera);
+            applyPerk(players, &reverseKeysPerk, game.renderer, &camera);
             checkPerkRespawn(&speedBoostPerk);
             checkPerkRespawn(&freezPerk);
             checkPerkRespawn(&reverseKeysPerk);
 
             // Perk render
-            renderPerk(game.renderer, &speedBoostPerk);
-            renderPerk(game.renderer, &freezPerk);
-            renderPerk(game.renderer, &reverseKeysPerk);
-            HuntAndRevive(game.renderer, players);
+            renderPerk(game.renderer, &speedBoostPerk, &camera);
+            renderPerk(game.renderer, &freezPerk, &camera);
+            renderPerk(game.renderer, &reverseKeysPerk, &camera);
+            HuntAndRevive(game.renderer, players, &camera);
 
             manageTimer(&game, &timerData);
 
@@ -80,8 +94,8 @@ int main(int argc, char **argv) {
 
     // Free resources and close SDL
     SDL_DestroyTexture(speedBoostPerk.texture);
-    SDL_DestroyTexture(freezPerk.texture); 
-    SDL_DestroyTexture(reverseKeysPerk.texture); 
+    SDL_DestroyTexture(freezPerk.texture);
+    SDL_DestroyTexture(reverseKeysPerk.texture);
     SDL_DestroyWindow(game.window);
     TTF_CloseFont(game.font);
     Mix_CloseAudio();
