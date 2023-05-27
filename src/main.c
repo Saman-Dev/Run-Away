@@ -22,7 +22,7 @@ void manageCameraAngle(Camera *camera, Player players[], int playerNumber);
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
-    Framework game = { NULL, NULL, NULL, 0, false, false, false };
+    Framework game = { NULL, NULL, NULL, 0, false, false, false , false, false, false, false};
     Background resources;
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
@@ -76,10 +76,9 @@ int main(int argc, char **argv) {
 
             manageTimer(&game, &timerData);
 
-            for(int i=0; i < MAX_CLIENTS; i++){
+            for (int i = 0; i < MAX_CLIENTS; i++) {
                 if(players[i].captured){
                     captured_players++;
-                    //printf("captured players %d\n", captured_players);
                 }
             }
     

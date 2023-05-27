@@ -19,7 +19,7 @@
 
 #define FPS 60
 
-#define TIMER_MINUTES 2 
+#define TIMER_MINUTES 0.10
 
 typedef struct {
     SDL_Window *window;

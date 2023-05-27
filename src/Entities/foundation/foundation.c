@@ -162,62 +162,51 @@ void handleGameOver(Framework *game) {
 }
 
 void displayGameOverScreen(Framework *game, Timer *timerData) {
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-    SDL_RenderClear(game->renderer);
-    SDL_Surface *gameOverSurface;
+    SDL_Texture *background = NULL;
 
-    if(timerData->timeRemaining == 0){
-        // Load the game over image
-        gameOverSurface = IMG_Load("resources/game_over_hunters_lose_menu.png");
-        if (!gameOverSurface) {
-            printf("Failed to load game over image: %s\n", IMG_GetError());
-            return;
-        }
-    }else
-    {
-        gameOverSurface = IMG_Load("resources/game_over_hunters_won_men.png");
-        if (!gameOverSurface) {
+    if (timerData->timeRemaining == 0) {
+        background = IMG_LoadTexture(game->renderer, "resources/game_over_hunters_lose_menu.png");
+        if (!background) {
             printf("Failed to load game over image: %s\n", IMG_GetError());
             return;
         }
     }
-
-    SDL_Texture *gameOverTexture = SDL_CreateTextureFromSurface(game->renderer, gameOverSurface);
-    if (!gameOverTexture) {
-        printf("Failed to create texture from game over surface: %s\n", SDL_GetError());
-        SDL_FreeSurface(gameOverSurface);
-        return;
+    else {
+        background = IMG_LoadTexture(game->renderer, "resources/game_over_hunters_won_men.png");
+        if (!background) {
+            printf("Failed to load game over image: %s\n", IMG_GetError());
+            return;
+        }
     }
-
-    SDL_Rect gameOverRect = {(SCREEN_WIDTH - gameOverSurface->w) / 2, (SCREEN_HEIGHT - gameOverSurface->h) / 2, gameOverSurface->w, gameOverSurface->h};
-    SDL_RenderCopy(game->renderer, gameOverTexture, NULL, &gameOverRect);
 
     // Render the "Go Back to Menu" option
-    SDL_Color textColor = {255, 255, 255};
-    SDL_Surface *menuOptionSurface = TTF_RenderText_Solid(game->font, "Go Back to Menu", textColor);
+    SDL_Surface *menuOptionSurface = TTF_RenderText_Solid(game->font, "Go Back to Menu", game->white);
     SDL_Texture *menuOptionTexture = SDL_CreateTextureFromSurface(game->renderer, menuOptionSurface);
-    SDL_Rect menuOptionRect = {(SCREEN_WIDTH - menuOptionSurface->w) / 2, ((SCREEN_HEIGHT + 200) + menuOptionSurface->h) / 2, menuOptionSurface->w, menuOptionSurface->h};
-    SDL_RenderCopy(game->renderer, menuOptionTexture, NULL, &menuOptionRect);
+    SDL_Rect menuOptionRect = {(SCREEN_WIDTH - menuOptionSurface->w) / 2, ((SCREEN_HEIGHT + 140) + menuOptionSurface->h) / 2, menuOptionSurface->w, menuOptionSurface->h};
 
     // Render the "Quit Game" option
-    SDL_Surface *quitOptionSurface = TTF_RenderText_Solid(game->font, "Quit", textColor);
+    SDL_Surface *quitOptionSurface = TTF_RenderText_Solid(game->font, "Quit", game->white);
     SDL_Texture *quitOptionTexture = SDL_CreateTextureFromSurface(game->renderer, quitOptionSurface);
-    SDL_Rect quitOptionRect = {(SCREEN_WIDTH - quitOptionSurface->w) / 2, ((SCREEN_HEIGHT + 375) + quitOptionSurface->h) / 2, quitOptionSurface->w, quitOptionSurface->h};
-    SDL_RenderCopy(game->renderer, quitOptionTexture, NULL, &quitOptionRect);
+    SDL_Rect quitOptionRect = {(SCREEN_WIDTH - quitOptionSurface->w) / 2, ((SCREEN_HEIGHT + 280) + quitOptionSurface->h) / 2, quitOptionSurface->w, quitOptionSurface->h};
 
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-            int mouseX, mouseY;
-            SDL_GetMouseState(&mouseX, &mouseY);
-            if (mouseX >= menuOptionRect.x && mouseX < menuOptionRect.x + menuOptionRect.w && mouseY >= menuOptionRect.y && mouseY < menuOptionRect.y + menuOptionRect.h) {
-                // Player clicked on "Go Back to Menu" option
-                game->goBackToMenu = true;
-            } else if (mouseX >= quitOptionRect.x && mouseX < quitOptionRect.x + quitOptionRect.w && mouseY >= quitOptionRect.y && mouseY < quitOptionRect.y + quitOptionRect.h) {
-                // Player clicked on "Quit Game" option
-                game->quitGame = true;
+    while (game->goBackToMenu == false && game->quitGame == false) {
+        while (SDL_PollEvent(&game->event)) {
+            if (game->event.type == SDL_MOUSEBUTTONDOWN) {
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+                if (mouseX >= menuOptionRect.x && mouseX < menuOptionRect.x + menuOptionRect.w && mouseY >= menuOptionRect.y && mouseY < menuOptionRect.y + menuOptionRect.h) {
+                    // Player clicked on "Go Back to Menu" option
+                    game->goBackToMenu = true;
+                } else if (mouseX >= quitOptionRect.x && mouseX < quitOptionRect.x + quitOptionRect.w && mouseY >= quitOptionRect.y && mouseY < quitOptionRect.y + quitOptionRect.h) {
+                    // Player clicked on "Quit Game" option
+                    game->quitGame = true;
+                }
             }
         }
+        SDL_RenderCopy(game->renderer, background, NULL, NULL);
+        SDL_RenderCopy(game->renderer, menuOptionTexture, NULL, &menuOptionRect);
+        SDL_RenderCopy(game->renderer, quitOptionTexture, NULL, &quitOptionRect);
+        SDL_RenderPresent(game->renderer);
     }
 
     if (game->showGameOverScreen) {
@@ -231,12 +220,12 @@ void displayGameOverScreen(Framework *game, Timer *timerData) {
         }
     }
 
-    SDL_FreeSurface(gameOverSurface);
+    //SDL_FreeSurface(gameOverSurface);
     SDL_FreeSurface(menuOptionSurface);
     SDL_FreeSurface(quitOptionSurface);
-    SDL_DestroyTexture(gameOverTexture);
+    SDL_DestroyTexture(background);
     SDL_DestroyTexture(menuOptionTexture);
     SDL_DestroyTexture(quitOptionTexture);
-
-    SDL_RenderPresent(game->renderer);
 }
+
+//void handleGameOverConditions() {
