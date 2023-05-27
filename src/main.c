@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
     NetworkBundle networkData = { {NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0} };
-    
+    int captured_players = 0;
+
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
     loadPlayers(game.renderer, players);
@@ -83,13 +84,20 @@ int main(int argc, char **argv) {
 
             manageTimer(&game, &timerData);
 
-            if (game.gameOver) {
+            for(int i=0; i < MAX_CLIENTS; i++){
+                if(players[i].captured){
+                    captured_players++;
+                    //printf("captured players %d\n", captured_players);
+                }
+            }
+    
+            if (game.gameOver || captured_players == 2) {
                 game.showGameOverScreen = true;
                 game.gameOver = false; // Reset the game over flag
             }
-
+            
             if (game.showGameOverScreen) {
-                displayGameOverScreen(&game);
+                displayGameOverScreen(&game,&timerData);
                 // Handle input to go back to the menu
                 // For example, if the user presses a certain key or clicks on the "Go Back to Menu" option,
                 // you can set game->menuState to true to return to the menu screen
@@ -104,6 +112,7 @@ int main(int argc, char **argv) {
 
             manageFrameRate(timeAtLoopBeginning);
         }
+        captured_players = 0;
     }
 
     // Free resources and close SDL

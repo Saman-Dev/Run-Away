@@ -161,15 +161,25 @@ void handleGameOver(Framework *game) {
     game->gameOver = true; // Set the game over flag to true
 }
 
-void displayGameOverScreen(Framework *game) {
+void displayGameOverScreen(Framework *game, Timer *timerData) {
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
     SDL_RenderClear(game->renderer);
+    SDL_Surface *gameOverSurface;
 
-    // Load the game over image
-    SDL_Surface *gameOverSurface = IMG_Load("resources/game_over_hunters_lose_menu.png");
-    if (!gameOverSurface) {
-        printf("Failed to load game over image: %s\n", IMG_GetError());
-        return;
+    if(timerData->timeRemaining == 0){
+        // Load the game over image
+        gameOverSurface = IMG_Load("resources/game_over_hunters_lose_menu.png");
+        if (!gameOverSurface) {
+            printf("Failed to load game over image: %s\n", IMG_GetError());
+            return;
+        }
+    }else
+    {
+        gameOverSurface = IMG_Load("resources/game_over_hunters_won_men.png");
+        if (!gameOverSurface) {
+            printf("Failed to load game over image: %s\n", IMG_GetError());
+            return;
+        }
     }
 
     SDL_Texture *gameOverTexture = SDL_CreateTextureFromSurface(game->renderer, gameOverSurface);
