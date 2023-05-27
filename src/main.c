@@ -98,11 +98,6 @@ int main(int argc, char **argv) {
             
             if (game.showGameOverScreen) {
                 displayGameOverScreen(&game,&timerData);
-                // Handle input to go back to the menu
-                // For example, if the user presses a certain key or clicks on the "Go Back to Menu" option,
-                // you can set game->menuState to true to return to the menu screen
-                // and game->showGameOverScreen to false to hide the game over screen
-                // You can add the necessary input handling logic here
             }
 
             // Present the rendered frame
