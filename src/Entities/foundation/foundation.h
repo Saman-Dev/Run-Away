@@ -19,7 +19,7 @@
 
 #define FPS 60
 
-#define TIMER_MINUTES 5
+#define TIMER_MINUTES 0.10
 
 typedef struct {
     SDL_Window *window;
@@ -30,6 +30,9 @@ typedef struct {
     bool menuState;
     bool quit;
     bool isMuted;
+    bool gameOver;
+    bool showGameOverScreen;
+    bool goBackToMenu;
 } Framework;
 
 typedef struct {
@@ -57,7 +60,9 @@ void manageFrameRate(int timeAtLoopBeginning);
 bool manageTimer(Framework *game, Timer *timerData);
 static void calculateRemainingTime(Timer *timerData);
 static void displayTime(Framework *game, Timer *timerData);
-bool checkIfTimerHasExpired(Timer *timerData);
+bool checkIfTimerHasExpired(Timer *timerData, Framework *game);
 static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h);
+void displayGameOverScreen(Framework *game);
+void handleGameOver(Framework *game);
 
 #endif

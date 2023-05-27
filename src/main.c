@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
     NetworkBundle networkData = { {NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0} };
-
+    
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
     loadPlayers(game.renderer, players);
@@ -82,6 +82,20 @@ int main(int argc, char **argv) {
             HuntAndRevive(game.renderer, players, &camera);
 
             manageTimer(&game, &timerData);
+
+            if (game.gameOver) {
+                game.showGameOverScreen = true;
+                game.gameOver = false; // Reset the game over flag
+            }
+
+            if (game.showGameOverScreen) {
+                displayGameOverScreen(&game);
+                // Handle input to go back to the menu
+                // For example, if the user presses a certain key or clicks on the "Go Back to Menu" option,
+                // you can set game->menuState to true to return to the menu screen
+                // and game->showGameOverScreen to false to hide the game over screen
+                // You can add the necessary input handling logic here
+            }
 
             // Present the rendered frame
             SDL_RenderPresent(game.renderer);
