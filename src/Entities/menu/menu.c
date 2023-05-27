@@ -150,7 +150,6 @@ static void handleMenuEntry(int *scene, Framework *game) {
 static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]) {
     initiateServerTCPCapability(&networkData->TCPInformation);
     setUpServer(&networkData->UDPInformation, networkData->UDPRecord, 2000);
-
     Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", "Play", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
     int selectedBox = 0;
     while (selectedBox != 5 && selectedBox != 6) {
@@ -169,9 +168,13 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
 }
 
 static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]) {
-    InitiateClientTCPCapability(&networkData->TCPInformation, networkData->TCPRecord);
-    setUpClient(&networkData->UDPInformation, "127.0.0.1", 2000);
-
+    char IPAddress[MAX_INPUT_LENGTH];
+    while (networkData->TCPInformation.socket == NULL) {
+        IPAddress[0] = '\0';
+        askForIPAddressToConnectTo(game, IPAddress);
+        InitiateClientTCPCapability(&networkData->TCPInformation, networkData->TCPRecord, IPAddress);
+    }
+    setUpClient(&networkData->UDPInformation, IPAddress, 2000); // "127.0.0.1"
     if (networkData->TCPInformation.inLobby) {
         Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", " ", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
         int selectedBox = 0;
@@ -218,22 +221,62 @@ static void handleSettingsOption(int *scene, Framework *game) {
     }
 }
 
-/*
-char *gameOverOptions[] = { "Back to Menu", "Quit", "\0"};                
-    else if (*state == GAME_OVER) {
-        selectedBox = displayOptions(game, menu);
-        switch (selectedBox) {
-        case 0:
-            *state = START;
-            SDLNet_UDP_Close(information->sourcePort);
-            SDLNet_TCP_Close(TCPInformation->socket);
-            break;
-        case 1:
-            game->quit = true;
-            break;
-        default:
-            break;
+static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
+    SDL_Surface *textBoxSurface = NULL;
+    SDL_Texture *textBoxTexture = NULL;
+    SDL_Rect textBoxRectangle = {0 , SCREEN_HEIGHT / 2 - LOCATION_ADJUSTMENT, 0, 0};
+    bool done = false;
+    bool renderText = true;
+    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 0);
+    SDL_StartTextInput();
+    while (!done) {
+        if (SDL_PollEvent(&game->event)) {
+            switch (game->event.type) {
+                case SDL_QUIT:
+                    done = true;
+                    break;
+                case SDL_TEXTINPUT:
+                    if (strlen(IPAddress) < (MAX_INPUT_LENGTH - 1)) {
+                        strcat(IPAddress, game->event.text.text);
+                        renderText = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (game->event.key.keysym.sym == SDLK_RETURN && game->event.key.state == 0) {
+                done = true;
+            }
+            else if (game->event.key.keysym.sym == SDLK_BACKSPACE && game->event.key.state == 0) {
+                if (strcmp(IPAddress, "\0") != 0) {
+                    IPAddress[strlen(IPAddress)-1] = '\0';
+                    renderText = true;
+                }
+            }
         }
+        SDL_RenderClear(game->renderer);
+        if (renderText) {
+            if (strcmp(IPAddress, "\0") == 0) {
+                if (textBoxSurface != NULL) {
+                    SDL_FreeSurface(textBoxSurface);
+                }
+                textBoxSurface = TTF_RenderText_Solid(game->font, " ", game->white);
+            }
+            else {
+                SDL_FreeSurface(textBoxSurface);
+                textBoxSurface = TTF_RenderText_Solid(game->font, IPAddress, game->white);
+            }
+            textBoxRectangle.x = (SCREEN_WIDTH - textBoxRectangle.w) / 2;
+            textBoxRectangle.w = textBoxSurface->w;
+            textBoxRectangle.h = textBoxSurface->h;
+            if (textBoxTexture != NULL) {
+                SDL_DestroyTexture(textBoxTexture);
+            }
+            textBoxTexture = SDL_CreateTextureFromSurface(game->renderer, textBoxSurface);
+            renderText = false;
+        }
+        SDL_RenderCopy(game->renderer, textBoxTexture, NULL, &textBoxRectangle);
+        SDL_RenderPresent(game->renderer);
     }
-    return selectedBox;
-    */
+    SDL_StopTextInput();
+}

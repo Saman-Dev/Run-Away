@@ -86,7 +86,7 @@ static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInforma
 static void receiveClientNumber(TCPLocalInformation *TCPInformation);
 static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber);
 void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
-void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], char IPAddress[]);
 static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]);
 static void manageLobby(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
 static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[]);

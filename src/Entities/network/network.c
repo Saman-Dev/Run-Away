@@ -200,6 +200,7 @@ void resetClientNetwork(NetworkBundle *networkData) {
     }
     networkData->toSend.positionX = 0;
     networkData->toSend.positionY = 0;
+    networkData->TCPInformation.socket = NULL;
 }
 
 ///// TCP /////
@@ -291,19 +292,23 @@ void initiateServerTCPCapability(TCPLocalInformation *TCPInformation) {
     SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);
 }
 
-void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
+void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], char IPAddress[]) {
     TCPInformation->inLobby = true;
     TCPInformation->set = SDLNet_AllocSocketSet(2);
 
-    if (SDLNet_ResolveHost(&TCPInformation->ip, "127.0.0.1", 9999) == -1) {
+    if (SDLNet_ResolveHost(&TCPInformation->ip, IPAddress, 9999) == -1) { // "127.0.0.1"
         printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-        exit(1);
+        SDLNet_FreeSocketSet(TCPInformation->set);
+        return;
     }
 
     TCPInformation->socket = SDLNet_TCP_Open(&TCPInformation->ip);
     if (TCPInformation->socket == NULL) {
         printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-        exit(1);
+        SDLNet_TCP_Close(TCPInformation->socket);
+        TCPInformation->socket = NULL;
+        SDLNet_FreeSocketSet(TCPInformation->set);
+        return;
     }
 
     SDLNet_TCP_AddSocket(TCPInformation->set, TCPInformation->socket);

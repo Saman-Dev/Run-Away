@@ -13,6 +13,7 @@
 #define MAX_NUMBER_OF_TEXT_BOXES 8
 #define SPACING_BETWEEN_TEXT_BOXES 36
 #define LOCATION_ADJUSTMENT 120
+#define MAX_INPUT_LENGTH 15
 
 typedef struct {
     char *options[MAX_NUMBER_OF_TEXT_BOXES];
@@ -30,5 +31,6 @@ static void handleMenuEntry(int *scene, Framework *game);
 static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]);
 static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]);
 static void handleSettingsOption(int *scene, Framework *game);
+static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]);
 
 #endif
