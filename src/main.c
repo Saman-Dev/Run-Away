@@ -18,6 +18,8 @@
 #include "Entities/perks/perks.h"
 #include "Entities/player/player.h"
 
+void manageCameraAngle(Camera *camera, Player players[], int playerNumber);
+
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     Framework game = { NULL, NULL, NULL, 0, false, false, false };
@@ -50,18 +52,8 @@ int main(int argc, char **argv) {
             handlePlayerMovement(&players[0], &camera);
             handlePlayerMovement(&players[1], &camera);
             handlePlayerMovement(&players[2], &camera);
-            if (networkData.TCPInformation.playerNumber == 0) {
-                camera.x = players[0].position.x - SCREEN_WIDTH / 2;
-                camera.y = players[0].position.y - SCREEN_HEIGHT / 2;
-            }
-            else if (networkData.TCPInformation.playerNumber == 1) {
-                camera.x = players[1].position.x - SCREEN_WIDTH / 2;
-                camera.y = players[1].position.y - SCREEN_HEIGHT / 2;
-            }
-            else {
-                camera.x = players[2].position.x - SCREEN_WIDTH / 2;
-                camera.y = players[2].position.y - SCREEN_HEIGHT / 2;
-            }
+
+            manageCameraAngle(&camera, players, networkData.TCPInformation.playerNumber);
 
             renderBackground(&game, resources, &camera);
 
@@ -121,4 +113,14 @@ int main(int argc, char **argv) {
     SDLNet_Quit();
     SDL_Quit();
     return 0;
+}
+
+void manageCameraAngle(Camera *camera, Player players[], int playerNumber) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if ((i - 1) == playerNumber) {
+            camera->x = players[i].position.x - SCREEN_WIDTH / 2;
+            camera->y = players[i].position.y - SCREEN_HEIGHT / 2;
+            break;
+        }
+    }
 }

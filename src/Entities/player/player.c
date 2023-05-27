@@ -303,8 +303,6 @@ static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY,
     }
 }
 
-
-
 void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ) {
     while (SDL_PollEvent(&game->event)) {
         if (game->event.type == SDL_QUIT) {
