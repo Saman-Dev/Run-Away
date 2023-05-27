@@ -222,12 +222,12 @@ static void handleSettingsOption(int *scene, Framework *game) {
 }
 
 static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
+    SDL_Texture *background = IMG_LoadTexture(game->renderer, "resources/start_menu.png");
     SDL_Surface *textBoxSurface = NULL;
     SDL_Texture *textBoxTexture = NULL;
     SDL_Rect textBoxRectangle = {0 , SCREEN_HEIGHT / 2 - LOCATION_ADJUSTMENT, 0, 0};
     bool done = false;
     bool renderText = true;
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 0);
     SDL_StartTextInput();
     while (!done) {
         if (SDL_PollEvent(&game->event)) {
@@ -254,7 +254,7 @@ static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
                 }
             }
         }
-        SDL_RenderClear(game->renderer);
+        SDL_RenderCopy(game->renderer, background, NULL, NULL);
         if (renderText) {
             if (strcmp(IPAddress, "\0") == 0) {
                 if (textBoxSurface != NULL) {
@@ -278,5 +278,8 @@ static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
         SDL_RenderCopy(game->renderer, textBoxTexture, NULL, &textBoxRectangle);
         SDL_RenderPresent(game->renderer);
     }
+    SDL_FreeSurface(textBoxSurface);
+    SDL_DestroyTexture(textBoxTexture);
+    SDL_DestroyTexture(background);
     SDL_StopTextInput();
 }
