@@ -26,6 +26,6 @@ int getNumberOfColumnsInMap();
 int getTheWidthOfTheTile();
 int getTheHeightOfTheTile();
 int getTileInformation(int x, int y);
-int encountersForbiddenTile(int x, int y, Camera *camera);
+int encountersForbiddenTile(int x, int y);
 
 #endif
