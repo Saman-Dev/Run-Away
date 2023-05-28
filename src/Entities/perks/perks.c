@@ -28,19 +28,18 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                     player->perkStartTime = time(NULL);
                 }
                 else if (perk->perkID == 3) {
-                    int numReversed = 0;
-                    while (numReversed < 2) {
-                        int randomPlayerIndex = (rand() % MAX_PLAYERS);
-                        Player *randomPlayer = &players[randomPlayerIndex];
-                        if (!randomPlayer->hasPerk) {
-                            randomPlayer->movementKeysReversed = true;
-                            randomPlayer->hasPerk = true;
-                            randomPlayer->perkStartTime = time(NULL);
-                            numReversed++;
-                        }
+                    for (int i = 0; i < rand() % MAX_PLAYERS; i++) {
+                        // Generate a random index within the range of MAX_CLIENTS
+                        int randomIndex = rand() % MAX_PLAYERS;
+
+                        // Apply the movementKeysReversed property to the randomly selected player
+                        Player *randomPlayer = &players[randomIndex];
+                        randomPlayer->movementKeysReversed = true;
                     }
                     perk->available = false;
                     perk->duration = perk_duration;
+                    player->hasPerk = true;
+                    player->perkStartTime = time(NULL);
                 }
             }
         }
@@ -122,7 +121,6 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     }
 
     srand(time(NULL));
-    int randomLocation = rand() % 2; // generate random number to determine perk location between 2 spawnpoints
 
     speedBoostPerk.texture = perkTextureSpeed;
     freezePerk.texture = perkTextureFreeze;
@@ -134,20 +132,7 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     reverseKeysPerk.rect.x = 960;
     reverseKeysPerk.rect.y = 400;
 
-    /*if (randomLocation == 1)
-    {
-        speedBoostPerk.rect.x = 500;
-        speedBoostPerk.rect.y = 740;
-        freezePerk.rect.x = 900;
-        freezePerk.rect.y = 400;
-    }
-    else
-    {
-        speedBoostPerk.rect.x = 860;
-        speedBoostPerk.rect.y = 750;
-        freezePerk.rect.x = 400;
-        freezePerk.rect.y = 200;
-    }*/
+
 
     speedBoostPerk.rect.w = freezePerk.rect.w = reverseKeysPerk.rect.w = PERK_WIDTH;
     speedBoostPerk.rect.h = freezePerk.rect.h = reverseKeysPerk.rect.h = PERK_HEIGHT;
