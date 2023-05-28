@@ -101,12 +101,27 @@ int main(int argc, char **argv) {
 }
 
 void manageCameraAngle(Camera *camera, Player players[], int playerNumber) {
+    /*
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if ((i - 1) == playerNumber) {
+
+        if ((i) == (playerNumber + 1)) {
             camera->x = players[i].position.x - SCREEN_WIDTH / 2;
             camera->y = players[i].position.y - SCREEN_HEIGHT / 2;
             break;
         }
+    }
+    */
+    if (playerNumber == 0) {
+        camera->x = players[0].position.x - SCREEN_WIDTH / 2;
+        camera->y = players[0].position.y - SCREEN_HEIGHT / 2;
+    }
+    else if (playerNumber == 1) {
+        camera->x = players[1].position.x - SCREEN_WIDTH / 2;
+        camera->y = players[1].position.y - SCREEN_HEIGHT / 2;
+    }
+    else {
+        camera->x = players[2].position.x - SCREEN_WIDTH / 2;
+        camera->y = players[2].position.y - SCREEN_HEIGHT / 2;
     }
 }
 
