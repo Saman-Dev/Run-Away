@@ -60,7 +60,7 @@ void manageFrameRate(int timeAtLoopBeginning);
 bool manageTimer(Framework *game, Timer *timerData);
 static void calculateRemainingTime(Timer *timerData);
 static void displayTime(Framework *game, Timer *timerData);
-bool checkIfTimerHasExpired(Timer *timerData, Framework *game);
+static bool checkIfTimerHasExpired(Timer *timerData, Framework *game);
 static void drawRectangle(SDL_Renderer *renderer, int x, int y, int w, int h);
 void displayGameOverScreen(Framework *game, Timer *timerData);
 void handleGameOver(Framework *game);

@@ -141,7 +141,7 @@ static void displayTime(Framework *game, Timer *timerData) {
     }
 }
 
-bool checkIfTimerHasExpired(Timer *timerData, Framework *game) {
+static bool checkIfTimerHasExpired(Timer *timerData, Framework *game) {
     if (timerData->timeRemaining == 0) {
         printf("The time has run out!\n");
         handleGameOver(game); // Call the game over function when time is 0
