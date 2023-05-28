@@ -47,7 +47,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                 int randomLocationY;
                 do {
                     randomLocationX = rand() % 2280;
-                    randomLocationY = rand() % 2280;
+                    randomLocationY = rand() % 720;
                 } while (encountersForbiddenTile(randomLocationX, randomLocationY) && encountersForbiddenTile(randomLocationX+20, randomLocationY+20) && encountersForbiddenTile(randomLocationX-20, randomLocationY-20));
                 perk->rect.x = randomLocationX;
                 perk->rect.y = randomLocationY;
@@ -76,8 +76,8 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                     int randomLocationX;
                     int randomLocationY;
                     do {
-                        randomLocationX = rand() % 2280;
-                        randomLocationY = rand() % 2280;
+                        randomLocationX = rand() % 1280;
+                        randomLocationY = rand() % 720;
                 } while (encountersForbiddenTile(randomLocationX, randomLocationY) || encountersForbiddenTile(randomLocationX+20, randomLocationY+20) || encountersForbiddenTile(randomLocationX-20, randomLocationY-20));
                     perk->rect.x = randomLocationX;
                     perk->rect.y = randomLocationY;
@@ -131,9 +131,9 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     Perk speedBoostPerk;
     Perk freezePerk;
     Perk reverseKeysPerk;
-    SDL_Texture *perkTextureSpeed = IMG_LoadTexture(renderer, "resources/newperk.png");
-    SDL_Texture *perkTextureFreeze = IMG_LoadTexture(renderer, "resources/newperk2.png");
-    SDL_Texture *perkTextureReverse = IMG_LoadTexture(renderer, "resources/newperk.png");
+    SDL_Texture *perkTextureSpeed = IMG_LoadTexture(renderer, "resources/perk_1.png");
+    SDL_Texture *perkTextureFreeze = IMG_LoadTexture(renderer, "resources/perk_2.png");
+    SDL_Texture *perkTextureReverse = IMG_LoadTexture(renderer, "resources/perk_3.png");
     if (perkTextureSpeed == NULL || perkTextureFreeze == NULL || perkTextureReverse == NULL) {
         printf("Failed to load perk sprite sheet: %s\n", IMG_GetError());
         exit(1);
@@ -153,7 +153,7 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     {
         do {
             randomLocationX[i] = rand() % 2280;
-            randomLocationY[i] = rand() % 2280;
+            randomLocationY[i] = rand() % 720;
         } while (encountersForbiddenTile(randomLocationX[i], randomLocationY[i]) || encountersForbiddenTile(randomLocationX[i] + 20, randomLocationY[i] + 20) || encountersForbiddenTile(randomLocationX[i] - 20, randomLocationY[i] - 20));
     }
 
