@@ -29,7 +29,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                 }
                 else if (perk->perkID == 3) {
                     for (int i = 0; i < rand() % MAX_PLAYERS; i++) {
-                        // Generate a random index within the range of MAX_CLIENTS
+                        // Generate a random index
                         int randomIndex = rand() % MAX_PLAYERS;
 
                         // Apply the movementKeysReversed property to the randomly selected player
@@ -41,13 +41,23 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                     player->hasPerk = true;
                     player->perkStartTime = time(NULL);
                 }
+
+                // Random new spawnpoint for perk
+                int randomLocationX;
+                int randomLocationY;
+                do {
+                    randomLocationX = rand() % 2280;
+                    randomLocationY = rand() % 2280;
+                } while (encountersForbiddenTile(randomLocationX, randomLocationY) && encountersForbiddenTile(randomLocationX+20, randomLocationY+20) && encountersForbiddenTile(randomLocationX-20, randomLocationY-20));
+                perk->rect.x = randomLocationX;
+                perk->rect.y = randomLocationY;
             }
         }
     }
     else {
         for (int i = 0; i < MAX_PLAYERS; i++) {
             Player *player = &players[i];
-            if (!perk->available && perk->duration > 0 && player->hasPerk) {
+            if (!perk->available &perk->duration > 0 && player->hasPerk) {
                 time_t current_time = time(NULL);
                 double elapsed_time = difftime(current_time, player->perkStartTime);
 
@@ -61,6 +71,16 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
                         otherPlayer->speed = DEFAULT_SPEED;
                     }
                     player->hasPerk = false;
+
+                    // Random new spawnpoint for perk
+                    int randomLocationX;
+                    int randomLocationY;
+                    do {
+                        randomLocationX = rand() % 2280;
+                        randomLocationY = rand() % 2280;
+                } while (encountersForbiddenTile(randomLocationX, randomLocationY) || encountersForbiddenTile(randomLocationX+20, randomLocationY+20) || encountersForbiddenTile(randomLocationX-20, randomLocationY-20));
+                    perk->rect.x = randomLocationX;
+                    perk->rect.y = randomLocationY;
                 }
                 else {
                     int remaining_time = (int)(perk->duration - elapsed_time);
@@ -70,7 +90,6 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
             }
         }
     }
-
     for (int i = 0; i < MAX_PLAYERS; i++) {
         Player *player = &players[i];
         if (player->frozen) {
@@ -125,14 +144,25 @@ Perk initializePerk(SDL_Renderer *renderer, int perkNr) {
     speedBoostPerk.texture = perkTextureSpeed;
     freezePerk.texture = perkTextureFreeze;
     reverseKeysPerk.texture = perkTextureReverse;
-    speedBoostPerk.rect.x = 880;
-    speedBoostPerk.rect.y = 400;
-    freezePerk.rect.x = 920;
-    freezePerk.rect.y = 400;
-    reverseKeysPerk.rect.x = 960;
-    reverseKeysPerk.rect.y = 400;
 
+    srand(time(NULL));
+    int randomLocationX[3];
+    int randomLocationY[3];
 
+    for (int i = 0; i < 3; i++)
+    {
+        do {
+            randomLocationX[i] = rand() % 2280;
+            randomLocationY[i] = rand() % 2280;
+        } while (encountersForbiddenTile(randomLocationX[i], randomLocationY[i]) || encountersForbiddenTile(randomLocationX[i] + 20, randomLocationY[i] + 20) || encountersForbiddenTile(randomLocationX[i] - 20, randomLocationY[i] - 20));
+    }
+
+    speedBoostPerk.rect.x = randomLocationX[0];
+    speedBoostPerk.rect.y = randomLocationY[0];
+    freezePerk.rect.x = randomLocationX[1];
+    freezePerk.rect.y = randomLocationY[1];
+    reverseKeysPerk.rect.x = randomLocationX[2];
+    reverseKeysPerk.rect.y = randomLocationY[2];
 
     speedBoostPerk.rect.w = freezePerk.rect.w = reverseKeysPerk.rect.w = PERK_WIDTH;
     speedBoostPerk.rect.h = freezePerk.rect.h = reverseKeysPerk.rect.h = PERK_HEIGHT;
