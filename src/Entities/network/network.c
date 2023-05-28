@@ -17,9 +17,8 @@ void setUpClient(UDPLocalInformation *information, char IP_address[], int port) 
             fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
             exit(1);
         }
-        printf("Tar utrymme för paket\n");
     }
-    
+
     printf("Client connected to server at %s on port %d.\n", IP_address, port);
 
     information->packetToSend->address.host = information->destination.host;
