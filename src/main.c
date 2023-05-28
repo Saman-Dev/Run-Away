@@ -19,6 +19,7 @@
 #include "Entities/player/player.h"
 
 void manageCameraAngle(Camera *camera, Player players[], int playerNumber);
+void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]);
 
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
@@ -27,7 +28,6 @@ int main(int argc, char **argv) {
     Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
     NetworkBundle networkData = { {NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0} };
-    int captured_players = 0;
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
@@ -76,29 +76,15 @@ int main(int argc, char **argv) {
 
             manageTimer(&game, &timerData);
 
-            for (int i = 0; i < MAX_CLIENTS; i++) {
-                if(players[i].captured){
-                    captured_players++;
-                }
-            }
-    
-            if (game.gameOver || captured_players == 2) {
-                game.showGameOverScreen = true;
-                game.gameOver = false; // Reset the game over flag
-            }
-            
-            if (game.showGameOverScreen) {
-                displayGameOverScreen(&game,&timerData);
-            }
-
             // Present the rendered frame
             SDL_RenderPresent(game.renderer);
 
             manageNetwork(&networkData, players);
 
+            manageGameOverConditions(&game, &timerData, players);
+
             manageFrameRate(timeAtLoopBeginning);
         }
-        captured_players = 0;
     }
 
     // Free resources and close SDL
@@ -121,5 +107,18 @@ void manageCameraAngle(Camera *camera, Player players[], int playerNumber) {
             camera->y = players[i].position.y - SCREEN_HEIGHT / 2;
             break;
         }
+    }
+}
+
+void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]) {
+    int captured_players = 0;
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if(players[i].captured){
+            captured_players++;
+        }
+    }
+
+    if (game->gameOver || captured_players == 2) {
+        displayGameOverScreen(game, timerData);
     }
 }

@@ -10,7 +10,6 @@ void initialize(Framework *game) {
     // Set initial game state
     game->menuState = true;
     game->gameOver = false;
-    game->showGameOverScreen = false;
     game->goBackToMenu = false;
     game->quitGame= false;
     // Initialize audio
@@ -209,15 +208,12 @@ void displayGameOverScreen(Framework *game, Timer *timerData) {
         SDL_RenderPresent(game->renderer);
     }
 
-    if (game->showGameOverScreen) {
-        if (game->goBackToMenu) {
-            game->menuState = true;
-            game->showGameOverScreen = false;
-            // Reset any other necessary game state variables here
-        } else if (game->quitGame) {
-             game->quit = true;
-            game->showGameOverScreen = false;
-        }
+    if (game->goBackToMenu) {
+        game->gameOver = false;
+        game->menuState = true;
+        // Reset any other necessary game state variables here
+    } else if (game->quitGame) {
+        game->quit = true;
     }
 
     //SDL_FreeSurface(gameOverSurface);
@@ -227,5 +223,3 @@ void displayGameOverScreen(Framework *game, Timer *timerData) {
     SDL_DestroyTexture(menuOptionTexture);
     SDL_DestroyTexture(quitOptionTexture);
 }
-
-//void handleGameOverConditions() {

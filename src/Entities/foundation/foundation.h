@@ -31,7 +31,6 @@ typedef struct {
     bool quit;
     bool isMuted;
     bool gameOver;
-    bool showGameOverScreen;
     bool goBackToMenu;
     bool quitGame;
 } Framework;
