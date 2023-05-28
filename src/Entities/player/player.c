@@ -323,4 +323,6 @@ void loadPlayers(SDL_Renderer *renderer, Player players[]) {
     players[1] = createPlayer(renderer, "resources/Hunter.png", 2, 1300, 780);
     players[2] = createPlayer(renderer, "resources/Runner_2.png", 3, 900, 1070);
     //players[3] = createPlayer(renderer, "resources/Runner_3.png", 3, 2050, 1070);
+    //players[4] = createPlayer(renderer, "resources/Hunter_2.png", 3, 2050, 1070);
+
 }
