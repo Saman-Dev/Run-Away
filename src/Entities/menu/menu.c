@@ -100,7 +100,7 @@ static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect text
 
 static void destroyBoxTextures(Menu *menu, SDL_Texture *textBoxTexture[]) {
     for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-    SDL_DestroyTexture(textBoxTexture[i]);
+        SDL_DestroyTexture(textBoxTexture[i]);
     }
 }
 
