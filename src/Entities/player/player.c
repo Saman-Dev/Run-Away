@@ -203,7 +203,8 @@ static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, 
         }
         break;
     case SDLK_ESCAPE:
-        game->quit = true;
+        game->isPaused = true;
+        game->menuState = true;
         break;
     default:
         break;

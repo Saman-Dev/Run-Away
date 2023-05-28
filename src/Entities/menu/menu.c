@@ -3,7 +3,9 @@
 void manageMenu(Framework *game, NetworkBundle *networkData, Player players[]) {
     int scene = 0;
     while (game->menuState) {
-        if (scene == 0) {
+        if(game->isPaused){
+            handlePauseOption(&scene, game, networkData);
+        }else if (scene == 0) {
             handleMenuEntry(&scene, game);
         }
         else if (scene == 1) {
@@ -100,7 +102,7 @@ static void prepareTextBoxesToBeShown(Framework *game, Menu *menu, SDL_Rect text
 
 static void destroyBoxTextures(Menu *menu, SDL_Texture *textBoxTexture[]) {
     for (int i = 0; strcmp(menu->options[i], "\0") != 0; i++) {
-        SDL_DestroyTexture(textBoxTexture[i]);
+    SDL_DestroyTexture(textBoxTexture[i]);
     }
 }
 
@@ -214,7 +216,45 @@ static void handleSettingsOption(int *scene, Framework *game) {
             break;
         case 3:
             playMenuClickSound();
-            *scene = 0;
+            if(game->menuState && game->isPaused){
+                game->menuState = false;
+                game->isPaused = false;
+            }else{
+                *scene = 0;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+static void handlePauseOption(int *scene, Framework *game, NetworkBundle *networkData) {
+    Menu menu = {{"Mute Song", " ", "Leave Game", "Quit Game", "\0"}, {"resources/pause_menu.png"}, false};
+    int selectedBox = displayOptions(game, &menu, NULL, NULL);
+    switch (selectedBox) {
+        case 0:
+            playMenuClickSound();
+            if (!game->isMuted) {
+                Mix_VolumeMusic(0);
+                game->isMuted = true;
+            }
+            else {
+                Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+                game->isMuted = false;
+            }
+            break;
+        case 2:
+            playMenuClickSound();
+            if(game->isPaused){
+                game->isPaused = false;
+            }
+            SDLNet_UDP_Close(networkData->UDPInformation.sourcePort);
+            SDLNet_TCP_Close(networkData->TCPInformation.socket);
+            break;
+        case 3:
+            game->menuState = false;
+            game->isPaused = false;
+            game->quit = true;
             break;
         default:
             break;
@@ -222,10 +262,10 @@ static void handleSettingsOption(int *scene, Framework *game) {
 }
 
 static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
-    SDL_Texture *background = IMG_LoadTexture(game->renderer, "resources/start_menu.png");
+    SDL_Texture *background = IMG_LoadTexture(game->renderer, "resources/join_menu.png");
     SDL_Surface *textBoxSurface = NULL;
     SDL_Texture *textBoxTexture = NULL;
-    SDL_Rect textBoxRectangle = {0 , SCREEN_HEIGHT / 2 - LOCATION_ADJUSTMENT, 0, 0};
+    SDL_Rect textBoxRectangle = {0 , SCREEN_HEIGHT / 2 - LOCATION_ADJUSTMENT + 15, 0, 0};
     bool done = false;
     bool renderText = true;
     SDL_StartTextInput();

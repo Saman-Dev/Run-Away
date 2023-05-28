@@ -32,5 +32,6 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
 static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]);
 static void handleSettingsOption(int *scene, Framework *game);
 static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]);
+static void handlePauseOption(int *scene, Framework *game, NetworkBundle *networkData);
 
 #endif

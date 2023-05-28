@@ -33,6 +33,7 @@ typedef struct {
     bool gameOver;
     bool goBackToMenu;
     bool quitGame;
+    bool isPaused;
 } Framework;
 
 typedef struct {
