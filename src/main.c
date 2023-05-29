@@ -122,7 +122,7 @@ void manageGameOverConditions(Framework *game, Timer *timerData, Player players[
         }
     }
 
-    if (game->gameOver || captured_players == 2) {
+    if (game->gameOver || captured_players == (MAX_CLIENTS - 2)) { // Subtracting by the number of hunters
         displayGameOverScreen(game, timerData);
     }
 }
