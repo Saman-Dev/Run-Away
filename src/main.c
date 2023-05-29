@@ -48,12 +48,9 @@ int main(int argc, char **argv) {
         }
         else {
             // Handle events
-            handleInput(&game, &players[0], &players[1], &players[MAX_CLIENTS-1]);
-            handlePlayerMovement(&players[0], &camera);
-            handlePlayerMovement(&players[1], &camera);
-            handlePlayerMovement(&players[2], &camera);
-            handlePlayerMovement(&players[3], &camera);
-            handlePlayerMovement(&players[4], &camera);
+            handleInput(&game, players, networkData.TCPInformation.playerNumber);
+            
+            handlePlayerMovement(players, &camera);
 
             manageCameraAngle(&camera, players, networkData.TCPInformation.playerNumber);
 

@@ -70,7 +70,7 @@ static void receiveData(UDPLocalInformation *information, Player players[]) {
         PlayerData temporary;
         memcpy(&temporary, (char *)information->packetToReceive->data, sizeof(PlayerData));
         // printf("receiveData-Received: %d %d %d %d\n", temporary.player, temporary.positionX, temporary.positionY, temporary.frame);
-        for (int i = 0; players[i].player != 0; i++) {
+        for (int i = 0; i < MAX_CLIENTS; i++) {
             if (temporary.player == players[i].player) {
                 applyReceivedData(&players[i], &temporary);
                 break;
@@ -103,8 +103,8 @@ static void manageServerDuties(UDPLocalInformation *information, UDPClientInform
         registerSourceInformation(information, UDPRecord);
         forwardreceivedPacket(information, receivedData, UDPRecord, players);
     }
-    if (checkDifference(toSend, &players[2])) {
-        sendHostPlayerPacket(information, UDPRecord, toSend, &players[2]);
+    if (checkDifference(toSend, &players[MAX_CLIENTS-1])) {
+        sendHostPlayerPacket(information, UDPRecord, toSend, &players[MAX_CLIENTS-1]);
     }
 }
 

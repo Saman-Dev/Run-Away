@@ -36,9 +36,9 @@ typedef struct {
 } Player;
 
 static Player createPlayer(SDL_Renderer *renderer, char playerModel[], int playerNumber, int positionX, int positionY);
-void handlePlayerMovement(Player *player, Camera *camera);
+void handlePlayerMovement(Player player[], Camera *camera);
 void renderPlayers(Framework game, Player players[], Camera camera);
-void handleInput(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
+void handleInput(Framework *game, Player player[], int playerNumber);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 void loadPlayers(SDL_Renderer *renderer, Player players[]);
