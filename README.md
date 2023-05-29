@@ -21,8 +21,3 @@ make
 The game is played by up to five players, each controlling a character on the screen. The objective of the game is that the hunters try to catch all runners before the the time runs out.
 
 Players can move their characters using the arrow keys and can use perks scattered throughout the map to gain an advantage over their opponents. The game ends when all runners are captured or when the time runs out.
-
-
-## License
-
-This game is licensed under the MIT License. See the LICENSE file for more information.
