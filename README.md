@@ -1,7 +1,7 @@
 <img width="1268" alt="image" src="https://github.com/Saman-Dev/Group-12/assets/23558427/d4f1137a-8ea1-488b-8246-e5513ca2a229">
 
 
-# Game README
+# RUN AWAY - Multiplayer Game
 
 This repository contains the source code for a multiplayer game developed using SDL2 library. The game is a cat-and-mouse style game where runners try to avoid being captured by the hunters.
 
