@@ -1,7 +1,7 @@
 #ifndef UDPLocalInformation_H
 #define UDPLocalInformation_H
 
-#define MAX_CLIENTS 3
+#define MAX_CLIENTS 5
 
 #include <stdbool.h>
 

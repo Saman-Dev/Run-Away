@@ -37,24 +37,32 @@ static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[], Ca
 }
 
 static void checkCapturedStatus(Player players[]) {
-    for (int i = 0; players[i].player != 0; i++) {
-        if (players[i].player == 2) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (players[i].player == 2 || players[i].player == 5) {
             continue;
         }
         else {
-            if (checkCollision(players[i].position, players[1].position) && players[i].captured == false) {
+            if (checkCollision(players[i].position, players[1].position) || checkCollision(players[i].position, players[MAX_CLIENTS-1].position) && players[i].captured == false) {
                 playCageLockSound();
                 players[i].captured = true;
                 players[i].speed = 0;
                 players[i].frame = 1;
+                continue;
             }
-            else if (checkCollision(players[0].position, players[2].position)) {
-                if (players[0].captured == true || players[2].captured == true) {
-                    playCageUnlockSound();
-                    players[0].speed = Default_Speed;
-                    players[0].captured = false;
-                    players[2].speed = Default_Speed;
-                    players[2].captured = false;
+            for (int j = 0; j < MAX_CLIENTS; j++) {
+                if (i == j || players[j].player == 2 || players[j].player == 5) {
+                    continue;
+                }
+                else {
+                    if (checkCollision(players[i].position, players[j].position)) {
+                        if (players[i].captured == true || players[j].captured == true) {
+                            playCageUnlockSound();
+                            players[i].speed = Default_Speed;
+                            players[i].captured = false;
+                            players[j].speed = Default_Speed;
+                            players[j].captured = false;
+                        }
+                    }
                 }
             }
         }

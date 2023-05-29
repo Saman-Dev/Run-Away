@@ -5,6 +5,8 @@
 
 #include "../perks/perks.h"
 #include "../player/player.h"
+#include "../network/network.h"
+
 #define Default_Speed 2
 
 void HuntAndRevive(SDL_Renderer *renderer, Player players[], Camera *camera);

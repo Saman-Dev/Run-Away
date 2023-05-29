@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     Framework game = { NULL, NULL, NULL, 0, false, false, false , false, false, false, false};
     Background resources;
-    Player players[5] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    Player players[6] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     Timer timerData = { 0, 0, 0, 0 };
     NetworkBundle networkData = { {NULL, 0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, NULL, 0}, {NULL, 0} };
 
@@ -48,10 +48,12 @@ int main(int argc, char **argv) {
         }
         else {
             // Handle events
-            handleInput(&game, &players[0], &players[1], &players[2]);
+            handleInput(&game, &players[0], &players[1], &players[MAX_CLIENTS-1]);
             handlePlayerMovement(&players[0], &camera);
             handlePlayerMovement(&players[1], &camera);
             handlePlayerMovement(&players[2], &camera);
+            handlePlayerMovement(&players[3], &camera);
+            handlePlayerMovement(&players[4], &camera);
 
             manageCameraAngle(&camera, players, networkData.TCPInformation.playerNumber);
 
