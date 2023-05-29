@@ -3,7 +3,7 @@
 
 # Game README
 
-This repository contains the source code for a multiplayer game developed using SDL2 library. The game is a capture-the-flag style game where runners try to avoide being captured hunters.
+This repository contains the source code for a multiplayer game developed using SDL2 library. The game is a cat-and-mouse style game where runners try to avoide being captured by the hunters.
 
 ## Getting Started
 
