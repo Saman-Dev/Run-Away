@@ -12,7 +12,7 @@ To run the game, you will need to have SDL2, SDL_image, SDL_mixer, SDL_net, and 
 Once you have the required libraries installed, you can compile and run the game by running the following commands in your terminal:
 
 ```
-make
+make OR mingw32-make.exe 
 ./game
 ```
 
