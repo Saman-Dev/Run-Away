@@ -57,7 +57,7 @@ void applyPerk(Player players[], Perk *perk, SDL_Renderer *renderer, Camera *cam
     else {
         for (int i = 0; i < MAX_PLAYERS; i++) {
             Player *player = &players[i];
-            if (!perk->available &perk->duration > 0 && player->hasPerk) {
+            if (!perk->available && (&perk->duration > 0) && player->hasPerk) {
                 time_t current_time = time(NULL);
                 double elapsed_time = difftime(current_time, player->perkStartTime);
 
