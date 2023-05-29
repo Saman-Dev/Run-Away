@@ -12,5 +12,6 @@
 void HuntAndRevive(SDL_Renderer *renderer, Player players[], Camera *camera);
 static void checkCapturedStatus(Player players[]);
 static void handleCage(SDL_Renderer *renderer, Image *cage, Player players[], Camera *camera);
+void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]);
 
 #endif

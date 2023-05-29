@@ -42,7 +42,7 @@ static void checkCapturedStatus(Player players[]) {
             continue;
         }
         else {
-            if (checkCollision(players[i].position, players[1].position) || checkCollision(players[i].position, players[MAX_CLIENTS-1].position) && players[i].captured == false) {
+            if ((checkCollision(players[i].position, players[1].position) || checkCollision(players[i].position, players[MAX_CLIENTS-1].position)) && players[i].captured == false) {
                 playCageLockSound();
                 players[i].captured = true;
                 players[i].speed = 0;
@@ -66,5 +66,18 @@ static void checkCapturedStatus(Player players[]) {
                 }
             }
         }
+    }
+}
+
+void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]) {
+    int captured_players = 0;
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if(players[i].captured){
+            captured_players++;
+        }
+    }
+
+    if (game->gameOver || captured_players == (MAX_CLIENTS - 2)) {
+        displayGameOverScreen(game, timerData);
     }
 }

@@ -42,4 +42,5 @@ void handleInput(Framework *game, Player player[], int playerNumber);
 static void handleKeyPresses(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 static void handleKeyReleases(Framework *game, Player *playerX, Player *playerY, Player *playerZ);
 void loadPlayers(SDL_Renderer *renderer, Player players[]);
+void manageCameraAngle(Camera *camera, Player players[], int playerNumber);
 #endif

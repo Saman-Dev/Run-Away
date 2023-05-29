@@ -18,9 +18,6 @@
 #include "Entities/perks/perks.h"
 #include "Entities/player/player.h"
 
-void manageCameraAngle(Camera *camera, Player players[], int playerNumber);
-void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]);
-
 int main(int argc, char **argv) {
     int timeAtLoopBeginning;
     Framework game = { NULL, NULL, NULL, 0, false, false, false , false, false, false, false};
@@ -97,32 +94,4 @@ int main(int argc, char **argv) {
     SDLNet_Quit();
     SDL_Quit();
     return 0;
-}
-
-void manageCameraAngle(Camera *camera, Player players[], int playerNumber) {
-    for (int i = -1; i < MAX_CLIENTS; i++) {
-        if (i == playerNumber && playerNumber == -1) {
-            camera->x = players[MAX_CLIENTS-1].position.x - SCREEN_WIDTH / 2;
-            camera->y = players[MAX_CLIENTS-1].position.y - SCREEN_HEIGHT / 2;
-            break;
-        }
-        else if (i == playerNumber) {
-            camera->x = players[i].position.x - SCREEN_WIDTH / 2;
-            camera->y = players[i].position.y - SCREEN_HEIGHT / 2;
-            break;
-        }
-    }
-}
-
-void manageGameOverConditions(Framework *game, Timer *timerData, Player players[]) {
-    int captured_players = 0;
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if(players[i].captured){
-            captured_players++;
-        }
-    }
-
-    if (game->gameOver || captured_players == (MAX_CLIENTS - 2)) { // Subtracting by the number of hunters
-        displayGameOverScreen(game, timerData);
-    }
 }

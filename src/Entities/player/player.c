@@ -330,3 +330,18 @@ void loadPlayers(SDL_Renderer *renderer, Player players[]) {
     players[3] = createPlayer(renderer, "resources/Runner_3.png", 4, 2050, 1030);
     players[4] = createPlayer(renderer, "resources/Hunter_2.png", 5, 2050, 1070);
 }
+
+void manageCameraAngle(Camera *camera, Player players[], int playerNumber) {
+    for (int i = -1; i < 5; i++) {
+        if (i == playerNumber && playerNumber == -1) {
+            camera->x = players[4].position.x - SCREEN_WIDTH / 2;
+            camera->y = players[4].position.y - SCREEN_HEIGHT / 2;
+            break;
+        }
+        else if (i == playerNumber) {
+            camera->x = players[i].position.x - SCREEN_WIDTH / 2;
+            camera->y = players[i].position.y - SCREEN_HEIGHT / 2;
+            break;
+        }
+    }
+}
