@@ -154,10 +154,13 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
     setUpServer(&networkData->UDPInformation, networkData->UDPRecord, 2000);
     Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", "Play", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
     int selectedBox = 0;
-    while (selectedBox != 5 && selectedBox != 6) {
+    while (game->menuState && selectedBox != 5 && selectedBox != 6) {
         selectedBox = displayOptions(game, &menu, networkData, players);
     }
-    if (selectedBox == 5) {
+    if (!game->menuState) {
+        *scene = 0;
+    }
+    else if (selectedBox == 5) {
         playMenuClickSound();
         changeThemeSong();
         networkData->TCPInformation.inLobby = false;
@@ -172,22 +175,33 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
 
 static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *networkData, Player players[]) {
     char IPAddress[MAX_INPUT_LENGTH];
-    while (networkData->TCPInformation.socket == NULL) {
+    while (networkData->TCPInformation.socket == NULL && game->menuState) {
         IPAddress[0] = '\0';
         askForIPAddressToConnectTo(game, IPAddress);
-        InitiateClientTCPCapability(&networkData->TCPInformation, networkData->TCPRecord, IPAddress);
-    }
-    setUpClient(&networkData->UDPInformation, IPAddress, 2000); // "127.0.0.1"
-    if (networkData->TCPInformation.inLobby) {
-        Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", " ", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
-        int selectedBox = 0;
-        while (selectedBox != 6 && networkData->TCPInformation.inLobby) {
-            selectedBox = displayOptions(game, &menu, networkData, players);
+        if (game->menuState) {
+            InitiateClientTCPCapability(&networkData->TCPInformation, networkData->TCPRecord, IPAddress);
         }
-        if (selectedBox == 6) {
-            playMenuClickSound();
-            resetNetwork(networkData);
-            *scene = 0;
+    }
+    if (game->menuState) {
+        setUpClient(&networkData->UDPInformation, IPAddress, 2000); // "127.0.0.1"
+        if (networkData->TCPInformation.inLobby) {
+            Menu menu = {{"Host Connected", "Spot Available", "Spot Available", "Spot Available", "Spot Available", " ", "Back", "\0"}, {"resources/lobby_menu.png"}, true};
+            int selectedBox = 0;
+            while (game->menuState && selectedBox != 6 && networkData->TCPInformation.inLobby) {
+                selectedBox = displayOptions(game, &menu, networkData, players);
+            }
+            if (!game->menuState) {
+                *scene = 0;
+            }
+            else if (selectedBox == 6) {
+                playMenuClickSound();
+                resetNetwork(networkData);
+                *scene = 0;
+            }
+            else {
+                changeThemeSong();
+                game->menuState = false;
+            }
         }
         else {
             changeThemeSong();
@@ -195,8 +209,7 @@ static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *net
         }
     }
     else {
-        changeThemeSong();
-        game->menuState = false;
+        *scene = 0;
     }
 }
 
@@ -275,6 +288,8 @@ static void askForIPAddressToConnectTo(Framework *game, char IPAddress[]) {
             switch (game->event.type) {
                 case SDL_QUIT:
                     done = true;
+                    game->menuState = false;
+                    game->quit = true;
                     break;
                 case SDL_TEXTINPUT:
                     if (strlen(IPAddress) < (MAX_INPUT_LENGTH - 1)) {
