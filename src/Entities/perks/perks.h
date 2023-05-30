@@ -13,7 +13,7 @@
 
 #include "../player/player.h"
 
-#define MAX_PLAYERS 3
+#define MAX_PLAYERS 5
 #define perk_duration 5
 #define DEFAULT_SPEED 2
 #define PERK_WIDTH 32
