@@ -75,7 +75,7 @@ static void sendHostPlayerPacket(UDPLocalInformation *information, UDPClientInfo
 static void applyReceivedData(Player *player, PlayerData *toSend);
 static void forwardreceivedPacket(UDPLocalInformation *information, PlayerData *receivedData, UDPClientInformation UDPRecord[], Player players[]);
 static void changeDestination(UDPLocalInformation *information, Uint32 clientIP, Uint16 clientPort);
-void resetClientNetwork(NetworkBundle *networkData);
+void resetNetwork(NetworkBundle *networkData);
 
 ///// TCP /////
 static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
@@ -89,8 +89,8 @@ void initiateServerTCPCapability(TCPLocalInformation *TCPInformation);
 void InitiateClientTCPCapability(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], char IPAddress[]);
 static void manageServerTCPActivity(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[]);
 static void manageLobby(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
-static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[]);
+static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[], bool reference[]);
 static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
-static void sendNewInLobbyValue(TCPClientInformation TCPRecord[]);
+static void sendNewInLobbyValue(TCPClientInformation TCPRecord[], bool reference[]);
 
 #endif

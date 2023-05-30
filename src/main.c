@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
 
     initialize(&game);
     initiateMapResources(game.renderer, &resources);
-    loadPlayers(game.renderer, players);
 
     Perk speedBoostPerk = initializePerk(game.renderer, 1);
     Perk freezPerk = initializePerk(game.renderer, 2);
@@ -40,6 +39,8 @@ int main(int argc, char **argv) {
         //printf("Plyer :%d \n", randomPlayerIndex);
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
+            resetNetwork(&networkData);
+            loadPlayers(game.renderer, players);
             manageMenu(&game, &networkData, players);
             timerData.timeWhenStarting = time(NULL);
         }

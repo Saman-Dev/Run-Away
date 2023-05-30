@@ -209,8 +209,11 @@ void displayGameOverScreen(Framework *game, Timer *timerData) {
     }
 
     if (game->goBackToMenu) {
-        game->gameOver = false;
         game->menuState = true;
+        game->gameOver = false;
+        game->goBackToMenu = false;
+        game->quitGame= false;
+        changeThemeSong();
         // Reset any other necessary game state variables here
     } else if (game->quitGame) {
         game->quit = true;

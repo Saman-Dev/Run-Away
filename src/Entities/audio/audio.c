@@ -55,10 +55,23 @@ void playWalkingSound(void) {
 }
 
 void changeThemeSong(void) {
-    music = Mix_LoadMUS("resources/main_theme2.mp3");
-    if (!music) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
-        exit(1);
+    static bool menuSound = true;
+    Mix_FreeMusic(music);
+    if (menuSound) {
+        music = Mix_LoadMUS("resources/main_theme2.mp3");
+        if (!music) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
+            exit(1);
+        }
+        menuSound = false;
+    }
+    else {
+        music = Mix_LoadMUS("resources/ThemeSong.mp3");
+        if (!music) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load OGG file: %s", Mix_GetError());
+            exit(1);
+        }
+        menuSound = true;
     }
     Mix_PlayMusic(music, -1);
 }

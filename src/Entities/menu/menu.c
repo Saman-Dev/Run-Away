@@ -166,6 +166,7 @@ static void handleHostGameOption(int *scene, Framework *game, NetworkBundle *net
     else {
         playMenuClickSound();
         *scene = 0;
+        resetNetwork(networkData);
     }
 }
 
@@ -185,7 +186,7 @@ static void handleJoinGameOption(int *scene, Framework *game, NetworkBundle *net
         }
         if (selectedBox == 6) {
             playMenuClickSound();
-            resetClientNetwork(networkData);
+            resetNetwork(networkData);
             *scene = 0;
         }
         else {

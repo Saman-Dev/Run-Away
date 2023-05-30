@@ -85,9 +85,11 @@ void setUpServer(UDPLocalInformation *information, UDPClientInformation UDPRecor
         exit(1);
     }
 
-    if (!((information->packetToReceive = SDLNet_AllocPacket(sizeof(PlayerData))) && (information->packetToSend = SDLNet_AllocPacket(sizeof(PlayerData))))) {
-        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        exit(1);
+    if (information->packetToReceive == NULL && information->packetToSend == NULL) {
+        if (!((information->packetToReceive = SDLNet_AllocPacket(sizeof(PlayerData))) && (information->packetToSend = SDLNet_AllocPacket(sizeof(PlayerData))))) {
+            fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+            exit(1);
+        }
     }
 
     initiateUDPAddressBook(UDPRecord);
@@ -194,15 +196,19 @@ static void changeDestination(UDPLocalInformation *information, Uint32 clientIP,
     information->destination.port = clientPort;
 }
 
-void resetClientNetwork(NetworkBundle *networkData) {
+void resetNetwork(NetworkBundle *networkData) {
     SDLNet_TCP_Close(networkData->TCPInformation.socket);
     SDLNet_UDP_Close(networkData->UDPInformation.sourcePort);
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        networkData->TCPRecord[i].active = false;
+        if (networkData->TCPRecord[i].active) {
+            removeTCPEntry(&networkData->TCPInformation, &networkData->TCPRecord[i], i);
+            removeUDPEntry(networkData->UDPRecord, i);
+        }
     }
     networkData->toSend.positionX = 0;
     networkData->toSend.positionY = 0;
     networkData->TCPInformation.socket = NULL;
+    SDLNet_FreeSocketSet(networkData->TCPInformation.set);
 }
 
 ///// TCP /////
@@ -349,17 +355,23 @@ void manageNetwork(NetworkBundle *networkData, Player players[]) {
 }
 
 static void manageLobby(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]) {
-    if (TCPInformation->inLobby) {
-        sendNumberOfPlayersConnected(TCPRecord);
+    static bool reference[2][MAX_CLIENTS] = {0};
+    if (TCPInformation->inLobby == true && reference[1][0] != false && reference[0][0] != false) {
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            reference[0][i] = false;
+            reference[1][i] = false;
+        }
     }
-    else {
-        sendNewInLobbyValue(TCPRecord);
+    if (TCPInformation->inLobby) {
+        sendNumberOfPlayersConnected(TCPRecord, reference[0]);
+    }
+    else if (!TCPInformation->inLobby){
+        sendNewInLobbyValue(TCPRecord, reference[1]);
     }
 }
 
-static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[]) {
+static void sendNumberOfPlayersConnected(TCPClientInformation TCPRecord[], bool reference[]) {
     TCPPacket toSend = {true, 0, {NULL, false}};
-    static bool reference[MAX_CLIENTS] = {0};
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (TCPRecord[i].active != reference[i]) {
             for (int j = 0; j < MAX_CLIENTS; j++) {
@@ -393,9 +405,8 @@ static void checkLobbyStatus(TCPLocalInformation *TCPInformation, TCPClientInfor
     }
 }
 
-static void sendNewInLobbyValue(TCPClientInformation TCPRecord[]) {
+static void sendNewInLobbyValue(TCPClientInformation TCPRecord[], bool reference[]) {
     TCPPacket toSend = {false, 0, {NULL, false}};
-    static bool reference[MAX_CLIENTS] = {0};
     for (int i = 0; i < MAX_CLIENTS; i++) {
     if (TCPRecord[i].active != reference[i]) {
         if (TCPRecord[i].active) {
