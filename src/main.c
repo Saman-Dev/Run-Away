@@ -35,8 +35,6 @@ int main(int argc, char **argv) {
     Camera camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
     while (!game.quit) {
-        //int randomPlayerIndex = (rand() % MAX_PLAYERS);
-        //printf("Plyer :%d \n", randomPlayerIndex);
         timeAtLoopBeginning = SDL_GetTicks();
         if (game.menuState) {
             resetNetwork(&networkData);

@@ -81,7 +81,6 @@ void resetNetwork(NetworkBundle *networkData);
 static void addClient(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[]);
 static void sendClientNumber(TCPsocket clientSocket, int numberToAssign);
 static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInformation TCPRecord[], UDPClientInformation UDPRecord[], int clientNumber);
-static void sendTCPData(TCPClientInformation TCPRecord[], TCPPacket toSend);
 static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *TCPRecord, int clientNumber);
 static void receiveClientNumber(TCPLocalInformation *TCPInformation);
 static void removeUDPEntry(UDPClientInformation UDPRecord[], int clientNumber);

@@ -240,23 +240,6 @@ static void receiveTCPData(TCPLocalInformation *TCPInformation, TCPClientInforma
         removeTCPEntry(TCPInformation, &TCPRecord[clientNumber], clientNumber);
         removeUDPEntry(UDPRecord, clientNumber);
     }
-    else {
-        printf("Received the following data in variable inMenu: \"%d\"\n", toSend.inLobby);
-        sendTCPData(TCPRecord, toSend);
-    }
-}
-
-static void sendTCPData(TCPClientInformation TCPRecord[], TCPPacket toSend) {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (TCPRecord[i].active) {
-            if (i == toSend.playerNumber) {
-                continue;
-            }
-            else {
-                SDLNet_TCP_Send(TCPRecord[i].socket, &toSend, sizeof(TCPPacket));
-            }
-        }
-    }
 }
 
 static void removeTCPEntry(TCPLocalInformation *TCPInformation, TCPClientInformation *TCPRecord, int clientNumber) {
