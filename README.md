@@ -3,7 +3,7 @@
 
 # RUN AWAY - Co-op Game
 
-This repository contains the source code for a multiplayer game developed using SDL2 library. The game is a cat-and-mouse style game where runners try to avoid being captured by the hunters.
+This repository contains the source code for a co-op game developed using SDL2 library. The game is a cat-and-mouse style game where runners try to avoid being captured by the hunters.
 
 ## Getting Started
 
