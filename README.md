@@ -1,4 +1,4 @@
-<img width="1268" alt="image" src="https://github.com/Saman-Dev/Group-12/assets/23558427/d4f1137a-8ea1-488b-8246-e5513ca2a229">
+<img width="1268" alt="image" src="https://github.com/Saman-Dev/Run-Away/blob/main/resources/PreviewImage.png">
 
 
 # RUN AWAY - Co-op Game
