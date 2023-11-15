@@ -5,6 +5,12 @@
 
 This repository contains the source code for a co-op game developed using SDL2 library. The game is a cat-and-mouse style game where runners try to avoid being captured by the hunters.
 
+
+## Development Team:
+
+We are a team of five students from KTH Royal Institute of Technology who collaborated on this project as part of our school assignment.
+
+
 ## Getting Started
 
 To run the game, you will need to have SDL2, SDL_image, SDL_mixer, SDL_net, and SDL_ttf libraries installed on your system. You can install these libraries using your system's package manager or by downloading them from their respective websites.
@@ -15,6 +21,7 @@ Once you have the required libraries installed, you can compile and run the game
 make OR mingw32-make.exe 
 ./game
 ```
+
 
 ## Gameplay
 
